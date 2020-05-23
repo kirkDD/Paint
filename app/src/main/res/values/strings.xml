@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Undo</string>
+    <string name="action_settings">Settings</string>
+    <string name="undo_label">Undo</string>
+    <string name="redo_label">Redo</string>
+    <string name="thickness_label">Thickness</string>
+    <string name="color_label">Color</string>
+    <string name="undo_desc">Undo an action</string>
+    <string name="redo_desc">Redo an action</string>
+    <string name="red_desc">Select red</string>
+    <string name="green_desc">Select green</string>
+    <string name="blue_desc">Select blue</string>
+    <string name="thickness_desc">Select a line thickness</string>
+    <string name="color_desc">Select a color</string>
+    <string name="thick_desc">Select thick stroke</string>
+    <string name="med_desc">Select medium stroke</string>
+    <string name="thin_desc">Select thin stroke</string>
+</resources>

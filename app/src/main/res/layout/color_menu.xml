@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/color_menu"
+    android:layout_width="wrap_content"
+    android:layout_height="0dp">
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_red"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/red_desc"
+        android:focusable="true"
+        app:fabSize="mini"
+        app:borderWidth="0dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_green"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:backgroundTint="@android:color/holo_green_dark"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/green_desc"
+        android:focusable="true"
+        app:fabSize="mini"
+        app:borderWidth="0dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_blue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:backgroundTint="@android:color/holo_blue_dark"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/blue_desc"
+        android:focusable="true"
+        app:fabSize="mini"
+        app:borderWidth="0dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_color"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:tint="@android:color/white"
+        android:contentDescription="@string/color_desc"
+        android:focusable="true"
+        app:srcCompat="@drawable/ic_palette" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:text="@string/color_label"
+        android:textAlignment="center"
+        android:textColor="@android:color/black" />
+</FrameLayout>

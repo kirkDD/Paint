@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/thickness_menu"
+    android:layout_width="wrap_content"
+    android:layout_height="0dp">
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_thickness_30"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/thick_desc"
+        android:focusable="true"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/ic_thickness_30" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_thickness_20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/med_desc"
+        android:focusable="true"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/ic_thickness_20" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_thickness_10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/thin_desc"
+        android:focusable="true"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/ic_thickness_10" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_thickness"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:tint="@android:color/white"
+        android:contentDescription="@string/thickness_desc"
+        android:focusable="true"
+        app:srcCompat="@drawable/ic_brush" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:text="@string/thickness_label"
+        android:textAlignment="center"
+        android:textColor="@android:color/black" />
+</FrameLayout>
