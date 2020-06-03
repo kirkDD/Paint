@@ -42,11 +42,16 @@ public class StackHistory implements AbstractStackHistory {
      */
     @Override
     public void addAction(AbstractReversibleAction action) {
-        // TODO: support addAction
+        //  support addAction
         // 1. If the stack is full, remove the oldest thing in it
         // 2. Add the new event to the undo stack
         // 3. Clear out the redo stack (when we do a new action we have to delete all the redo
         // actions to ensure consistency)
+        if (mUndoStack.size() >= mCapacity) {
+            mUndoStack.removeFirst();
+        }
+        mUndoStack.addLast(action);
+        mRedoStack.clear();
     }
 
     /**
@@ -56,13 +61,17 @@ public class StackHistory implements AbstractStackHistory {
      */
     @Override
     public AbstractReversibleAction undo() {
-        // TODO: support undo
+        //  support undo
         // 1. If the undo stack is empty return null
         // 2. Otherwise remove the most recent action from the stack
         // 2.1. Add it to the redo stack
         // 2.2. Return it.
-
-        return null;
+        if (mUndoStack.isEmpty()) {
+            return null;
+        }
+        AbstractReversibleAction a = mUndoStack.removeLast();
+        mRedoStack.addLast(a);
+        return a;
     }
 
     /**
@@ -72,13 +81,17 @@ public class StackHistory implements AbstractStackHistory {
      */
     @Override
     public AbstractReversibleAction redo() {
-        // TODO: support redo
+        //  support redo
         // 1. If the redo stack is empty return null
         // 2. Otherwise get the most recent action from the stack
         // 2.1. Add it to the undo stack
         // 2.2. Return it.
-
-        return null;
+        if (mRedoStack.isEmpty()) {
+            return null;
+        }
+        AbstractReversibleAction a = mRedoStack.removeLast();
+        mUndoStack.addLast(a);
+        return a;
     }
 
     /**
@@ -86,7 +99,9 @@ public class StackHistory implements AbstractStackHistory {
      */
     @Override
     public void clear() {
-        // TODO: clear the datastructures
+        // clear the datastructures
+        mUndoStack.clear();
+        mRedoStack.clear();
     }
 
     /**

@@ -141,6 +141,10 @@ public class DrawingView extends FrameLayout {
                 onDrawCancel();
                 mState = DrawingModel.START;
                 return true;
+            case MotionEvent.ACTION_DOWN:
+                Log.i(LOG_TAG, "Action Down, start");
+                mState = DrawingModel.START;
+                return false;
             default:
                 break;
         }

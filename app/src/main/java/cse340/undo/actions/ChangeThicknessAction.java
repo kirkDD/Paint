@@ -1,5 +1,6 @@
 package cse340.undo.actions;
 
+import android.graphics.Paint;
 import android.support.annotation.NonNull;
 
 import cse340.undo.app.DrawingView;
@@ -26,17 +27,20 @@ public class ChangeThicknessAction extends AbstractReversibleAction {
     @Override
     public void doAction(DrawingView view) {
         super.doAction(view);
-        // TODO: update the thickness in the view
-        // TODO: store any information you'll need to undo this later
-        // TODO: don't store any information you won't need
-
+        //  update the thickness in the view
+        //  store any information you'll need to undo this later
+        //  don't store any information you won't need
+        Paint cur = view.getCurrentPaint();
+        mPrev =cur.getStrokeWidth();
+        cur.setStrokeWidth(mThickness);
     }
 
     /** @inheritDoc */
     @Override
     public void undoAction(DrawingView view) {
         super.undoAction(view);
-        // TODO: update the thickness in the view
+        //  update the thickness in the view
+        view.getCurrentPaint().setStrokeWidth(mPrev);
     }
 
     /** @inheritDoc */

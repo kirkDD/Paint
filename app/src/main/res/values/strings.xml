@@ -15,4 +15,13 @@
     <string name="thick_desc">Select thick stroke</string>
     <string name="med_desc">Select medium stroke</string>
     <string name="thin_desc">Select thin stroke</string>
+    <string name="thinnest_desc">Select thinnest stroke</string>
+    <string name="fully_opaque">Select most opaque stroke</string>
+    <string name="fully_opaque_number">1f</string>
+    <string name="medium_opaque">Select medium opaque stroke</string>
+    <string name="medium_opaque_number">0.5f</string>
+    <string name="transparent">Select transparent stroke</string>
+    <string name="transparent_number">0.1f</string>
+    <string name="opacity_desc">Select a line opacity</string>
+    <string name="opacity_label">Opacity</string>
 </resources>
