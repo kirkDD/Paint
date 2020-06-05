@@ -321,6 +321,6 @@ public class ReversibleDrawingActivity extends AbstractReversibleDrawingActivity
     @Override
     public void onColorSelected(int color) {
         doAction(new ChangeColorAction(color));
-        showColorPicker(false);
+        showColorPicker(true);
     }
 }
