@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="fab_label_margin">24dp</dimen>
+    <dimen name="fab_parent_margin">16dp</dimen>
+</resources>
