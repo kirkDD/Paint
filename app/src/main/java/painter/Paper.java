@@ -1,6 +1,7 @@
 package painter;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -19,16 +20,22 @@ import painter.actions.ActionStraightLine;
 public class Paper extends FrameLayout {
     static final String TAG = "-=-= Paper";
 
-    public Paper(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        Log.d(TAG, "Paper: initializing");
-        setNextAction(ActionStraightLine.class);
-    }
 
     // current action
     AbstractPaintActionExtendsView action;
     // current action's class
     Class<? extends AbstractPaintActionExtendsView> actionClass;
+    static Paint theOneAndOnlyPaint;
+
+    int background_color = -1;
+
+    public Paper(@NonNull Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        Log.d(TAG, "Paper: initializing");
+        setNextAction(ActionStraightLine.class);
+        theOneAndOnlyPaint = new Paint();
+    }
+
 
     /**
      * set next action - line, rect...
@@ -36,10 +43,6 @@ public class Paper extends FrameLayout {
      */
     void setNextAction(Class<? extends AbstractPaintActionExtendsView> nextAction) {
         actionClass = nextAction;
-        initAction();
-    }
-
-    void initAction() {
         try {
             Log.d(TAG, "initAction: " + actionClass.getConstructor(Context.class));
             action = actionClass.getConstructor(Context.class).newInstance(getContext());
@@ -51,6 +54,8 @@ public class Paper extends FrameLayout {
     }
 
 
+
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (action != null) {
@@ -58,4 +63,37 @@ public class Paper extends FrameLayout {
         }
         return false;
     }
+
+    ///////////////////
+    // for the settings
+    ///////////////////
+
+    // here u go, just edit the paint
+    public Paint getPaintToEdit() {
+        return theOneAndOnlyPaint;
+    }
+
+    // apply settings
+    public void applyPaintEdit() {
+        if (action != null) {
+            action.setStyle(theOneAndOnlyPaint);
+        } else {
+            Log.e(TAG, "applySettingToAction: changing style on null action");
+        }
+    }
+
+    // other settings
+
+    @Override
+    public void setBackgroundColor(int color) {
+        background_color = color;
+        super.setBackgroundColor(background_color);
+    }
+
+    public int getBackgroundColor() {
+        return background_color;
+    }
+
+
+
 }
