@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -18,6 +19,8 @@ public class StrokeView extends View {
     /** The paint brush with which to draw the path */
     protected final Paint mPaint;
 
+    static int counter = 0;
+    int count = 0;
     /**
      * Create a new stroke view to show on the DrawingView
      * @param context the context of this new view
@@ -28,6 +31,9 @@ public class StrokeView extends View {
         super(context);
         this.mPath = path;
         this.mPaint = paint;
+        count = counter;
+        counter += 1;
+
     }
 
     /**
@@ -36,7 +42,7 @@ public class StrokeView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
+        Log.d(" -=-= stroke info", "onDraw: " + count + ": " + getWidth() + ", " + getHeight());
         canvas.drawPath(mPath, mPaint);
     }
 }
