@@ -28,7 +28,6 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
             paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setAntiAlias(true);
         }
-
         thisColor = Color.RED; // default
         thisWidth = 10f; // default
         coordinates = new float[4];
@@ -55,7 +54,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     // which end point to move?
                     if (dist(coordinates[0], coordinates[1], e.getX(), e.getY()) < ACTION_RADIUS) {
                         currentIndex = 0;
-                    } else if (dist(coordinates[0], coordinates[1], e.getX(), e.getY()) < ACTION_RADIUS) {
+                    } else if (dist(coordinates[2], coordinates[3], e.getX(), e.getY()) < ACTION_RADIUS) {
                         currentIndex = 2;
                     } else {
                         lastX = e.getX();
