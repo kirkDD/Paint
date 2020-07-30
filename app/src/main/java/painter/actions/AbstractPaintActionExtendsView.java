@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -16,15 +17,17 @@ import android.view.View;
 public abstract class AbstractPaintActionExtendsView extends View {
     static final String TAG = "Abstract Action";
 
-    Paint paint;
-    public AbstractPaintActionExtendsView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        paint = new Paint();
+
+    public AbstractPaintActionExtendsView(Context context) {
+        super(context);
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Log.e(TAG, "onDraw: don't call default onDraw");
+        Paint paint = new Paint();
         paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setTextSize(100);
@@ -49,4 +52,12 @@ public abstract class AbstractPaintActionExtendsView extends View {
      * @return true iff done
      */
     public abstract boolean yóuD¤ne();
+
+
+    /**
+     * useful helpers
+     */
+    double dist(float a, float b, float x, float y) {
+        return Math.sqrt(Math.pow(a - x, 2) + Math.pow(b - y, 2));
+    }
 }
