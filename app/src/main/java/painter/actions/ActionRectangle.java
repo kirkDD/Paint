@@ -19,6 +19,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
     int myColor;
     float myWidth;
     Paint.Style myStyle;
+    float rotateAngle;
 
     public ActionRectangle(Context context) {
         super(context);
@@ -32,12 +33,13 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         myColor = Color.GREEN;
         myWidth = 10;
         myStyle = Paint.Style.STROKE;
+        rotateAngle = 0;
     }
 
     // associate id to index
     HashMap<Integer, Integer> idMap;
     boolean firstTouch = true;
-    int action = 0; // 0 resizing, 1 moving
+    int action = 0; // 0 resizing, 1 moving, 2 rotating
     float lastX, lastY;
     @Override
     public boolean handleTouch(MotionEvent e) {
@@ -65,8 +67,10 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                         action = 1;
                         lastX = e.getX(index);
                         lastY = e.getY(index);
-                    } else {
+                    } else if (e.getPointerCount() == 2) {
                         action = 0;
+                    } else {
+                        action = 2;
                     }
                 }
                 invalidate();
@@ -80,6 +84,17 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                     coors[3] -= lastY - e.getY(index);
                     lastX = e.getX(index);
                     lastY = e.getY(index);
+                } else if (action == 2) {
+                    // resizing
+                    for (int i : idMap.keySet()) {
+                        if (e.findPointerIndex(i) != -1) {
+                            // resize it
+                            coors[idMap.get(i)] = e.getX(e.findPointerIndex(i));
+                            coors[idMap.get(i) + 1] = e.getY(e.findPointerIndex(i));
+                        }
+                    }
+                    // rotating
+                    rotateAngle = (float) (Math.atan2(coors[0] - coors[2], coors[1] - coors[3]) * 180 / Math.PI);
                 } else {
                     // resizing
                     for (int i : idMap.keySet()) {
@@ -117,6 +132,13 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         paint.setColor(myColor);
         paint.setStrokeWidth(myWidth);
         paint.setStyle(myStyle);
+
+        if (rotateAngle != 0) {
+            canvas.translate((coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2);
+            canvas.rotate(-rotateAngle);
+            canvas.translate(-(coors[0] + coors[2]) / 2, -(coors[1] + coors[3]) / 2);
+        }
+
         canvas.drawRect(
                 Math.min(coors[0], coors[2]),
                 Math.min(coors[1], coors[3]),
