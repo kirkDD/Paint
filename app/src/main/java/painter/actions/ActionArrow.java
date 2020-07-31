@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -23,12 +24,6 @@ public class ActionArrow extends ActionStraightLine {
 
 
     @Override
-    public boolean handleTouch(MotionEvent e) {
-        return super.handleTouch(e);
-    }
-
-
-    @Override
     public void setStyle(Paint p) {
         super.setStyle(p);
         // change size of triangle
@@ -37,7 +32,6 @@ public class ActionArrow extends ActionStraightLine {
         triangle[4] = thisWidth * 10;
         // color
         Arrays.fill(colors, thisColor);
-
     }
 
     @Override

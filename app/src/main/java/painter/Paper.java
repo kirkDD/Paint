@@ -41,7 +41,7 @@ public class Paper extends FrameLayout {
         theOneAndOnlyPaint = new Paint();
         history = new ArrayList<>();
         redoStack = new Stack<>();
-        setNextAction(ActionArrow.class);
+        setNextAction(ActionRectangle.class);
     }
 
 
