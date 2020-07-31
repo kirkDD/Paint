@@ -10,6 +10,8 @@ import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Stack;
 
 import painter.actions.AbstractPaintActionExtendsView;
 import painter.actions.ActionOval;
@@ -22,7 +24,8 @@ import painter.actions.ActionStraightLine;
 public class Paper extends FrameLayout {
     static final String TAG = "-=-= Paper";
 
-
+    ArrayList<AbstractPaintActionExtendsView> history;
+    Stack<AbstractPaintActionExtendsView> redoStack;
     // current action
     AbstractPaintActionExtendsView action;
     // current action's class
@@ -36,6 +39,8 @@ public class Paper extends FrameLayout {
         Log.d(TAG, "Paper: initializing");
         setNextAction(ActionOval.class);
         theOneAndOnlyPaint = new Paint();
+        history = new ArrayList<>();
+        redoStack = new Stack<>();
     }
 
 
@@ -61,7 +66,13 @@ public class Paper extends FrameLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (action != null) {
+            if (event.getPointerCount() == 1 && event.getActionMasked() == MotionEvent.ACTION_UP) {
+                // done??? just a temp fix
+                history.add(action);
+                setNextAction(actionClass); // same action
+            }
             return action.handleTouch(event);
+
         }
         return false;
     }
@@ -96,6 +107,39 @@ public class Paper extends FrameLayout {
         return background_color;
     }
 
+
+
+    ////////////////////
+    // manage it self
+    ////////////////////
+
+    public void undo() {
+        if (history.size() > 0) {
+            redoStack.push(history.get(history.size() - 1));
+            removeView(history.get(history.size() - 1));
+            history.remove(history.size() - 1);
+        } else {
+            Log.i(TAG, "unDo: noting to undo");
+        }
+    }
+
+    public void redo() {
+        if (redoStack.size() > 0) {
+            history.add(redoStack.pop());
+            addView(history.get(history.size() - 1));
+        } else {
+            Log.i(TAG, "redo: nothing to redo");
+        }
+    }
+
+    // you can undo a clear, slowly
+    public void clear() {
+        for (int i = 0; i < history.size(); i++) {
+            redoStack.push(history.get(history.size() - 1 - i));
+        }
+        history.clear();
+        removeAllViews();
+    }
 
 
 }

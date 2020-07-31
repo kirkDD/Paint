@@ -20,5 +20,6 @@ public class ActionOval extends ActionRectangle {
                 Math.max(coors[0], coors[2]),
                 Math.max(coors[1], coors[3]),
                 paint);
+
     }
 }
