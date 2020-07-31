@@ -1,11 +1,11 @@
 package painter.actions;
 
+import java.util.function.UnaryOperator;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.support.annotation.Nullable;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,7 +21,6 @@ public abstract class AbstractPaintActionExtendsView extends View {
     public AbstractPaintActionExtendsView(Context context) {
         super(context);
     }
-
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -47,11 +46,21 @@ public abstract class AbstractPaintActionExtendsView extends View {
      */
     public abstract void setStyle(Paint p);
 
+//    /**
+//     * report if this action is finished
+//     * @return true iff done
+//     */
+//    public abstract boolean yóuD¤ne();
+
+    UnaryOperator<AbstractPaintActionExtendsView> callWhenDone;
+    public void setOnCompletion(UnaryOperator<AbstractPaintActionExtendsView> calledWhenDone) {
+        callWhenDone = calledWhenDone;
+    }
+
     /**
-     * report if this action is finished
-     * @return true iff done
+     * switch to edit, then call callWhenDone
      */
-    public abstract boolean yóuD¤ne();
+    public abstract void editButtonClicked();
 
 
     /**
@@ -60,4 +69,5 @@ public abstract class AbstractPaintActionExtendsView extends View {
     double dist(float a, float b, float x, float y) {
         return Math.sqrt(Math.pow(a - x, 2) + Math.pow(b - y, 2));
     }
+
 }

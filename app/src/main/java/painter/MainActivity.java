@@ -20,6 +20,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_full_screen);
         paper = findViewById(R.id.paper);
 
+        findViewById(R.id.edit_action_button).setOnClickListener((v) -> {
+            paper.editActionButtonClicked();
+        });
     }
 
 

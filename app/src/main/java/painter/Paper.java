@@ -1,6 +1,7 @@
 package painter;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -41,12 +42,14 @@ public class Paper extends FrameLayout {
         theOneAndOnlyPaint = new Paint();
         history = new ArrayList<>();
         redoStack = new Stack<>();
-        setNextAction(ActionRectangle.class);
+
+        setNextAction(ActionArrow.class);
     }
 
 
     /**
      * set next action - line, rect...
+     *
      * @param nextAction the action's class
      */
     void setNextAction(Class<? extends AbstractPaintActionExtendsView> nextAction) {
@@ -59,19 +62,24 @@ public class Paper extends FrameLayout {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             Log.e(TAG, "initAction: cannot init class", e);
         }
+        action.setOnCompletion((action) -> {
+            addToHistory();
+            return null;
+        });
+
     }
-
-
 
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (action != null) {
+            // editing historys
+            if (selectingHistoryAction(event)) {
+                return true;
+            }
             boolean b = action.handleTouch(event);
-            if (event.getPointerCount() == 1 && event.getActionMasked() == MotionEvent.ACTION_UP) {
-                // done??? just a temp fix
-                history.add(action);
-                setNextAction(actionClass); // same action
+            if (!b) { // action has changed through call back
+                b = action.handleTouch(event);
             }
             return b;
 
@@ -110,7 +118,6 @@ public class Paper extends FrameLayout {
     }
 
 
-
     ////////////////////
     // manage itself
     ////////////////////
@@ -144,4 +151,78 @@ public class Paper extends FrameLayout {
     }
 
 
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        drawHistory(canvas);
+    }
+
+
+
+    /////////////////////
+    // let actions add themselves
+    /////////////////////
+
+    void addToHistory() {
+        history.add(action);
+        setNextAction(actionClass); // same action
+    }
+
+    // let actions know if they are editing or done
+    public void editActionButtonClicked() {
+        if (action == null) return;
+        action.editButtonClicked();
+    }
+
+
+    // EXPERIMENTTs
+
+    void drawHistory(Canvas canvas) {
+        if (history == null) {
+            return;
+        }
+        // also draw the history
+        canvas.save();
+        canvas.translate(0, getHeight() * 0.9f);
+        canvas.scale(0.1f, 0.1f);
+        float dx = getWidth() * 10;
+        for (int i = history.size() - 1; i >= 0; i--) {
+            if (dx <= 0) {
+                break;
+            }
+            dx -= getWidth();
+            canvas.save();
+            canvas.translate(dx, 0);
+            theOneAndOnlyPaint.setStyle(Paint.Style.STROKE);
+            canvas.drawRect(0, 0, getWidth(), getHeight(), theOneAndOnlyPaint);
+//            canvas.drawPaint(theOneAndOnlyPaint);
+            history.get(i).draw(canvas);
+            canvas.restore();
+        }
+        canvas.restore();
+    }
+
+
+    boolean selectingHistory = false;
+
+    boolean selectingHistoryAction(MotionEvent e) {
+        if (e.getActionMasked() == MotionEvent.ACTION_DOWN && e.getY() > getHeight() * 0.9f) {
+            selectingHistory = true;
+            return true;
+        }
+        if (selectingHistory) {
+            if (e.getActionMasked() == MotionEvent.ACTION_UP) {
+                // select index
+                int index = history.size() - 10 + (int) (e.getX() * 10 / getWidth());
+                index = Math.max(0, Math.min(history.size() - 1, index));
+                // move index
+                action = history.remove(index);
+                selectingHistory = false;
+                Log.i(TAG, "selectingHistoryAction: selected: " + index);
+            }
+            return true;
+        }
+        return false;
+    }
 }

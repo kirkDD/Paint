@@ -34,7 +34,18 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         started = false;
     }
 
-    boolean started;
+    boolean editing;
+    @Override
+    public void editButtonClicked() {
+        if (!finished) return; // ignores
+        if (!editing) {
+            editing = true;
+        } else {
+            callWhenDone.apply(this);
+        }
+    }
+
+    boolean started, finished;
     int currentIndex; // can be -1, 0, 2
     float lastX, lastY;
     @Override
@@ -50,6 +61,12 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     started = true;
                     currentIndex = 2;
                 } else {
+                    // if finished
+                    if (finished && !editing) {
+                        // done
+                        callWhenDone.apply(this);
+                        return false;
+                    }
                     // move or reshape line?
                     // which end point to move?
                     if (dist(coordinates[0], coordinates[1], e.getX(), e.getY()) < ACTION_RADIUS) {
@@ -80,6 +97,13 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     coordinates[currentIndex + 1] = e.getY();
                 }
                 invalidate();
+                if (e.getActionMasked() == MotionEvent.ACTION_UP && !finished) { // change this to click done or clicked edit
+                    finished = true;
+//                } else {
+                    // we are editing so, dont call done
+//                    callWhenDone.apply(this);
+                    // second action
+                }
                 return true;
             default:
                 return false;
@@ -92,10 +116,6 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         thisColor = p.getColor();
     }
 
-    @Override
-    public boolean yóuD¤ne() {
-        return true;
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {

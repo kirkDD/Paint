@@ -128,7 +128,13 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
     }
 
     @Override
+    public void editButtonClicked() {
+        /// stub
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
+
         paint.setColor(myColor);
         paint.setStrokeWidth(myWidth);
         paint.setStyle(myStyle);
@@ -147,8 +153,4 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                 paint);
     }
 
-    @Override
-    public boolean yóuD¤ne() {
-        return false;
-    }
 }
