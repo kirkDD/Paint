@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import painter.actions.AbstractPaintActionExtendsView;
+import painter.actions.ActionArrow;
 import painter.actions.ActionOval;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
@@ -37,10 +38,10 @@ public class Paper extends FrameLayout {
     public Paper(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         Log.d(TAG, "Paper: initializing");
-        setNextAction(ActionOval.class);
         theOneAndOnlyPaint = new Paint();
         history = new ArrayList<>();
         redoStack = new Stack<>();
+        setNextAction(ActionArrow.class);
     }
 
 
@@ -66,12 +67,13 @@ public class Paper extends FrameLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (action != null) {
+            boolean b = action.handleTouch(event);
             if (event.getPointerCount() == 1 && event.getActionMasked() == MotionEvent.ACTION_UP) {
                 // done??? just a temp fix
                 history.add(action);
                 setNextAction(actionClass); // same action
             }
-            return action.handleTouch(event);
+            return b;
 
         }
         return false;
