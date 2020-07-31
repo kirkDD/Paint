@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import java.lang.reflect.InvocationTargetException;
 
 import painter.actions.AbstractPaintActionExtendsView;
+import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
 
 /**
@@ -32,7 +33,7 @@ public class Paper extends FrameLayout {
     public Paper(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         Log.d(TAG, "Paper: initializing");
-        setNextAction(ActionStraightLine.class);
+        setNextAction(ActionRectangle.class);
         theOneAndOnlyPaint = new Paint();
     }
 

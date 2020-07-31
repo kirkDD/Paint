@@ -73,6 +73,8 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     coordinates[3] -= lastY - e.getY();
                     lastX = e.getX();
                     lastY = e.getY();
+                    // don't move off screen
+//                    if () 
                 } else { // move one end point
                     coordinates[currentIndex] = e.getX();
                     coordinates[currentIndex + 1] = e.getY();
