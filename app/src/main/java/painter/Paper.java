@@ -112,7 +112,7 @@ public class Paper extends FrameLayout {
 
 
     ////////////////////
-    // manage it self
+    // manage itself
     ////////////////////
 
     public void undo() {
@@ -121,7 +121,7 @@ public class Paper extends FrameLayout {
             removeView(history.get(history.size() - 1));
             history.remove(history.size() - 1);
         } else {
-            Log.i(TAG, "unDo: noting to undo");
+            Log.i(TAG, "unDo: nothing to undo");
         }
     }
 
