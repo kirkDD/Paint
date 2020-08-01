@@ -15,7 +15,7 @@ import android.view.View;
  * a view that should be added, removed from paper
  */
 public abstract class AbstractPaintActionExtendsView extends View {
-    static final String TAG = "Abstract Action";
+    static final String TAG = "-=-= Abstract Action";
 
 
     public AbstractPaintActionExtendsView(Context context) {

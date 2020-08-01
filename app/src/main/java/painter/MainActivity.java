@@ -1,5 +1,6 @@
 package painter;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_full_screen);
         paper = findViewById(R.id.paper);
+        paper.setBackgroundColor(Color.WHITE);
 
         findViewById(R.id.edit_action_button).setOnClickListener((v) -> {
             paper.editActionButtonClicked();

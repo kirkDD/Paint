@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import java.util.Arrays;
 
 public class ActionArrow extends ActionStraightLine {
+    static final String TAG = "-=-= ActionArrow";
 
     float[] triangle;
     int[] colors;
@@ -27,19 +28,21 @@ public class ActionArrow extends ActionStraightLine {
     public void setStyle(Paint p) {
         super.setStyle(p);
         // change size of triangle
-        triangle[1] = thisWidth * 4;
-        triangle[3] = thisWidth * 4;
-        triangle[4] = thisWidth * 10;
+        triangle[1] = thisWidth * 2.5f;
+        triangle[3] = - thisWidth * 2.5f;
+        triangle[4] = thisWidth * 5.5f;
         // color
         Arrays.fill(colors, thisColor);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        // highlight by super
         super.onDraw(canvas);
         // also draw triangle
         // calculate the triangle position
         // translate and rotate?
+        paint.setColor(thisColor);
         canvas.translate(coors[2], coors[3]);
         canvas.rotate(180f + (float) (Math.atan2(coors[1] - coors[3],
                 coors[0] - coors[2]) * 180 / Math.PI));

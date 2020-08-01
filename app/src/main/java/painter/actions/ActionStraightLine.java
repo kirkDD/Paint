@@ -80,6 +80,13 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                 } else { // move one end point
                     coors[currentIndex] = e.getX();
                     coors[currentIndex + 1] = e.getY();
+                    // snap to same x
+                    if (Math.abs(coors[0] - coors[2]) < 3) {
+                        coors[currentIndex] = coors[2 - currentIndex];
+                    } else if (Math.abs(coors[1] - coors[3]) < 3) {
+                        // same y
+                        coors[currentIndex + 1] = coors[2 - currentIndex + 1];
+                    }
                 }
                 invalidate();
                 if (e.getPointerCount() == 1 &&
@@ -99,7 +106,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         thisColor = p.getColor();
     }
 
-
+    float animate = 0;
     @Override
     protected void onDraw(Canvas canvas) {
         // draw line
@@ -108,8 +115,17 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         canvas.drawLine(coors[0], coors[1], coors[2], coors[3], paint);
 
         // draw high light
+        conditionalDrawHighlight(canvas);
+    }
+
+    void conditionalDrawHighlight(Canvas canvas) {
+        // draw high light
         if (currentState == ActionState.REVISING || currentState == ActionState.STARTED) {
-            canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f, thisWidth * 3, paint);
+            paint.setAlpha(125);
+            canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f,
+                    thisWidth * 3 * (float) (1 + Math.sin(animate) * 0.2), paint);
+            animate += 0.08;
+            invalidate();
         }
     }
 }

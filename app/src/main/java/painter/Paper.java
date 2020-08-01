@@ -2,6 +2,7 @@ package painter;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -48,6 +49,9 @@ public class Paper extends FrameLayout {
         super(context, attrs);
         Log.d(TAG, "Paper: initializing");
         theOneAndOnlyPaint = new Paint();
+        theOneAndOnlyPaint.setColor(Color.RED);
+        theOneAndOnlyPaint.setStyle(Paint.Style.STROKE);
+        theOneAndOnlyPaint.setStrokeWidth(10);
         history = new ArrayList<>();
         redoStack = new Stack<>();
 
@@ -64,11 +68,11 @@ public class Paper extends FrameLayout {
         actionClass = nextAction;
         try {
             action = actionClass.getConstructor(Context.class).newInstance(getContext());
-
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             Log.e(TAG, "initAction: cannot init class", e);
         }
         addView(action);
+        action.setStyle(theOneAndOnlyPaint); // apply current style
         action.setOnCompletion((action) -> {
             addToHistory();
             return null;
@@ -232,7 +236,6 @@ public class Paper extends FrameLayout {
                     removeView(temp);
                 }
                 invalidate();
-                Log.i(TAG, "selectingHistoryAction: selected: " + index);
             }
             return true;
         }

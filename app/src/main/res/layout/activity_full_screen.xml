@@ -10,9 +10,8 @@
         android:id="@+id/paper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimaryDark"
         />
-<!--dont know y cannot render-->
+
     <Button
         android:id="@+id/edit_action_button"
         android:background="@color/colorPrimary"
@@ -21,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
+        android:layout_marginTop="@dimen/fab_label_margin"
         />
 
 

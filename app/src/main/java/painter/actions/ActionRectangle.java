@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.MotionEvent;
 
+import java.nio.file.ClosedDirectoryStreamException;
 import java.util.HashMap;
 
 public class ActionRectangle extends AbstractPaintActionExtendsView {
@@ -91,18 +93,18 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                     lastY = e.getY(index);
                 } else if (action == 2) {
                     // resizing
-//                    for (int i : idMap.keySet()) {
-//                        if (e.findPointerIndex(i) != -1) {
-//                            // resize it
-//                            coors[idMap.get(i)] = e.getX(e.findPointerIndex(i));
-//                            coors[idMap.get(i) + 1] = e.getY(e.findPointerIndex(i));
-//                        }
-//                    }
                     // rotating todo
                     rotateAngle = (float)
-                            (Math.atan2((coors[0] - coors[2]) / 2 - e.getX(index),
-                                (coors[1] - coors[3]) / 2 - e.getY(index))
+                            (Math.atan2((coors[0] + coors[2]) / 2 - e.getX(index),
+                                (coors[1] + coors[3]) / 2 - e.getY(index))
                             * 180 / Math.PI);
+                    // snap to angle
+                    for (int i = -180; i <= 180; i += 90) {
+                        if (Math.abs(rotateAngle - i) < 3) {
+                            rotateAngle = i;
+                            break;
+                        }
+                    }
                 } else {
                     // resizing
                     for (int i : idMap.keySet()) {
@@ -119,7 +121,9 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
             case MotionEvent.ACTION_UP:
                 if (e.getPointerCount() == 1) {
                     // last finger up
-                    currentState = ActionState.FINISHED;
+                    if (currentState == ActionState.STARTED) {
+                        currentState = ActionState.FINISHED;
+                    }
                 }
                 invalidate();
                 return true;
@@ -136,6 +140,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
     }
 
 
+    float time = 0;
     @Override
     protected void onDraw(Canvas canvas) {
 
@@ -156,6 +161,21 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                 Math.max(coors[1], coors[3]),
                 paint);
 
+        // show editing
+        conditionalDrawHighlight(canvas);
+    }
+
+
+    void conditionalDrawHighlight(Canvas canvas) {
+        if (currentState == ActionState.REVISING || currentState == ActionState.STARTED) {
+            // draw indicator
+            paint.setAlpha(120);
+            canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f,
+                    (float) (dist(coors[0], coors[1], coors[2], coors[3]) / 20f * (0.1 * Math.sin(time) + 1)),
+                    paint);
+            time += 0.08;
+            invalidate();
+        }
     }
 
 }

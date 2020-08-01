@@ -21,5 +21,6 @@ public class ActionOval extends ActionRectangle {
                 Math.max(coors[1], coors[3]),
                 paint);
 
+        conditionalDrawHighlight(canvas);
     }
 }
