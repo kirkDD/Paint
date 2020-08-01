@@ -121,7 +121,8 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
     void conditionalDrawHighlight(Canvas canvas) {
         // draw high light
         if (currentState == ActionState.REVISING || currentState == ActionState.STARTED) {
-            paint.setAlpha(125);
+            paint.setAlpha(HIGHLIGHT_ALPHA);
+            paint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
             canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f,
                     thisWidth * 3 * (float) (1 + Math.sin(animate) * 0.2), paint);
             animate += 0.08;

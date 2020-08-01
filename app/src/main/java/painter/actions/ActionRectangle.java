@@ -175,7 +175,8 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
     void conditionalDrawHighlight(Canvas canvas) {
         if (currentState == ActionState.REVISING || currentState == ActionState.STARTED) {
             // draw indicator
-            paint.setAlpha(120);
+            paint.setAlpha(HIGHLIGHT_ALPHA);
+            paint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
             canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f,
                     (float) (dist(coors[0], coors[1], coors[2], coors[3]) / 20f * (0.1 * Math.sin(time) + 1)),
                     paint);

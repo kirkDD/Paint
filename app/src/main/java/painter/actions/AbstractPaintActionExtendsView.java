@@ -17,6 +17,9 @@ import android.view.View;
 public abstract class AbstractPaintActionExtendsView extends View {
     static final String TAG = "-=-= Abstract Action";
 
+    static final float HIGHLIGHT_STROKE_WIDTH = 4f;
+    static final int HIGHLIGHT_ALPHA = 125;
+
 
     public AbstractPaintActionExtendsView(Context context) {
         super(context);
