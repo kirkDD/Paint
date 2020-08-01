@@ -40,9 +40,9 @@ public class ActionArrow extends ActionStraightLine {
         // also draw triangle
         // calculate the triangle position
         // translate and rotate?
-        canvas.translate(coordinates[2], coordinates[3]);
-        canvas.rotate(180f + (float) (Math.atan2(coordinates[1] - coordinates[3],
-                coordinates[0] - coordinates[2]) * 180 / Math.PI));
+        canvas.translate(coors[2], coors[3]);
+        canvas.rotate(180f + (float) (Math.atan2(coors[1] - coors[3],
+                coors[0] - coors[2]) * 180 / Math.PI));
         canvas.drawVertices(Canvas.VertexMode.TRIANGLE_FAN, 6, triangle, 0, null, 0,
                 colors, 0, null, 0, 0, paint);
     }

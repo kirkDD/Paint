@@ -20,6 +20,7 @@ public abstract class AbstractPaintActionExtendsView extends View {
 
     public AbstractPaintActionExtendsView(Context context) {
         super(context);
+        currentState = ActionState.NEW;
     }
 
     @Override
@@ -60,14 +61,45 @@ public abstract class AbstractPaintActionExtendsView extends View {
     /**
      * switch to edit, then call callWhenDone
      */
-    public abstract void editButtonClicked();
+    ActionState currentState;
+    public void editButtonClicked() {
+        switch (currentState) {
+            case NEW:
+            case STARTED:
+            case FINISHED:
+                currentState = ActionState.REVISING;
+                break;
+            case REVISING:
+                currentState = ActionState.FINISHED;
+                callWhenDone.apply(this);
+        }
+        invalidate();
+    }
 
+    /**
+     * change state to FINISHED
+     * @return true if there is some thing in this action
+     *      false if this is empty
+     */
+    public boolean focusLost() {
+        if (currentState == ActionState.NEW) {
+            return false;
+        } else {
+            currentState = ActionState.FINISHED;
+            invalidate();
+            return true;
+        }
+    }
 
     /**
      * useful helpers
      */
     double dist(float a, float b, float x, float y) {
         return Math.sqrt(Math.pow(a - x, 2) + Math.pow(b - y, 2));
+    }
+
+    enum ActionState {
+        NEW, STARTED, FINISHED, REVISING;
     }
 
 }

@@ -26,6 +26,14 @@ import painter.actions.ActionStraightLine;
 public class Paper extends FrameLayout {
     static final String TAG = "-=-= Paper";
 
+
+    /**
+     * invariant if u can keep it:
+     *      action is not null
+     *      action is added to view, view group
+     *      action is not in history
+     */
+
     ArrayList<AbstractPaintActionExtendsView> history;
     Stack<AbstractPaintActionExtendsView> redoStack;
     // current action
@@ -55,13 +63,12 @@ public class Paper extends FrameLayout {
     void setNextAction(Class<? extends AbstractPaintActionExtendsView> nextAction) {
         actionClass = nextAction;
         try {
-            Log.d(TAG, "initAction: " + actionClass.getConstructor(Context.class));
             action = actionClass.getConstructor(Context.class).newInstance(getContext());
-            Log.d(TAG, "initAction: adding view");
-            addView(action);
+
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             Log.e(TAG, "initAction: cannot init class", e);
         }
+        addView(action);
         action.setOnCompletion((action) -> {
             addToHistory();
             return null;
@@ -98,11 +105,7 @@ public class Paper extends FrameLayout {
 
     // apply settings
     public void applyPaintEdit() {
-        if (action != null) {
-            action.setStyle(theOneAndOnlyPaint);
-        } else {
-            Log.e(TAG, "applySettingToAction: changing style on null action");
-        }
+        action.setStyle(theOneAndOnlyPaint);
     }
 
     // other settings
@@ -171,7 +174,6 @@ public class Paper extends FrameLayout {
 
     // let actions know if they are editing or done
     public void editActionButtonClicked() {
-        if (action == null) return;
         action.editButtonClicked();
     }
 
@@ -196,7 +198,6 @@ public class Paper extends FrameLayout {
             canvas.translate(dx, 0);
             theOneAndOnlyPaint.setStyle(Paint.Style.STROKE);
             canvas.drawRect(0, 0, getWidth(), getHeight(), theOneAndOnlyPaint);
-//            canvas.drawPaint(theOneAndOnlyPaint);
             history.get(i).draw(canvas);
             canvas.restore();
         }
@@ -213,12 +214,24 @@ public class Paper extends FrameLayout {
         }
         if (selectingHistory) {
             if (e.getActionMasked() == MotionEvent.ACTION_UP) {
+                AbstractPaintActionExtendsView temp = action;
+
                 // select index
                 int index = history.size() - 10 + (int) (e.getX() * 10 / getWidth());
                 index = Math.max(0, Math.min(history.size() - 1, index));
                 // move index
                 action = history.remove(index);
+                action.editButtonClicked();
                 selectingHistory = false;
+
+                // deal with current action
+                if (temp.focusLost()) {
+                    history.add(temp);
+                } else {
+                    // remove view
+                    removeView(temp);
+                }
+                invalidate();
                 Log.i(TAG, "selectingHistoryAction: selected: " + index);
             }
             return true;

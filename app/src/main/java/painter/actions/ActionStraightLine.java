@@ -14,7 +14,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
     static final int ACTION_RADIUS = 100;
 
     // x1, y1, x2, y2
-    float[] coordinates;
+    float[] coors;
 
     static Paint paint; // all lines share paint
 
@@ -30,48 +30,35 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         }
         thisColor = Color.RED; // default
         thisWidth = 10f; // default
-        coordinates = new float[4];
-        started = false;
+        coors = new float[4];
     }
 
-    boolean editing;
-    @Override
-    public void editButtonClicked() {
-        if (!finished) return; // ignores
-        if (!editing) {
-            editing = true;
-        } else {
-            callWhenDone.apply(this);
-        }
-    }
 
-    boolean started, finished;
     int currentIndex; // can be -1, 0, 2
     float lastX, lastY;
     @Override
     public boolean handleTouch(MotionEvent e) {
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                if (!started) {
+                if (currentState == ActionState.NEW) {
                     // init both end
-                    coordinates[0] = e.getX();
-                    coordinates[1] = e.getY();
-                    coordinates[2] = e.getX();
-                    coordinates[3] = e.getY();
-                    started = true;
+                    coors[0] = e.getX();
+                    coors[1] = e.getY();
+                    coors[2] = e.getX();
+                    coors[3] = e.getY();
+                    // change current state
                     currentIndex = 2;
-                } else {
-                    // if finished
-                    if (finished && !editing) {
-                        // done
-                        callWhenDone.apply(this);
-                        return false;
-                    }
-                    // move or reshape line?
+                    currentState = ActionState.STARTED;
+                } else if (currentState == ActionState.FINISHED) {
+                    // done
+                    callWhenDone.apply(this);
+                    return false;
+                } else if (currentState == ActionState.STARTED || currentState == ActionState.REVISING) {
+                    // decide: resize, move
                     // which end point to move?
-                    if (dist(coordinates[0], coordinates[1], e.getX(), e.getY()) < ACTION_RADIUS) {
+                    if (dist(coors[0], coors[1], e.getX(), e.getY()) < ACTION_RADIUS) {
                         currentIndex = 0;
-                    } else if (dist(coordinates[2], coordinates[3], e.getX(), e.getY()) < ACTION_RADIUS) {
+                    } else if (dist(coors[2], coors[3], e.getX(), e.getY()) < ACTION_RADIUS) {
                         currentIndex = 2;
                     } else {
                         lastX = e.getX();
@@ -84,25 +71,21 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_UP:
                 if (currentIndex == -1) { // move both
-                    coordinates[0] -= lastX - e.getX();
-                    coordinates[1] -= lastY - e.getY();
-                    coordinates[2] -= lastX - e.getX();
-                    coordinates[3] -= lastY - e.getY();
+                    coors[0] -= lastX - e.getX();
+                    coors[1] -= lastY - e.getY();
+                    coors[2] -= lastX - e.getX();
+                    coors[3] -= lastY - e.getY();
                     lastX = e.getX();
                     lastY = e.getY();
-                    // don't move off screen
-//                    if () 
                 } else { // move one end point
-                    coordinates[currentIndex] = e.getX();
-                    coordinates[currentIndex + 1] = e.getY();
+                    coors[currentIndex] = e.getX();
+                    coors[currentIndex + 1] = e.getY();
                 }
                 invalidate();
-                if (e.getActionMasked() == MotionEvent.ACTION_UP && !finished) { // change this to click done or clicked edit
-                    finished = true;
-//                } else {
-                    // we are editing so, dont call done
-//                    callWhenDone.apply(this);
-                    // second action
+                if (e.getPointerCount() == 1 &&
+                        e.getActionMasked() == MotionEvent.ACTION_UP &&
+                        currentState == ActionState.STARTED) { // change this to click done or clicked edit
+                    currentState = ActionState.FINISHED;
                 }
                 return true;
             default:
@@ -122,6 +105,11 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         // draw line
         paint.setColor(thisColor);
         paint.setStrokeWidth(thisWidth);
-        canvas.drawLine(coordinates[0], coordinates[1], coordinates[2], coordinates[3], paint);
+        canvas.drawLine(coors[0], coors[1], coors[2], coors[3], paint);
+
+        // draw high light
+        if (currentState == ActionState.REVISING || currentState == ActionState.STARTED) {
+            canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f, thisWidth * 3, paint);
+        }
     }
 }

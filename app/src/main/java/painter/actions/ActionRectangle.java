@@ -54,13 +54,18 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN:
-                if (firstTouch) {
+                if (currentState == ActionState.NEW) {
                     // init both points
                     coors[0] = e.getX(index);
                     coors[1] = e.getY(index);
                     coors[2] = e.getX(index);
                     coors[3] = e.getY(index);
                     firstTouch = false;
+                    currentState = ActionState.STARTED;
+                } else if (currentState == ActionState.FINISHED) {
+                    // done
+                    callWhenDone.apply(this);
+                    return false;
                 } else {
                     // more than one finger or resize or move
                     if (e.getPointerCount() == 1) {
@@ -86,15 +91,18 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                     lastY = e.getY(index);
                 } else if (action == 2) {
                     // resizing
-                    for (int i : idMap.keySet()) {
-                        if (e.findPointerIndex(i) != -1) {
-                            // resize it
-                            coors[idMap.get(i)] = e.getX(e.findPointerIndex(i));
-                            coors[idMap.get(i) + 1] = e.getY(e.findPointerIndex(i));
-                        }
-                    }
-                    // rotating
-                    rotateAngle = (float) (Math.atan2(coors[0] - coors[2], coors[1] - coors[3]) * 180 / Math.PI);
+//                    for (int i : idMap.keySet()) {
+//                        if (e.findPointerIndex(i) != -1) {
+//                            // resize it
+//                            coors[idMap.get(i)] = e.getX(e.findPointerIndex(i));
+//                            coors[idMap.get(i) + 1] = e.getY(e.findPointerIndex(i));
+//                        }
+//                    }
+                    // rotating todo
+                    rotateAngle = (float)
+                            (Math.atan2((coors[0] - coors[2]) / 2 - e.getX(index),
+                                (coors[1] - coors[3]) / 2 - e.getY(index))
+                            * 180 / Math.PI);
                 } else {
                     // resizing
                     for (int i : idMap.keySet()) {
@@ -111,7 +119,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
             case MotionEvent.ACTION_UP:
                 if (e.getPointerCount() == 1) {
                     // last finger up
-
+                    currentState = ActionState.FINISHED;
                 }
                 invalidate();
                 return true;
@@ -127,10 +135,6 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         myStyle = p.getStyle();
     }
 
-    @Override
-    public void editButtonClicked() {
-        /// stub
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -151,6 +155,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                 Math.max(coors[0], coors[2]),
                 Math.max(coors[1], coors[3]),
                 paint);
+
     }
 
 }
