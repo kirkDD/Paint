@@ -4,12 +4,15 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import cse340.undo.R;
 
 public class MainActivity extends AppCompatActivity {
 
+    /** View groups containing undo and redo menu buttons. */
+    private ViewGroup mUndoMenu, mRedoMenu;
     Paper paper;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
