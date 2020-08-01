@@ -3,7 +3,9 @@ package painter.actions;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Shader;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -36,7 +38,11 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         myWidth = 10;
         myStyle = Paint.Style.STROKE;
         rotateAngle = 0;
+
+
+
     }
+
 
     // associate id to index
     HashMap<Integer, Integer> idMap;

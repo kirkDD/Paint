@@ -65,6 +65,7 @@ public abstract class AbstractPaintActionExtendsView extends View {
     public void editButtonClicked() {
         switch (currentState) {
             case NEW:
+                return;
             case STARTED:
             case FINISHED:
                 currentState = ActionState.REVISING;

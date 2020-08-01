@@ -3,8 +3,10 @@ package painter.actions;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Shader;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -21,6 +23,9 @@ public class ActionArrow extends ActionStraightLine {
         // x1,y1, x2...
         triangle = new float[]{0, 30, 0, -30, 50, 0};
         colors = new int[]{Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED};
+
+        Shader shader = new LinearGradient(0,0,50,50,Color.RED,Color.GREEN, Shader.TileMode.REPEAT);
+        paint.setShader(shader);
     }
 
 

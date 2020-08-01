@@ -20,6 +20,7 @@ import painter.actions.ActionArrow;
 import painter.actions.ActionOval;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
+import painter.actions.ActionStroke;
 
 /**
  * the paper to hold all drawings (views)
@@ -50,12 +51,12 @@ public class Paper extends FrameLayout {
         Log.d(TAG, "Paper: initializing");
         theOneAndOnlyPaint = new Paint();
         theOneAndOnlyPaint.setColor(Color.RED);
-        theOneAndOnlyPaint.setStyle(Paint.Style.STROKE);
+        theOneAndOnlyPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         theOneAndOnlyPaint.setStrokeWidth(10);
         history = new ArrayList<>();
         redoStack = new Stack<>();
 
-        setNextAction(ActionArrow.class);
+        setNextAction(ActionStroke.class);
     }
 
 
@@ -178,6 +179,7 @@ public class Paper extends FrameLayout {
 
     // let actions know if they are editing or done
     public void editActionButtonClicked() {
+
         action.editButtonClicked();
     }
 
@@ -212,6 +214,9 @@ public class Paper extends FrameLayout {
     boolean selectingHistory = false;
 
     boolean selectingHistoryAction(MotionEvent e) {
+        if (history.size() == 0) {
+            return false;
+        }
         if (e.getActionMasked() == MotionEvent.ACTION_DOWN && e.getY() > getHeight() * 0.9f) {
             selectingHistory = true;
             return true;
