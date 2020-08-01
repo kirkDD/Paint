@@ -13,6 +13,7 @@ import android.widget.FrameLayout;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Stack;
 
 import painter.actions.AbstractPaintActionExtendsView;
@@ -46,6 +47,14 @@ public class Paper extends FrameLayout {
 
     int background_color = -1;
 
+    Class<? extends AbstractPaintActionExtendsView>[] shapes = new Class[]{
+            ActionStroke.class,
+            ActionArrow.class,
+            ActionRectangle.class,
+            ActionStraightLine.class,
+            ActionOval.class
+    };
+
     public Paper(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         Log.d(TAG, "Paper: initializing");
@@ -57,7 +66,11 @@ public class Paper extends FrameLayout {
         redoStack = new Stack<>();
 
         setNextAction(ActionStroke.class);
+        random = new Random();
     }
+
+    // instead of ui to pick actions...
+    Random random;
 
 
     /**
@@ -174,7 +187,9 @@ public class Paper extends FrameLayout {
 
     void addToHistory() {
         history.add(action);
-        setNextAction(actionClass); // same action
+//        setNextAction(actionClass); // same action
+        // random action since no ui
+        setNextAction(shapes[random.nextInt(shapes.length)]);
     }
 
     // let actions know if they are editing or done

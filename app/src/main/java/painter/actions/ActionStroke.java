@@ -14,7 +14,7 @@ import android.view.MotionEvent;
 public class ActionStroke extends AbstractPaintActionExtendsView {
 
     static final float MIN_MOVE_DIST = 5;
-    static final long NEW_INSTANCE_DELAY_MS = 1000;
+    static final long NEW_INSTANCE_DELAY_MS = 300;
 
     int thisColor;
     float thisWidth;
