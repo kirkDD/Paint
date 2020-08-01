@@ -24,4 +24,5 @@
     <string name="transparent_number">0.1f</string>
     <string name="opacity_desc">Select a line opacity</string>
     <string name="opacity_label">Opacity</string>
+    <string name="edit_button">edit</string>
 </resources>

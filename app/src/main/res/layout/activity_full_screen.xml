@@ -23,7 +23,7 @@
         android:id="@+id/edit_action_button"
         android:background="@color/colorPrimary"
         android:textColor="@color/colorAccent"
-        android:text="edit"
+        android:text="@string/edit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
