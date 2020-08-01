@@ -44,7 +44,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     int pointerId = -1;
 
     float lastX, lastY;
-    int action = 0; // 0 move, 1 scale
+    int action = 0; // 0 move, 1 scale, 2 rotate
     int secondPointerId = -1;
     @Override
     public boolean handleTouch(MotionEvent e) {
@@ -79,7 +79,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                         action = 0;
                         lastX = e.getX(index);
                         lastY = e.getY(index);
-                    } else if (e.getPointerCount() == 2) {
+                    } else if (e.getPointerCount() == 2) { // scale
                         action = 1;
                         secondPointerId = id;
                         path.offset(-bound.centerX(), -bound.centerY());
@@ -91,6 +91,10 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                         boundW = bound.width();
                         boundH = bound.height();
 
+                    } else if (e.getPointerCount() == 3) { // rotate
+                        action = 2;
+                        savedPath.rewind();
+                        savedPath.addPath(path);
                     }
                 }
                 invalidate();
@@ -127,6 +131,12 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                         // also translate
                         pathOffsetX = (e.getX(e.findPointerIndex(pointerId)) + e.getX(e.findPointerIndex(secondPointerId))) / 2f;
                         pathOffsetY = (e.getY(e.findPointerIndex(pointerId)) + e.getY(e.findPointerIndex(secondPointerId))) / 2f;
+                    } else if (action == 2) {
+                        // rotate
+                        pathTransform.setRotate(
+                                (float) angleBetween(bound.centerX(), bound.centerY(), e.getX(), e.getY()),
+                                bound.centerX(), bound.centerY());
+                        savedPath.transform(pathTransform, path);
                     }
                     invalidate();
                 }
@@ -142,6 +152,9 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                         action = 0; // back to move
                         lastX = e.getX(e.findPointerIndex(pointerId));
                         lastY = e.getY(e.findPointerIndex(pointerId));
+                    } if (action == 2 && e.getPointerCount() == 1) {
+                        // stop
+                        action = 0;
                     }
                 }
                 invalidate();

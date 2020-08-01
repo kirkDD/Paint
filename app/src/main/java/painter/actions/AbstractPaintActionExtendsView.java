@@ -102,6 +102,10 @@ public abstract class AbstractPaintActionExtendsView extends View {
         return Math.sqrt(Math.pow(a - x, 2) + Math.pow(b - y, 2));
     }
 
+    double angleBetween(float a, float b, float x, float y) {
+        return Math.atan2(a - x, b - y) * 180 / Math.PI;
+    }
+
     enum ActionState {
         NEW, STARTED, FINISHED, REVISING;
     }

@@ -100,10 +100,12 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                 } else if (action == 2) {
                     // resizing
                     // rotating todo
-                    rotateAngle = (float)
-                            (Math.atan2((coors[0] + coors[2]) / 2 - e.getX(index),
-                                (coors[1] + coors[3]) / 2 - e.getY(index))
-                            * 180 / Math.PI);
+                    rotateAngle = (float) angleBetween(
+                            (coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2,
+                            e.getX(index), e.getY(index));
+//                            (Math.atan2((coors[0] + coors[2]) / 2 - e.getX(index),
+//                                (coors[1] + coors[3]) / 2 - e.getY(index))
+//                            * 180 / Math.PI);
                     // snap to angle
                     for (int i = -180; i <= 180; i += 90) {
                         if (Math.abs(rotateAngle - i) < 3) {
