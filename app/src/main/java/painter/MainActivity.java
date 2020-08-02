@@ -48,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
         mMenusLastId = new SparseIntArray();
         paper = findViewById(R.id.paper);
         paper.setBackgroundColor(Color.WHITE);
-        findViewById(R.id.edit_action_button).setOnClickListener((v) -> {
-            paper.editActionButtonClicked();
-        });
+//        findViewById(R.id.edit_action_button).setOnClickListener((v) -> {
+//            paper.editActionButtonClicked();
+//        });
         // set up undo/redo button
         mUndoMenu = (ViewGroup) getLayoutInflater().inflate(R.layout.undo_menu, mLayout , false);
         mRedoMenu = (ViewGroup) getLayoutInflater().inflate(R.layout.redo_menu, mLayout , false);
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.fab_undo).setOnClickListener((v) -> paper.undo());
         findViewById(R.id.fab_redo).setOnClickListener((v) -> paper.redo());
 
-        experiment();
+//        experiment();
     }
 
     void experiment() {

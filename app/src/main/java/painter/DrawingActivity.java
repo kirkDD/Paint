@@ -52,7 +52,7 @@ public class DrawingActivity extends MainActivity{
         });
 
         addCollapsableMenu(R.layout.shape_menu, ConstraintSet.BOTTOM, ConstraintSet.END, SHAPE_MENU_ITEMS, this::onShapeMenuSelected);
-        findViewById(R.id.fab_action).setOnClickListener((v) -> {
+        findViewById(R.id.fab_shape).setOnClickListener((v) -> {
             enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, isShapeMenuOpen);
             isShapeMenuOpen = toggleMenu(SHAPE_MENU_ITEMS, isShapeMenuOpen);
         });
@@ -96,7 +96,7 @@ public class DrawingActivity extends MainActivity{
 //                break;
 //        }
         isActionMenuOpen = toggleMenu(ACTION_MENU_ITEMS, isActionMenuOpen);
-        enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, isActionMenuOpen);
+        enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, !isActionMenuOpen);
     }
 
     /**
