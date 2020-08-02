@@ -161,6 +161,8 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                     } if (action == 2 && e.getPointerCount() == 1) {
                         // stop
                         action = 0;
+                        lastX = e.getX(e.findPointerIndex(pointerId));
+                        lastY = e.getY(e.findPointerIndex(pointerId));
                     }
                 }
                 invalidate();
@@ -191,19 +193,19 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
 
         canvas.drawPath(path, paint);
         if (currentState == ActionState.REVISING) {
-            // high light
-            paint.setAlpha((int) (70 + 70 * Math.sin(animate)));
-            animate += 0.1;
-            invalidate();
-            // or bound?
             paint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
-            path.computeBounds(bound, false);
-            canvas.drawRect(bound, paint);
-
             if (action == 2) {
-                // rotate center
+                // rotate center instead of bound
                 paint.setAlpha(HIGHLIGHT_ALPHA);
                 canvas.drawCircle(boundCX, boundCY, 10, paint);
+            } else {
+                // high light
+                paint.setAlpha((int) (70 + 70 * Math.sin(animate)));
+                animate += 0.1;
+                invalidate();
+                // or bound?
+                path.computeBounds(bound, false);
+                canvas.drawRect(bound, paint);
             }
         }
 

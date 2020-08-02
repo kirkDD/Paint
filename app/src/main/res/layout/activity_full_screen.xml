@@ -29,8 +29,6 @@
 
         <Button
             android:id="@+id/edit_action_button"
-            android:background="@color/colorPrimary"
-            android:textColor="@color/colorAccent"
             android:text="@string/edit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,7 +40,44 @@
             android:id="@+id/test_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@test"
+            android:text="@erase"
+            />
+
+        <Button
+            android:onClick="rect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@rect"
+            />
+        <Button
+            android:onClick="oval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@oval"
+            />
+        <Button
+            android:onClick="line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@line"
+            />
+        <Button
+            android:onClick="arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@arrow"
+            />
+        <Button
+            android:onClick="aStroke"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@stroke"
+            />
+        <Button
+            android:onClick="clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@clear"
             />
 
     </LinearLayout>

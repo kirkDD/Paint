@@ -6,10 +6,16 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import cse340.undo.R;
+import painter.actions.ActionArrow;
+import painter.actions.ActionOval;
+import painter.actions.ActionRectangle;
+import painter.actions.ActionStraightLine;
+import painter.actions.ActionStroke;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,4 +61,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
     }
+
+
+    // testing hooking up paper
+    public void rect(View v) {
+        paper.setDrawAction(ActionRectangle.class);
+    }
+    public void oval(View v) {
+        paper.setDrawAction(ActionOval.class);
+    }
+    public void line(View v) {
+        paper.setDrawAction(ActionStraightLine.class);
+    }
+    public void arrow(View v) {
+        paper.setDrawAction(ActionArrow.class);
+    }
+    public void aStroke(View v) {
+        paper.setDrawAction(ActionStroke.class);
+    }
+    public void clear(View v) {
+        paper.clear();
+    }
+
 }

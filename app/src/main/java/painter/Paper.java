@@ -42,7 +42,7 @@ public class Paper extends FrameLayout {
     // current action
     AbstractPaintActionExtendsView action;
     // current action's class
-    Class<? extends AbstractPaintActionExtendsView> actionClass;
+    Class<? extends AbstractPaintActionExtendsView> actionClass = ActionRectangle.class;
     static Paint theOneAndOnlyPaint;
 
     int background_color = -1;
@@ -65,7 +65,8 @@ public class Paper extends FrameLayout {
         history = new ArrayList<>();
         redoStack = new Stack<>();
 
-        setNextAction(ActionStroke.class);
+
+        initCurrentAction();
         random = new Random();
     }
 
@@ -74,12 +75,9 @@ public class Paper extends FrameLayout {
 
 
     /**
-     * set next action - line, rect...
-     *
-     * @param nextAction the action's class
+     * initialize current action from actionClass
      */
-    void setNextAction(Class<? extends AbstractPaintActionExtendsView> nextAction) {
-        actionClass = nextAction;
+    void initCurrentAction() {
         try {
             action = actionClass.getConstructor(Context.class).newInstance(getContext());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
@@ -94,21 +92,41 @@ public class Paper extends FrameLayout {
     }
 
     /**
+     * must call helper to add to history
+     */
+    void wrapUpCurrentAction() {
+        if (this.action.focusLost()) {
+            history.add(action);
+            histTranslateX = getWidth() * 11;
+            invalidate();
+        } else {
+            removeView(action);
+        }
+    }
+
+    /**
      * interface to select an action
-     * @param action
+     * set next action - line, rect...
      */
     public void setDrawAction(Class<? extends AbstractPaintActionExtendsView> action) {
-        if (this.action.focusLost()) {
-            history.add(this.action);
-        } else {
-            removeView(this.action);
-        }
-        setNextAction(action);
+        wrapUpCurrentAction();
+        actionClass = action;
+        initCurrentAction();
     }
+
 
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        // show/hide history
+        if (action.contains(getWidth() / 2f, getHeight() * 1.1f, getWidth() / 2f)) {
+            histYTarget = getHeight();
+            delayCount += 1;
+            postDelayed(showHistory, 200);
+            performClick(); // weird lint issue
+        } else {
+            histYTarget = getHeight() * 0.9f;
+        }
         if (erasing) {
             eraseAction(event);
             invalidate();
@@ -126,6 +144,11 @@ public class Paper extends FrameLayout {
             return b;
         }
         return false;
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 
     ///////////////////
@@ -160,19 +183,26 @@ public class Paper extends FrameLayout {
     ////////////////////
 
     public void undo() {
+        wrapUpCurrentAction();
         if (history.size() > 0) {
-            redoStack.push(history.get(history.size() - 1));
-            removeView(history.get(history.size() - 1));
-            history.remove(history.size() - 1);
+            redoStack.push(history.remove(history.size() - 1));
+            removeView(redoStack.peek());
         } else {
             Log.i(TAG, "unDo: nothing to undo");
         }
+        if (history.size() > 0) {
+            action = history.remove(history.size() - 1);
+        } else {
+            initCurrentAction();
+        }
+        invalidate();
     }
 
     public void redo() {
         if (redoStack.size() > 0) {
-            history.add(redoStack.pop());
-            addView(history.get(history.size() - 1));
+            wrapUpCurrentAction();
+            action = redoStack.pop();
+            addView(action);
         } else {
             Log.i(TAG, "redo: nothing to redo");
         }
@@ -180,11 +210,13 @@ public class Paper extends FrameLayout {
 
     // you can undo a clear, slowly
     public void clear() {
+        wrapUpCurrentAction();
         for (int i = 0; i < history.size(); i++) {
             redoStack.push(history.get(history.size() - 1 - i));
         }
         history.clear();
         removeAllViews();
+        initCurrentAction();
     }
 
     float currPointerX, currPointerY;
@@ -193,9 +225,10 @@ public class Paper extends FrameLayout {
         super.onDraw(canvas);
 
         drawHistory(canvas);
+
         if (erasing) {
             // show touch
-            canvas.drawCircle(currPointerX, currPointerY, 10, internalPaint);
+            canvas.drawCircle(currPointerX, currPointerY, eraserRadius, internalPaint);
         }
     }
 
@@ -206,12 +239,10 @@ public class Paper extends FrameLayout {
     /////////////////////
 
     void addToHistory() {
-        if (history.size() == 0 || !history.get(history.size() - 1).equals(action)) {
-            history.add(action);
-        }
-        setNextAction(actionClass); // same action
+        wrapUpCurrentAction();
+        initCurrentAction(); // same action
         // random action since no ui
-//        setNextAction(shapes[random.nextInt(shapes.length)]);
+//        initCurrentAction(shapes[random.nextInt(shapes.length)]);
     }
 
     // let actions know if they are editing or done
@@ -234,19 +265,17 @@ public class Paper extends FrameLayout {
      * erase action
      */
     boolean erasing;
+    float eraserRadius = 10;
     public void toggleEraseMode() {
         erasing = !erasing;
         if (erasing) {
             // check current
-            if (action.focusLost()) {
-                // add action to history
-                history.add(action);
-            }
+            wrapUpCurrentAction();
         } else {
             if (history.size() > 0) {
                 action = history.remove(history.size() - 1);
             } else {
-                setNextAction(actionClass);
+                initCurrentAction();
             }
         }
         invalidate();
@@ -256,10 +285,9 @@ public class Paper extends FrameLayout {
         currPointerX = event.getX();
         currPointerY = event.getY();
         for (int i = history.size() - 1; i >= 0; i--) {
-            if (history.get(i).contains(currPointerX, currPointerY,10)) {
-                AbstractPaintActionExtendsView act = history.remove(i);
-                removeView(act);
-                redoStack.add(act);
+            if (history.get(i).contains(currPointerX, currPointerY, eraserRadius)) {
+                redoStack.add(history.remove(i));
+                removeView(redoStack.peek());
             }
         }
     }
@@ -267,6 +295,7 @@ public class Paper extends FrameLayout {
 
     // EXPERIMENTTs
     static Paint internalPaint;
+    float histTranslateX, histY, histYTarget;
     void drawHistory(Canvas canvas) {
         if (history == null) {
             return;
@@ -274,14 +303,14 @@ public class Paper extends FrameLayout {
         if (internalPaint == null) {
             internalPaint = new Paint();
             internalPaint.setColor(Color.BLACK);
-            internalPaint.setStrokeWidth(10);
             internalPaint.setStyle(Paint.Style.STROKE);
         }
         // also draw the history
         canvas.save();
-        canvas.translate(0, getHeight() * 0.9f);
+        canvas.translate(0, histY); // getHeight() * 0.9f
         canvas.scale(0.1f, 0.1f);
-        float dx = getWidth() * 10;
+        float dx = histTranslateX; // getWidth() * 10;
+
         for (int i = history.size() - 1; i >= 0; i--) {
             if (dx <= 0) {
                 break;
@@ -289,12 +318,35 @@ public class Paper extends FrameLayout {
             dx -= getWidth();
             canvas.save();
             canvas.translate(dx, 0);
+            internalPaint.setStrokeWidth(20);
             canvas.drawRect(0, 0, getWidth(), getHeight(), internalPaint);
             history.get(i).draw(canvas);
             canvas.restore();
         }
         canvas.restore();
+
+        // animate
+        if (histTranslateX > getWidth() * 10) {
+            histTranslateX -= (histTranslateX - getWidth() * 10) * 0.2 + 0.5;
+            invalidate();
+        } else {
+            histTranslateX = getWidth() * 10;
+        }
+        if (Math.abs(histY - histYTarget) > 1) {
+            histY += (histYTarget - histY) * 0.2;
+            invalidate();
+        }
     }
+
+
+    int delayCount = 0;
+    Runnable showHistory = () -> {
+        delayCount --;
+        if (delayCount == 0) {
+            histYTarget = getHeight() * 0.90f;
+            invalidate();
+        }
+    };
 
 
     boolean selectingHistory = false;
@@ -303,29 +355,23 @@ public class Paper extends FrameLayout {
         if (history.size() == 0) {
             return false;
         }
-        if (e.getActionMasked() == MotionEvent.ACTION_DOWN && e.getY() > getHeight() * 0.9f) {
+        if (e.getActionMasked() == MotionEvent.ACTION_DOWN && e.getY() > histY) {
             selectingHistory = true;
             return true;
         }
         if (selectingHistory) {
             if (e.getActionMasked() == MotionEvent.ACTION_UP) {
-                AbstractPaintActionExtendsView temp = action;
-
+                int oldHistorySize = history.size();
+                // deal with current action
+                wrapUpCurrentAction();
                 // select index
-                int index = history.size() - 10 + (int) (e.getX() * 10 / getWidth());
+                int index = history.size() - 10 + (int) (e.getX() * 10 / getWidth())
+                        - oldHistorySize == history.size()? 0 : 1;
                 index = Math.max(0, Math.min(history.size() - 1, index));
                 // move index
                 action = history.remove(index);
                 action.editButtonClicked();
                 selectingHistory = false;
-
-                // deal with current action
-                if (temp.focusLost()) {
-                    history.add(temp);
-                } else {
-                    // remove view
-                    removeView(temp);
-                }
                 invalidate();
             }
             return true;
