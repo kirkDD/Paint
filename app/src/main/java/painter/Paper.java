@@ -348,7 +348,7 @@ public class Paper extends FrameLayout {
     Runnable showHistory = () -> {
         delayCount --;
         if (delayCount == 0) {
-            histYTarget = getHeight() * -0.1f;
+            histYTarget = 0;
             invalidate();
         }
     };
