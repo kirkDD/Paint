@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import painter.actions.ActionStraightLine;
 import painter.actions.ActionStroke;
 
 public class MainActivity extends AppCompatActivity {
+    static final String TAG = "-=-= Main Activity";
 
     /** View groups containing undo and redo menu buttons. */
     ConstraintLayout mLayout;
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.edit_action_button).setOnClickListener((v) -> {
             paper.editActionButtonClicked();
         });
+
         // set up undo/redo button
         mUndoMenu = (ViewGroup) getLayoutInflater().inflate(R.layout.undo_menu, mLayout , false);
         mRedoMenu = (ViewGroup) getLayoutInflater().inflate(R.layout.redo_menu, mLayout , false);
@@ -66,9 +69,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void experiment() {
-        findViewById(R.id.erase).setOnClickListener((v) -> {
-            paper.toggleEraseMode();
-        });
+
     }
 
     @Override
@@ -143,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                                       View.OnClickListener listener) {
         View menu = getLayoutInflater().inflate(layoutId, mLayout, false);
         addMenu(menu, verticalAnchor, horizontalAnchor);
-
+        Log.d(TAG, "addCollapsableMenu: adding ");
         ConstraintSet cons = new ConstraintSet();
         cons.clone(mLayout);
 
@@ -189,5 +190,7 @@ public class MainActivity extends AppCompatActivity {
     public void letters(View v) {
         paper.setDrawAction(ActionLetters.class);
     }
-
+    public void erase(View v) {
+        paper.toggleEraseMode();
+    }
 }

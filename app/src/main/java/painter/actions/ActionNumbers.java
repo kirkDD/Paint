@@ -11,10 +11,10 @@ public class ActionNumbers extends ActionStroke {
     int nextIntToAdd = 0;
     float CHAR_WIDTH;
 
+    float thisTextSize = 150;
     public ActionNumbers(Context context) {
         super(context);
-        paint.setTextSize(150);
-        CHAR_WIDTH = paint.measureText("0  ") / 3f + 5; // tune width :(
+        CHAR_WIDTH = paint.measureText("0  ") / 3f + 2; // tune width :(
         stringBuilder = new StringBuilder();
     }
 
@@ -62,10 +62,17 @@ public class ActionNumbers extends ActionStroke {
 
         // add texts
         paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(thisTextSize);
         canvas.drawTextOnPath(stringBuilder.toString(), path, 0, 0, paint);
 
 
         conditionalDrawHighlight(canvas);
 
+    }
+
+    @Override
+    public void setStyle(Paint p) {
+        super.setStyle(p);
+        thisTextSize = p.getTextSize();
     }
 }
