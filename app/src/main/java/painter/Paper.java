@@ -19,6 +19,7 @@ import java.util.Stack;
 
 import painter.actions.AbstractPaintActionExtendsView;
 import painter.actions.ActionArrow;
+import painter.actions.ActionNumbers;
 import painter.actions.ActionOval;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
@@ -43,7 +44,7 @@ public class Paper extends FrameLayout {
     // current action
     AbstractPaintActionExtendsView action;
     // current action's class
-    Class<? extends AbstractPaintActionExtendsView> actionClass = ActionRectangle.class;
+    Class<? extends AbstractPaintActionExtendsView> actionClass = ActionNumbers.class;
     static Paint theOneAndOnlyPaint;
 
     int background_color = -1;
@@ -108,6 +109,7 @@ public class Paper extends FrameLayout {
      * set next action - line, rect...
      */
     public void setDrawAction(Class<? extends AbstractPaintActionExtendsView> action) {
+        if (erasing) toggleEraseMode();
         finishAction();
         actionClass = action;
         initCurrentAction();
@@ -249,14 +251,18 @@ public class Paper extends FrameLayout {
             toggleEraseMode();
             // stop erasing
         }
-        finishAction(); 
-        if (history.size() == 0) {
-            Log.i(TAG, "editActionButtonClicked: nothing to edit");
-            initCurrentAction();
-        } else {
-            action = history.get(history.size() - 1);
-            action.editButtonClicked();
+        if (action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.NEW) {
+            if (history.size() <= 1) {
+                Log.i(TAG, "editActionButtonClicked: nothing to edit");
+                return;
+            } else {
+                // edit the last one, not this one
+                finishAction();
+                action = history.get(history.size() - 1);
+            }
         }
+        // edit current action
+        action.editButtonClicked();
     }
 
     /**
@@ -359,9 +365,12 @@ public class Paper extends FrameLayout {
         }
         if (selectingHistory) {
             if (e.getActionMasked() == MotionEvent.ACTION_UP) {
-                int oldHistorySize = history.size();
                 // deal with current action
-                finishAction();
+                finishAction(); // zero size array
+                if (history.size() == 0) {
+                    initCurrentAction();
+                    return true;
+                }
                 // select index
                 int index = history.size() - 10 + (int) (e.getX() * 10 / getWidth());
                 index = Math.max(0, Math.min(history.size() - 1, index));

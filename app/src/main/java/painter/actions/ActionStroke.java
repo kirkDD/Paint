@@ -189,15 +189,24 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
         paint.setStrokeCap(thisCap);
         paint.setStrokeWidth(thisWidth);
         paint.setStrokeJoin(thisJoin);
+        paint.setStyle(Paint.Style.STROKE);
         canvas.translate(pathOffsetX, pathOffsetY);
 
         canvas.drawPath(path, paint);
+
+        conditionalDrawHighlight(canvas);
+
+    }
+
+    void conditionalDrawHighlight(Canvas canvas) {
         if (currentState == ActionState.REVISING) {
             paint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
             if (action == 2) {
                 // rotate center instead of bound
                 paint.setAlpha(HIGHLIGHT_ALPHA);
+                paint.setXfermode(HIGHLIGHT_PAINT_MODE);
                 canvas.drawCircle(boundCX, boundCY, 10, paint);
+                paint.setXfermode(null);
             } else {
                 // high light
                 paint.setAlpha((int) (70 + 70 * Math.sin(animate)));
@@ -205,11 +214,12 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                 invalidate();
                 // or bound?
                 path.computeBounds(bound, false);
+                paint.setStyle(Paint.Style.STROKE);
                 canvas.drawRect(bound, paint);
             }
         }
-
     }
+
 
     Path containsPath;
     @Override
