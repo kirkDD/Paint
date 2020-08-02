@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -38,9 +40,6 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         myWidth = 10;
         myStyle = Paint.Style.STROKE;
         rotateAngle = 0;
-
-
-
     }
 
 
@@ -98,21 +97,12 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                     lastX = e.getX(index);
                     lastY = e.getY(index);
                 } else if (action == 2) {
-                    // resizing
-                    // rotating todo
+                    // rotating
                     rotateAngle = (float) angleBetween(
                             (coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2,
                             e.getX(index), e.getY(index));
-//                            (Math.atan2((coors[0] + coors[2]) / 2 - e.getX(index),
-//                                (coors[1] + coors[3]) / 2 - e.getY(index))
-//                            * 180 / Math.PI);
                     // snap to angle
-                    for (int i = -180; i <= 180; i += 90) {
-                        if (Math.abs(rotateAngle - i) < 3) {
-                            rotateAngle = i;
-                            break;
-                        }
-                    }
+                    rotateAngle = snapAngle(rotateAngle);
                 } else {
                     // resizing
                     for (int i : idMap.keySet()) {
@@ -174,14 +164,48 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
     }
 
 
+    @Override
+    public boolean contains(float x, float y, float radius) {
+        // due to rotation, we need to shift x,y as well
+//        Log.d(TAG, "contains: xy " + x + ", " + y);
+        x -= (coors[0] + coors[2]) / 2f;
+        y -= (coors[1] + coors[3]) / 2f;
+//        Log.d(TAG, "contains: xy 1 " + x + ", " + y);
+        // rotate
+        double r = dist(x, y, 0, 0);
+        double ang = angleBetween(x, y, 0, 0) + 90 - rotateAngle;
+//        Log.d(TAG, "contains: ang = " + ang);
+        x = (float) (Math.cos(ang / 180 * Math.PI) * r);
+        y = (float) (Math.sin(ang / 180 * Math.PI) * r);
+        // go back
+        x += (coors[0] + coors[2]) / 2f;
+        y += (coors[1] + coors[3]) / 2f;
+//        Log.d(TAG, "contains: xy 2 " + x + ", " + y);
+
+        if (coors[0] < coors[2]) {
+            if (coors[0] > x + radius || coors[2] < x - radius) return false;
+        } else {
+            if (coors[0] < x - radius || coors[2] > x + radius) return false;
+        }
+        if (coors[1] < coors[3]) {
+            return !(coors[1] > y + radius) && !(coors[3] < y - radius); // intelliJ is good!
+        } else {
+            if (coors[1] < y - radius || coors[3] > y + radius) return false;
+        }
+        return true;
+    }
+
     void conditionalDrawHighlight(Canvas canvas) {
         if (currentState == ActionState.REVISING || currentState == ActionState.STARTED) {
             // draw indicator
             paint.setAlpha(HIGHLIGHT_ALPHA);
             paint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setXfermode(HIGHLIGHT_PAINT_MODE);
             canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f,
                     (float) (dist(coors[0], coors[1], coors[2], coors[3]) / 20f * (0.1 * Math.sin(time) + 1)),
                     paint);
+            paint.setXfermode(null);
             time += 0.08;
             invalidate();
         }

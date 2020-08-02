@@ -1,11 +1,15 @@
 package painter.actions;
 
+import java.util.Currency;
 import java.util.function.UnaryOperator;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Xfermode;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,9 +21,9 @@ import android.view.View;
 public abstract class AbstractPaintActionExtendsView extends View {
     static final String TAG = "-=-= Abstract Action";
 
+    static final Xfermode HIGHLIGHT_PAINT_MODE = new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY);
     static final float HIGHLIGHT_STROKE_WIDTH = 4f;
     static final int HIGHLIGHT_ALPHA = 125;
-
 
     public AbstractPaintActionExtendsView(Context context) {
         super(context);
@@ -49,12 +53,6 @@ public abstract class AbstractPaintActionExtendsView extends View {
      * @param p Paint that has those info
      */
     public abstract void setStyle(Paint p);
-
-//    /**
-//     * report if this action is finished
-//     * @return true iff done
-//     */
-//    public abstract boolean yóuD¤ne();
 
     UnaryOperator<AbstractPaintActionExtendsView> callWhenDone;
     public void setOnCompletion(UnaryOperator<AbstractPaintActionExtendsView> calledWhenDone) {
@@ -96,18 +94,48 @@ public abstract class AbstractPaintActionExtendsView extends View {
     }
 
     /**
+     * get state
+     * @return the current state
+     */
+    public ActionState getCurrentState() {
+        return currentState;
+    }
+
+    /**
+     * test if a point touches actual content of action
+     * @param x,y location
+     * @param radius the bound to allow
+     */
+    public abstract boolean contains(float x, float y, float radius);
+
+
+    /**
      * useful helpers
      */
+
     double dist(float a, float b, float x, float y) {
         return Math.sqrt(Math.pow(a - x, 2) + Math.pow(b - y, 2));
     }
 
+    // in degrees
     double angleBetween(float a, float b, float x, float y) {
         return Math.atan2(a - x, b - y) * 180 / Math.PI;
     }
 
-    enum ActionState {
+    // in degrees
+    float snapAngle(float angle) {
+        for (int i = -180; i <= 180; i += 45) {
+            if (Math.abs(angle - i) < 3) {
+                return i;
+            }
+        }
+        return angle;
+    }
+
+
+    public enum ActionState {
         NEW, STARTED, FINISHED, REVISING;
+
     }
 
 }

@@ -38,6 +38,8 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
         savedPath = new Path();
         bound = new RectF();
         pathTransform = new Matrix();
+
+        containsPath = new Path();
     }
 
     long lastTimeStamp; // should combine quick strokes
@@ -74,7 +76,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                     }
                 } else if (currentState == ActionState.REVISING) {
                     // editing?
-                    if (action == 2) return true;
+                    if (action == 2) return true;  // rotating, ignores new finger
                     if (e.getPointerCount() == 1) {
                         pointerId = id;
                         action = 0;
@@ -138,7 +140,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                     } else if (action == 2) {
                         // rotate
                         pathTransform.setRotate(
-                                (float) -angleBetween(boundCX + pathOffsetX, boundCY + pathOffsetY, e.getX(), e.getY()),
+                                snapAngle((float) -angleBetween(boundCX + pathOffsetX, boundCY + pathOffsetY, e.getX(), e.getY())),
                                 boundCX, boundCY);
                         savedPath.transform(pathTransform, path);
                     }
@@ -205,5 +207,14 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
             }
         }
 
+    }
+
+    Path containsPath;
+    @Override
+    public boolean contains(float x, float y, float radius) {
+        containsPath.addRect(x - radius, y - radius, x + radius, y - radius, Path.Direction.CW);
+        containsPath.op(path, Path.Op.DIFFERENCE);
+        post(() -> containsPath.rewind());
+        return containsPath.isEmpty();
     }
 }

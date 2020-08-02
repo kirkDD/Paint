@@ -65,7 +65,7 @@ public class Paper extends FrameLayout {
         history = new ArrayList<>();
         redoStack = new Stack<>();
 
-        setNextAction(ActionStroke.class);
+        setNextAction(ActionRectangle.class);
         random = new Random();
     }
 
@@ -97,7 +97,11 @@ public class Paper extends FrameLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (action != null) {
+        if (erasing) {
+            eraseAction(event);
+            invalidate();
+            return true;
+        } else if (action != null) {
             // editing historys
             if (selectingHistoryAction(event)) {
                 return true;
@@ -106,8 +110,8 @@ public class Paper extends FrameLayout {
             if (!b) { // action has changed through call back
                 b = action.handleTouch(event);
             }
+            invalidate();
             return b;
-
         }
         return false;
     }
@@ -171,12 +175,16 @@ public class Paper extends FrameLayout {
         removeAllViews();
     }
 
-
+    float currPointerX, currPointerY;
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
         drawHistory(canvas);
+        if (erasing) {
+            // show touch
+            canvas.drawCircle(currPointerX, currPointerY, 10, internalPaint);
+        }
     }
 
 
@@ -186,24 +194,76 @@ public class Paper extends FrameLayout {
     /////////////////////
 
     void addToHistory() {
-        history.add(action);
-//        setNextAction(actionClass); // same action
+        if (history.size() == 0 || !history.get(history.size() - 1).equals(action)) {
+            history.add(action);
+        }
+        setNextAction(actionClass); // same action
         // random action since no ui
-        setNextAction(shapes[random.nextInt(shapes.length)]);
+//        setNextAction(shapes[random.nextInt(shapes.length)]);
     }
 
     // let actions know if they are editing or done
     public void editActionButtonClicked() {
-
+        if (erasing) {
+            toggleEraseMode();
+            // stop erasing
+        }
+        if (action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.NEW) {
+            // edit the last one
+            if (history.size() > 0) {
+                removeView(action);
+                action = history.remove(history.size() - 1);
+            }
+        }
         action.editButtonClicked();
+    }
+
+    /**
+     * erase action
+     */
+    boolean erasing = true;
+    public void toggleEraseMode() {
+        erasing = !erasing;
+        if (erasing) {
+            // check current
+            if (action.focusLost()) {
+                // add action to history
+                history.add(action);
+            }
+        } else {
+            if (history.size() > 0) {
+                action = history.remove(history.size() - 1);
+            } else {
+                setNextAction(actionClass);
+            }
+        }
+        invalidate();
+    }
+
+    void eraseAction(MotionEvent event) {
+        currPointerX = event.getX();
+        currPointerY = event.getY();
+        for (int i = history.size() - 1; i >= 0; i--) {
+            if (history.get(i).contains(currPointerX, currPointerY,10)) {
+                AbstractPaintActionExtendsView act = history.remove(i);
+                removeView(act);
+                redoStack.add(act);
+            }
+        }
     }
 
 
     // EXPERIMENTTs
-
+    static Paint internalPaint;
     void drawHistory(Canvas canvas) {
         if (history == null) {
             return;
+        }
+        if (internalPaint == null) {
+            internalPaint = new Paint();
+            internalPaint.setColor(Color.BLACK);
+            internalPaint.setStrokeWidth(10);
+            internalPaint.setStyle(Paint.Style.STROKE);
         }
         // also draw the history
         canvas.save();
@@ -217,8 +277,7 @@ public class Paper extends FrameLayout {
             dx -= getWidth();
             canvas.save();
             canvas.translate(dx, 0);
-            theOneAndOnlyPaint.setStyle(Paint.Style.STROKE);
-            canvas.drawRect(0, 0, getWidth(), getHeight(), theOneAndOnlyPaint);
+            canvas.drawRect(0, 0, getWidth(), getHeight(), internalPaint);
             history.get(i).draw(canvas);
             canvas.restore();
         }

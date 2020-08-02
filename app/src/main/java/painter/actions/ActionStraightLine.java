@@ -129,4 +129,9 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
             invalidate();
         }
     }
+
+    @Override
+    public boolean contains(float x, float y, float radius) {
+        return false;
+    }
 }

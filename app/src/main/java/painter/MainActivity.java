@@ -38,10 +38,18 @@ public class MainActivity extends AppCompatActivity {
         mLayout.addView(mRedoMenu);
 
 
+
         findViewById(R.id.fab_undo).setOnClickListener((v) -> paper.undo());
         findViewById(R.id.fab_redo).setOnClickListener((v) -> paper.redo());
+
+        experiment();
     }
 
+    void experiment() {
+        findViewById(R.id.test_button).setOnClickListener((v) -> {
+            paper.toggleEraseMode();
+        });
+    }
 
     @Override
     protected void onDestroy() {

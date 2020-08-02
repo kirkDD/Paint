@@ -24,8 +24,7 @@ public class ActionArrow extends ActionStraightLine {
         triangle = new float[]{0, 30, 0, -30, 50, 0};
         colors = new int[]{Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED};
 
-        Shader shader = new LinearGradient(0,0,50,50,Color.RED,Color.GREEN, Shader.TileMode.REPEAT);
-        paint.setShader(shader);
+
     }
 
 
