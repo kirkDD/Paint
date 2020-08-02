@@ -81,9 +81,9 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     coors[currentIndex] = e.getX();
                     coors[currentIndex + 1] = e.getY();
                     // snap to same x
-                    if (Math.abs(coors[0] - coors[2]) < 3) {
+                    if (Math.abs(coors[0] - coors[2]) < 10) {
                         coors[currentIndex] = coors[2 - currentIndex];
-                    } else if (Math.abs(coors[1] - coors[3]) < 3) {
+                    } else if (Math.abs(coors[1] - coors[3]) < 10) {
                         // same y
                         coors[currentIndex + 1] = coors[2 - currentIndex + 1];
                     }
@@ -125,7 +125,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
             paint.setAlpha(HIGHLIGHT_ALPHA);
             paint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
             canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f,
-                    thisWidth * 3 * (float) (1 + Math.sin(animate) * 0.2), paint);
+                    thisWidth * 3 * (float) (1 + Math.sin(animate) * 0.1), paint);
             animate += 0.08;
             invalidate();
         }
