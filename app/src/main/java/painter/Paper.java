@@ -50,14 +50,6 @@ public class Paper extends FrameLayout {
 
     int background_color = -1;
 
-    Class<? extends AbstractPaintActionExtendsView>[] shapes = new Class[]{
-            ActionStroke.class,
-            ActionArrow.class,
-            ActionRectangle.class,
-            ActionStraightLine.class,
-            ActionOval.class
-    };
-
     public Paper(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         Log.d(TAG, "Paper: initializing");
@@ -65,9 +57,10 @@ public class Paper extends FrameLayout {
         theOneAndOnlyPaint.setColor(Color.RED);
         theOneAndOnlyPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         theOneAndOnlyPaint.setStrokeWidth(10);
+        theOneAndOnlyPaint.setTextSize(120);
+
         history = new ArrayList<>();
         redoStack = new Stack<>();
-
 
         initCurrentAction();
     }
@@ -87,8 +80,10 @@ public class Paper extends FrameLayout {
         addView(action);
         // add to history
         history.add(action);
+        // animation start
         histTranslateX = getWidth() * 11;
         invalidate();
+        // callback
         action.setOnCompletion((action) -> {
             initCurrentAction();    // let actions clone themselves
             return null;
@@ -130,6 +125,7 @@ public class Paper extends FrameLayout {
         } else {
             histYTarget = getHeight() * 0.9f;
         }
+        // erasing
         if (erasing) {
             eraseAction(event);
             invalidate();
@@ -139,6 +135,7 @@ public class Paper extends FrameLayout {
             if (selectingHistoryAction(event)) {
                 return true;
             }
+            // real action with Actions
             boolean b = action.handleTouch(event);
             if (!b) { // action has changed through call back
                 b = action.handleTouch(event);
@@ -357,8 +354,9 @@ public class Paper extends FrameLayout {
     };
 
 
-    boolean selectingHistory = false;
 
+    boolean selectingHistory = false;
+    // select history
     boolean selectingHistoryAction(MotionEvent e) {
         if (history.size() == 0) {
             return false;
