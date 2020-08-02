@@ -88,6 +88,21 @@
             android:layout_height="wrap_content"
             android:text="@clear"
             />
+        <Button
+            android:id="@+id/nums"
+            android:onClick="nums"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@nums"
+            />
+
+        <Button
+            android:id="@+id/letters"
+            android:onClick="letters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@letters"
+            />
 
     </LinearLayout>
 

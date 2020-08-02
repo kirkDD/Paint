@@ -17,6 +17,8 @@ import java.util.Arrays;
 
 import cse340.undo.R;
 import painter.actions.ActionArrow;
+import painter.actions.ActionLetters;
+import painter.actions.ActionNumbers;
 import painter.actions.ActionOval;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
@@ -180,6 +182,12 @@ public class MainActivity extends AppCompatActivity {
     }
     public void clear(View v) {
         paper.clear();
+    }
+    public void nums(View v) {
+        paper.setDrawAction(ActionNumbers.class);
+    }
+    public void letters(View v) {
+        paper.setDrawAction(ActionLetters.class);
     }
 
 }
