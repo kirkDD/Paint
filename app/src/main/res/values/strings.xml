@@ -42,4 +42,5 @@
     <string name="action_fab_desc">select an action</string>
     <string name="fab_action">actions</string>
     <string name="shape_fab_desc">select a shape</string>
+    <string name="shapes">shapes</string>
 </resources>
