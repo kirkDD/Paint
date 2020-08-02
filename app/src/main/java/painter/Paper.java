@@ -364,7 +364,6 @@ public class Paper extends FrameLayout {
         // the height of histroy is 0.1 h
         if (e.getActionMasked() == MotionEvent.ACTION_DOWN && e.getY() < histY + getHeight() * 0.1) {
             selectingHistory = true;
-            Log.d(TAG, "selectingHistoryAction: " + histY);
             return true;
         }
         if (selectingHistory) {
