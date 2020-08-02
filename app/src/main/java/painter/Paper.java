@@ -203,9 +203,11 @@ public class Paper extends FrameLayout {
     public void redo() {
         if (redoStack.size() > 0) {
             finishAction();
-            action = redoStack.pop();
-            history.add(action);
+            history.add(redoStack.pop());
+            action = history.get(history.size() - 1);
             addView(action);
+            histTranslateX = getWidth() * 11;
+            invalidate();
         } else {
             Log.i(TAG, "redo: nothing to redo");
         }
