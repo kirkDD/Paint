@@ -20,8 +20,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="painter.MainActivity"
-            android:label="@string/app_name"
+            android:name="painter.DrawingActivity"
+            android:label="Paint"
             android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
