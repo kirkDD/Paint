@@ -204,6 +204,7 @@ public class Paper extends FrameLayout {
         if (redoStack.size() > 0) {
             finishAction();
             action = redoStack.pop();
+            history.add(action);
             addView(action);
         } else {
             Log.i(TAG, "redo: nothing to redo");
