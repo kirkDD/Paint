@@ -212,9 +212,12 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     Path containsPath;
     @Override
     public boolean contains(float x, float y, float radius) {
-        containsPath.addRect(x - radius, y - radius, x + radius, y - radius, Path.Direction.CW);
-        containsPath.op(path, Path.Op.DIFFERENCE);
-        post(() -> containsPath.rewind());
-        return containsPath.isEmpty();
+        containsPath.moveTo(x + pathOffsetX, y + pathOffsetY);
+        containsPath.addCircle(x + pathOffsetX, y + pathOffsetY,
+                radius, Path.Direction.CW);
+        containsPath.op(path, Path.Op.INTERSECT);
+        boolean re = !containsPath.isEmpty();
+        containsPath.rewind();
+        return re;
     }
 }

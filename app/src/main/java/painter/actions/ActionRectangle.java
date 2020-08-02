@@ -167,20 +167,16 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
     @Override
     public boolean contains(float x, float y, float radius) {
         // due to rotation, we need to shift x,y as well
-//        Log.d(TAG, "contains: xy " + x + ", " + y);
         x -= (coors[0] + coors[2]) / 2f;
         y -= (coors[1] + coors[3]) / 2f;
-//        Log.d(TAG, "contains: xy 1 " + x + ", " + y);
         // rotate
         double r = dist(x, y, 0, 0);
-        double ang = angleBetween(x, y, 0, 0) + 90 - rotateAngle;
-//        Log.d(TAG, "contains: ang = " + ang);
+        double ang = 90 + angleBetween(x, y, 0, 0) - rotateAngle;  // 90 is the offset needed
         x = (float) (Math.cos(ang / 180 * Math.PI) * r);
         y = (float) (Math.sin(ang / 180 * Math.PI) * r);
         // go back
         x += (coors[0] + coors[2]) / 2f;
         y += (coors[1] + coors[3]) / 2f;
-//        Log.d(TAG, "contains: xy 2 " + x + ", " + y);
 
         if (coors[0] < coors[2]) {
             if (coors[0] > x + radius || coors[2] < x - radius) return false;

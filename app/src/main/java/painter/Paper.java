@@ -65,7 +65,7 @@ public class Paper extends FrameLayout {
         history = new ArrayList<>();
         redoStack = new Stack<>();
 
-        setNextAction(ActionRectangle.class);
+        setNextAction(ActionStroke.class);
         random = new Random();
     }
 
@@ -91,7 +91,19 @@ public class Paper extends FrameLayout {
             addToHistory();
             return null;
         });
+    }
 
+    /**
+     * interface to select an action
+     * @param action
+     */
+    public void setDrawAction(Class<? extends AbstractPaintActionExtendsView> action) {
+        if (this.action.focusLost()) {
+            history.add(this.action);
+        } else {
+            removeView(this.action);
+        }
+        setNextAction(action);
     }
 
 
@@ -221,7 +233,7 @@ public class Paper extends FrameLayout {
     /**
      * erase action
      */
-    boolean erasing = true;
+    boolean erasing;
     public void toggleEraseMode() {
         erasing = !erasing;
         if (erasing) {

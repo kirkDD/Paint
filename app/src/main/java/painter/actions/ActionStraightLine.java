@@ -118,6 +118,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         conditionalDrawHighlight(canvas);
     }
 
+
     void conditionalDrawHighlight(Canvas canvas) {
         // draw high light
         if (currentState == ActionState.REVISING || currentState == ActionState.STARTED) {
