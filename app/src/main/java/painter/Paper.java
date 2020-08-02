@@ -19,6 +19,7 @@ import java.util.Stack;
 
 import painter.actions.AbstractPaintActionExtendsView;
 import painter.actions.ActionArrow;
+import painter.actions.ActionLetters;
 import painter.actions.ActionNumbers;
 import painter.actions.ActionOval;
 import painter.actions.ActionRectangle;
@@ -44,7 +45,7 @@ public class Paper extends FrameLayout {
     // current action
     AbstractPaintActionExtendsView action;
     // current action's class
-    Class<? extends AbstractPaintActionExtendsView> actionClass = ActionNumbers.class;
+    Class<? extends AbstractPaintActionExtendsView> actionClass = ActionLetters.class;
     static Paint theOneAndOnlyPaint;
 
     int background_color = -1;

@@ -38,9 +38,13 @@ public class ActionNumbers extends ActionStroke {
         lX = e.getX();
         lY = e.getY();
         while (stringBuilder.length() * CHAR_WIDTH < distMoved) {
-            stringBuilder.append(++nextIntToAdd).append("  ");
+            addThingToString();
         }
         return re;
+    }
+
+    void addThingToString() {
+        stringBuilder.append(nextIntToAdd++).append("  ");
     }
 
     @Override
