@@ -2,6 +2,8 @@ package painter;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
@@ -10,6 +12,8 @@ import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+
+import java.util.Arrays;
 
 import cse340.undo.R;
 import painter.actions.ActionArrow;
@@ -119,6 +123,44 @@ public class MainActivity extends AppCompatActivity {
 
         cons.applyTo(mLayout);
         mMenusLastId.put(key, menu.getId());
+    }
+
+    /**
+     * Adds a collapsible menu to the screen.
+     *
+     * @param layoutId  ID of the layout which contains the menu.
+     * @param verticalAnchor    ConstraintSet constant to anchor the menu vertically.
+     * @param horizontalAnchor  ConstraintSet constant to anchor the menu horizontally.
+     * @param items List of collapsible item IDs.
+     * @param listener  Listener to be registered for onClick on each item.
+     */
+    protected void addCollapsableMenu(@LayoutRes int layoutId,
+                                      int verticalAnchor,
+                                      int horizontalAnchor,
+                                      @IdRes int[] items,
+                                      View.OnClickListener listener) {
+        View menu = getLayoutInflater().inflate(layoutId, mLayout, false);
+        addMenu(menu, verticalAnchor, horizontalAnchor);
+
+        ConstraintSet cons = new ConstraintSet();
+        cons.clone(mLayout);
+
+        if (verticalAnchor == ConstraintSet.BOTTOM) {
+            cons.connect(menu.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+        } else {
+            cons.connect(menu.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+        }
+
+        cons.applyTo(mLayout);
+
+        Arrays.stream(items).mapToObj(this::findViewById).forEach(
+                v -> ((View) v).setOnClickListener(listener));
+    }
+
+    protected static void setViewVisibility(View view, boolean visible) {
+        if (view != null) {
+            view.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        }
     }
     // testing hooking up paper
     public void rect(View v) {

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/shape_menu"
+    android:layout_width="wrap_content"
+    android:layout_height="0dp">
+
+    <Button
+        android:id="@+id/rect"
+        android:onClick="rect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/rect"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/rect_desc"
+        android:focusable="true"
+
+        />
+    <Button
+        android:id="@+id/oval"
+        android:onClick="oval"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/oval"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/oval_desc"
+        android:focusable="true"
+        />
+    <Button
+        android:id="@+id/line"
+        android:onClick="line"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/line"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/line_desc"
+        android:focusable="true"
+        />
+    <Button
+        android:id="@+id/arrow"
+        android:onClick="arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/arrow"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/arrow_desc"
+        android:focusable="true"
+        />
+    <Button
+        android:id="@+id/stroke"
+        android:onClick="aStroke"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/stroke"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/stroke_desc"
+        android:focusable="true"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_shape"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:tint="@android:color/white"
+        android:contentDescription="@string/shape_fab_desc"
+        android:focusable="true"
+        app:srcCompat="@drawable/ic_shape" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:text="@string/color_label"
+        android:textAlignment="center"
+        android:textColor="@android:color/black" />
+</FrameLayout>

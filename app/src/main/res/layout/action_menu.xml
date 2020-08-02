@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/action_menu"
+    android:layout_width="wrap_content"
+    android:layout_height="0dp">
+
+    <Button
+    android:id="@+id/edit"
+    android:text="@string/edit_button"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/edit_mode"
+        android:focusable="true"
+    />
+
+    <!--    test buttons -->
+
+    <Button
+        android:id="@+id/erase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/erase"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/erase"
+        android:focusable="true"
+        />
+
+    <Button
+        android:id="@+id/clear"
+        android:onClick="clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/clear"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/clear"
+        android:focusable="true"
+        />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:tint="@android:color/white"
+        android:contentDescription="@string/action_fab_desc"
+        android:focusable="true"
+        app:srcCompat="@drawable/ic_build" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:text="@string/fab_action"
+        android:textAlignment="center"
+        android:textColor="@android:color/black" />
+</FrameLayout>

@@ -25,4 +25,21 @@
     <string name="opacity_desc">Select a line opacity</string>
     <string name="opacity_label">Opacity</string>
     <string name="edit_button">edit</string>
+    <string name="edit_button_desc">edit mode</string>
+    <string name="edit_mode">edit mode</string>
+    <string name="erase">erase</string>
+    <string name="clear">clear</string>
+    <string name="rect">rect</string>
+    <string name="rect_desc">draw a rectangle</string>
+    <string name="oval">oval</string>
+    <string name="oval_desc">draw an oval</string>
+    <string name="line_desc">draw a line</string>
+    <string name="line">line</string>
+    <string name="arrow">arrow</string>
+    <string name="arrow_desc">draw an arrow</string>
+    <string name="stroke">stroke</string>
+    <string name="stroke_desc">draw a stroke</string>
+    <string name="action_fab_desc">select an action</string>
+    <string name="fab_action">actions</string>
+    <string name="shape_fab_desc">select a shape</string>
 </resources>
