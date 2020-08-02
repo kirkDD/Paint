@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.constraint.ConstraintSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.HashSet;
@@ -34,17 +35,12 @@ public class DrawingActivity extends MainActivity{
     private boolean isActionMenuOpen;
     private boolean isShapeMenuOpen;
 
- //   private Set<Integer> menuIDs;
 
-    @SuppressLint("PrivateResource")
+    @SuppressLint({"PrivateResource", "ClickableViewAccessibility"})
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMiniFabSize = getResources().getDimensionPixelSize(R.dimen.design_fab_size_mini);
-//        menuIDs = new HashSet<Integer>() {{
-//            add(R.id.fab_action);
-//            add(R.id.fab_color);
-//            add(R.id.fab_shape);
-//        }};
+
         addCollapsableMenu(R.layout.action_menu, ConstraintSet.BOTTOM, ConstraintSet.END, ACTION_MENU_ITEMS, this::onActionMenuSelected);
         findViewById(R.id.fab_action).setOnClickListener((v) -> {
             enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, isActionMenuOpen);
@@ -55,6 +51,20 @@ public class DrawingActivity extends MainActivity{
         findViewById(R.id.fab_shape).setOnClickListener((v) -> {
             enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, isShapeMenuOpen);
             isShapeMenuOpen = toggleMenu(SHAPE_MENU_ITEMS, isShapeMenuOpen);
+        });
+
+        paper.setOnTouchListener((view, event) -> {
+            if (isShapeMenuOpen) {
+                isActionMenuOpen = toggleMenu(ACTION_MENU_ITEMS, isActionMenuOpen);
+                enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, !isActionMenuOpen);
+                return true;
+            } else if (isActionMenuOpen) {
+                isShapeMenuOpen = toggleMenu(SHAPE_MENU_ITEMS, isShapeMenuOpen);
+                enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, !isShapeMenuOpen);
+                return true;
+            } else {
+                return paper.onTouchEvent(event);
+            }
         });
     }
     /**
