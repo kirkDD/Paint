@@ -19,7 +19,7 @@ public class DrawingActivity extends MainActivity{
     /** List of menu item FABs for action menu. */
     @IdRes
     private static final int[] ACTION_MENU_ITEMS = {
-            R.id.erase, R.id.edit, R.id.clear
+            R.id.erase, R.id.edit_action_button, R.id.clear
     };
 
     /** List of menu item FABs for shape menu. */
@@ -51,7 +51,7 @@ public class DrawingActivity extends MainActivity{
             isActionMenuOpen = toggleMenu(ACTION_MENU_ITEMS, isActionMenuOpen);
         });
 
-        addCollapsableMenu(R.layout.shape_menu, ConstraintSet.BOTTOM, ConstraintSet.END, ACTION_MENU_ITEMS, this::onShapeMenuSelected);
+        addCollapsableMenu(R.layout.shape_menu, ConstraintSet.BOTTOM, ConstraintSet.END, SHAPE_MENU_ITEMS, this::onShapeMenuSelected);
         findViewById(R.id.fab_action).setOnClickListener((v) -> {
             enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, isShapeMenuOpen);
             isShapeMenuOpen = toggleMenu(SHAPE_MENU_ITEMS, isShapeMenuOpen);

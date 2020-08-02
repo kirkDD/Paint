@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void experiment() {
-        findViewById(R.id.test_button).setOnClickListener((v) -> {
+        findViewById(R.id.erase).setOnClickListener((v) -> {
             paper.toggleEraseMode();
         });
     }
