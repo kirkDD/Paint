@@ -116,14 +116,14 @@ public class Paper extends FrameLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // show/hide history
-        if (action.contains(getWidth() / 2f, getHeight() * 1.1f, getWidth() / 2f)) {
-            histYTarget = getHeight();
-            Log.d(TAG, "onTouchEvent: hiding");
+        if (action.contains(getWidth() / 2f, getHeight() * -0.1f, getWidth() / 2f)) {
+            // hide
+            histYTarget = getHeight() * -0.1f;
             delayCount += 1;
             postDelayed(showHistory, 200);
             performClick(); // weird lint issue
         } else {
-            histYTarget = getHeight() * 0.9f;
+            histYTarget = 0;
         }
         // erasing
         if (erasing) {
@@ -238,11 +238,11 @@ public class Paper extends FrameLayout {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        if (histY == 0) {
-            Log.d(TAG, "onLayout: 1st time");
-            histY = bottom - top;
-            histYTarget = histY;
-        }
+//        if (histY == 0) {
+//            Log.d(TAG, "onLayout: 1st time");
+//            histY = 0;
+//            histYTarget = histY;
+//        }
     }
 
 
@@ -348,7 +348,7 @@ public class Paper extends FrameLayout {
     Runnable showHistory = () -> {
         delayCount --;
         if (delayCount == 0) {
-            histYTarget = getHeight() * 0.90f;
+            histYTarget = getHeight() * -0.1f;
             invalidate();
         }
     };
@@ -361,8 +361,10 @@ public class Paper extends FrameLayout {
         if (history.size() == 0) {
             return false;
         }
-        if (e.getActionMasked() == MotionEvent.ACTION_DOWN && e.getY() > histY) {
+        // the height of histroy is 0.1 h
+        if (e.getActionMasked() == MotionEvent.ACTION_DOWN && e.getY() < histY + getHeight() * 0.1) {
             selectingHistory = true;
+            Log.d(TAG, "selectingHistoryAction: " + histY);
             return true;
         }
         if (selectingHistory) {
