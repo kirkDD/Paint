@@ -63,18 +63,23 @@ public class DrawingActivity extends MainActivity{
      * @param view The FAB the user clicked on.
      */
     private void onShapeMenuSelected(View view) {
-//        switch (view.getId()) {
-//            case R.id.rect:
-//                break;
-//            case R.id.oval:
-//                break;
-//            case R.id.line:
-//                break;
-//            case R.id.stroke:
-//                break;
-//            case R.id.arrow:
-//                break;
-//        }
+        switch (view.getId()) {
+            case R.id.rect:
+                rect(view);
+                break;
+            case R.id.oval:
+                oval(view);
+                break;
+            case R.id.line:
+                line(view);
+                break;
+            case R.id.stroke:
+                aStroke(view);
+                break;
+            case R.id.arrow:
+                arrow(view);
+                break;
+        }
         isShapeMenuOpen = toggleMenu(SHAPE_MENU_ITEMS, isShapeMenuOpen);
         enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, !isShapeMenuOpen);
     }
@@ -85,16 +90,17 @@ public class DrawingActivity extends MainActivity{
      * @param view The FAB the user clicked on.
      */
     private void onActionMenuSelected(View view) {
-//        switch (view.getId()) {
-//            case R.id.edit:
-//                paper.editActionButtonClicked();
-//                break;
-//            case R.id.clear:
-//                clear(view);
-//                break;
-//            case R.id.erase:
-//                break;
-//        }
+        switch (view.getId()) {
+            case R.id.edit_action_button:
+                paper.editActionButtonClicked();
+                break;
+            case R.id.clear:
+                clear(view);
+                break;
+            case R.id.erase:
+                paper.toggleEraseMode();
+                break;
+        }
         isActionMenuOpen = toggleMenu(ACTION_MENU_ITEMS, isActionMenuOpen);
         enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, !isActionMenuOpen);
     }
