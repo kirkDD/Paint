@@ -9,7 +9,9 @@
     tools:context="painter.MainActivity"
     android:clipChildren="false"
     android:clipToPadding="false">
-<FrameLayout android:layout_width="match_parent"
+<FrameLayout
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="painter.MainActivity">
 
@@ -20,6 +22,7 @@
         />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_gravity="right"
         android:orientation="vertical"
         android:layout_width="wrap_content"
@@ -44,36 +47,42 @@
             />
 
         <Button
+            android:id="@+id/rect"
             android:onClick="rect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@rect"
             />
         <Button
+            android:id="@+id/oval"
             android:onClick="oval"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@oval"
             />
         <Button
+            android:id="@+id/line"
             android:onClick="line"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@line"
             />
         <Button
+            android:id="@+id/arrow"
             android:onClick="arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@arrow"
             />
         <Button
+            android:id="@+id/stroke"
             android:onClick="aStroke"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@stroke"
             />
         <Button
+            android:id="@+id/clear"
             android:onClick="clear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
