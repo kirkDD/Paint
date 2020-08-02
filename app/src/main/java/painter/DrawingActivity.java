@@ -26,7 +26,7 @@ public class DrawingActivity extends MainActivity{
     /** List of menu item FABs for shape menu. */
     @IdRes
     private static final int[] SHAPE_MENU_ITEMS = {
-            R.id.rect, R.id.oval, R.id.line, R.id.arrow, R.id.stroke
+            R.id.rect, R.id.oval, R.id.line, R.id.arrow, R.id.stroke, R.id.number, R.id.letters
     };
 
     private int mMiniFabSize;
@@ -88,6 +88,12 @@ public class DrawingActivity extends MainActivity{
                 break;
             case R.id.arrow:
                 arrow(view);
+                break;
+            case R.id.number:
+                nums(view);
+                break;
+            case R.id.letters:
+                letters(view);
                 break;
         }
         isShapeMenuOpen = toggleMenu(SHAPE_MENU_ITEMS, isShapeMenuOpen);

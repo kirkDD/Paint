@@ -7,7 +7,6 @@
 
     <Button
         android:id="@+id/rect"
-        android:onClick="rect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/rect"
@@ -21,7 +20,6 @@
         />
     <Button
         android:id="@+id/oval"
-        android:onClick="oval"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/oval"
@@ -34,7 +32,6 @@
         />
     <Button
         android:id="@+id/line"
-        android:onClick="line"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/line"
@@ -47,7 +44,6 @@
         />
     <Button
         android:id="@+id/arrow"
-        android:onClick="arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/arrow"
@@ -60,7 +56,6 @@
         />
     <Button
         android:id="@+id/stroke"
-        android:onClick="aStroke"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/stroke"
@@ -69,6 +64,30 @@
         android:alpha="0"
         android:clickable="false"
         android:contentDescription="@string/stroke_desc"
+        android:focusable="true"
+        />
+    <Button
+        android:id="@+id/number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/number"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/number_desc"
+        android:focusable="true"
+        />
+    <Button
+        android:id="@+id/letters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/letter"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/fab_label_margin"
+        android:alpha="0"
+        android:clickable="false"
+        android:contentDescription="@string/letter_desc"
         android:focusable="true"
         />
 

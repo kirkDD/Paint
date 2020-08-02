@@ -43,4 +43,8 @@
     <string name="fab_action">actions</string>
     <string name="shape_fab_desc">select a shape</string>
     <string name="shapes">shapes</string>
+    <string name="number">number</string>
+    <string name="number_desc">draw a line of number</string>
+    <string name="letter">letter</string>
+    <string name="letter_desc">draw a line of letters</string>
 </resources>
