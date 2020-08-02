@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.ClosedDirectoryStreamException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Stack;
@@ -34,7 +35,7 @@ public class Paper extends FrameLayout {
      * invariant if u can keep it:
      *      action is not null
      *      action is added to view, view group
-     *      action is not in history
+     *      action is not "not" in history, changed Sunday
      */
 
     ArrayList<AbstractPaintActionExtendsView> history;
@@ -67,11 +68,7 @@ public class Paper extends FrameLayout {
 
 
         initCurrentAction();
-        random = new Random();
     }
-
-    // instead of ui to pick actions...
-    Random random;
 
 
     /**
@@ -83,24 +80,26 @@ public class Paper extends FrameLayout {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             Log.e(TAG, "initAction: cannot init class", e);
         }
-        addView(action);
         action.setStyle(theOneAndOnlyPaint); // apply current style
+        // add to view
+        addView(action);
+        // add to history
+        history.add(action);
+        histTranslateX = getWidth() * 11;
+        invalidate();
         action.setOnCompletion((action) -> {
-            addToHistory();
+            initCurrentAction();    // let actions clone themselves
             return null;
         });
     }
 
     /**
-     * must call helper to add to history
+     * end the current action
+     * may produce empty history!
      */
-    void wrapUpCurrentAction() {
-        if (this.action.focusLost()) {
-            history.add(action);
-            histTranslateX = getWidth() * 11;
-            invalidate();
-        } else {
-            removeView(action);
+    void finishAction() {
+        if (!action.focusLost()) {
+            removeView(history.remove(history.size() - 1));
         }
     }
 
@@ -109,7 +108,7 @@ public class Paper extends FrameLayout {
      * set next action - line, rect...
      */
     public void setDrawAction(Class<? extends AbstractPaintActionExtendsView> action) {
-        wrapUpCurrentAction();
+        finishAction();
         actionClass = action;
         initCurrentAction();
     }
@@ -121,6 +120,7 @@ public class Paper extends FrameLayout {
         // show/hide history
         if (action.contains(getWidth() / 2f, getHeight() * 1.1f, getWidth() / 2f)) {
             histYTarget = getHeight();
+            Log.d(TAG, "onTouchEvent: hiding");
             delayCount += 1;
             postDelayed(showHistory, 200);
             performClick(); // weird lint issue
@@ -183,7 +183,7 @@ public class Paper extends FrameLayout {
     ////////////////////
 
     public void undo() {
-        wrapUpCurrentAction();
+        finishAction();
         if (history.size() > 0) {
             redoStack.push(history.remove(history.size() - 1));
             removeView(redoStack.peek());
@@ -191,7 +191,7 @@ public class Paper extends FrameLayout {
             Log.i(TAG, "unDo: nothing to undo");
         }
         if (history.size() > 0) {
-            action = history.remove(history.size() - 1);
+            action = history.get(history.size() - 1);
         } else {
             initCurrentAction();
         }
@@ -200,7 +200,7 @@ public class Paper extends FrameLayout {
 
     public void redo() {
         if (redoStack.size() > 0) {
-            wrapUpCurrentAction();
+            finishAction();
             action = redoStack.pop();
             addView(action);
         } else {
@@ -210,7 +210,7 @@ public class Paper extends FrameLayout {
 
     // you can undo a clear, slowly
     public void clear() {
-        wrapUpCurrentAction();
+        finishAction();
         for (int i = 0; i < history.size(); i++) {
             redoStack.push(history.get(history.size() - 1 - i));
         }
@@ -232,18 +232,16 @@ public class Paper extends FrameLayout {
         }
     }
 
-
-
-    /////////////////////
-    // let actions add themselves
-    /////////////////////
-
-    void addToHistory() {
-        wrapUpCurrentAction();
-        initCurrentAction(); // same action
-        // random action since no ui
-//        initCurrentAction(shapes[random.nextInt(shapes.length)]);
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        if (histY == 0) {
+            Log.d(TAG, "onLayout: 1st time");
+            histY = bottom - top;
+            histYTarget = histY;
+        }
     }
+
 
     // let actions know if they are editing or done
     public void editActionButtonClicked() {
@@ -251,14 +249,14 @@ public class Paper extends FrameLayout {
             toggleEraseMode();
             // stop erasing
         }
-        if (action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.NEW) {
-            // edit the last one
-            if (history.size() > 0) {
-                removeView(action);
-                action = history.remove(history.size() - 1);
-            }
+        finishAction(); 
+        if (history.size() == 0) {
+            Log.i(TAG, "editActionButtonClicked: nothing to edit");
+            initCurrentAction();
+        } else {
+            action = history.get(history.size() - 1);
+            action.editButtonClicked();
         }
-        action.editButtonClicked();
     }
 
     /**
@@ -270,10 +268,10 @@ public class Paper extends FrameLayout {
         erasing = !erasing;
         if (erasing) {
             // check current
-            wrapUpCurrentAction();
+            finishAction();
         } else {
             if (history.size() > 0) {
-                action = history.remove(history.size() - 1);
+                action = history.get(history.size() - 1);
             } else {
                 initCurrentAction();
             }
@@ -363,13 +361,13 @@ public class Paper extends FrameLayout {
             if (e.getActionMasked() == MotionEvent.ACTION_UP) {
                 int oldHistorySize = history.size();
                 // deal with current action
-                wrapUpCurrentAction();
+                finishAction();
                 // select index
-                int index = history.size() - 10 + (int) (e.getX() * 10 / getWidth())
-                        - oldHistorySize == history.size()? 0 : 1;
+                int index = history.size() - 10 + (int) (e.getX() * 10 / getWidth());
                 index = Math.max(0, Math.min(history.size() - 1, index));
                 // move index
                 action = history.remove(index);
+                history.add(action);
                 action.editButtonClicked();
                 selectingHistory = false;
                 invalidate();
