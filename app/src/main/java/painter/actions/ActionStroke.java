@@ -175,6 +175,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
 
     @Override
     public void setStyle(Paint p) {
+        super.setStyle(p);
         thisColor = p.getColor();
         thisWidth = p.getStrokeWidth();
         thisCap = p.getStrokeCap();

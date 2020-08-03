@@ -144,7 +144,9 @@ public abstract class AbstractPaintActionExtendsView extends View {
      * set the styles, ie color, thickness, ...
      * @param p Paint that has those info
      */
-    public abstract void setStyle(Paint p);
+    public void setStyle(Paint p) {
+        invalidate();
+    }
 
     // currState -> FINISHED
     // shouldShowQuickAction -> false

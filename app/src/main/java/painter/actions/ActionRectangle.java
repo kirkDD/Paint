@@ -139,6 +139,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
 
     @Override
     public void setStyle(Paint p) {
+        super.setStyle(p);
         myColor = p.getColor();
         myWidth = p.getStrokeWidth();
         myStyle = p.getStyle();

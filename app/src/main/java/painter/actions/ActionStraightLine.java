@@ -107,6 +107,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
 
     @Override
     public void setStyle(Paint p) {
+        super.setStyle(p);
         thisWidth = p.getStrokeWidth();
         thisColor = p.getColor();
     }

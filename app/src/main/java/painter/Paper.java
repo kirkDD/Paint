@@ -163,7 +163,9 @@ public class Paper extends FrameLayout {
 
     // apply settings
     public void applyPaintEdit() {
-        action.setStyle(theOneAndOnlyPaint);
+        if (action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.REVISING) {
+            action.setStyle(theOneAndOnlyPaint);
+        }
     }
 
     // other settings
