@@ -1,5 +1,8 @@
 package painter;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -17,6 +20,7 @@ import android.view.WindowManager;
 import java.util.Arrays;
 
 import cse340.undo.R;
+import cse340.undo.app.ReversibleDrawingActivity;
 import painter.actions.ActionArrow;
 import painter.actions.ActionLetters;
 import painter.actions.ActionNumbers;
@@ -24,8 +28,11 @@ import painter.actions.ActionOval;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
 import painter.actions.ActionStroke;
+import painter.superactions.AbstractSuperAction;
+import painter.superactions.ActionSave;
 
 public class MainActivity extends AppCompatActivity {
+    static final String TAG = "-=-= MainActivity";
 
     /** View groups containing undo and redo menu buttons. */
     ConstraintLayout mLayout;
@@ -61,7 +68,37 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.fab_undo).setOnClickListener((v) -> paper.undo());
         findViewById(R.id.fab_redo).setOnClickListener((v) -> paper.redo());
 
+        SuperActionManager superActionManager = new SuperActionManager(this);
+        superActionManager.setPaper(paper);
+
+
+        addContentView(superActionManager, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+//        new Thread(() -> {
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            Log.d(TAG, " sending intent ");
+//            Intent i = new Intent(this, ReversibleDrawingActivity.class);
+//            startActivity(i);
+//        }).start();
+
+        getPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
+
     }
+
+    void getPermission(String[] permissions) {
+        for (String per : permissions) {
+            if (checkSelfPermission(per) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{per}, Math.abs(per.hashCode()));
+            }
+        }
+    }
+
+
+
 
     @Override
     protected void onDestroy() {

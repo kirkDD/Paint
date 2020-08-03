@@ -34,6 +34,12 @@ public class Paper extends FrameLayout {
     static final String TAG = "-=-= Paper";
 
 
+    /////////////////////////
+    // for super actions
+    /////////////////////////
+    // rep expose?
+
+
     /**
      * invariant if u can keep it:
      *      action is not null
@@ -41,8 +47,8 @@ public class Paper extends FrameLayout {
      *      action is not "not" in history, changed Sunday
      */
 
-    ArrayList<AbstractPaintActionExtendsView> history;
-    Stack<AbstractPaintActionExtendsView> redoStack;
+    public ArrayList<AbstractPaintActionExtendsView> history;
+    public Stack<AbstractPaintActionExtendsView> redoStack;
     // current action
     AbstractPaintActionExtendsView action;
     // current action's class
@@ -399,4 +405,21 @@ public class Paper extends FrameLayout {
         }
         return false;
     }
+
+
+    //////////////////
+    // super actions
+    //////////////////
+
+    public void drawSelf(Canvas c) {
+        finishAction();
+        c.drawColor(background_color);
+        for (AbstractPaintActionExtendsView act : history) {
+            act.draw(c);
+        }
+        if (history.size() == 0) {
+            initCurrentAction();
+        }
+    }
+
 }
