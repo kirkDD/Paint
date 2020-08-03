@@ -14,7 +14,7 @@ public class ActionNumbers extends ActionStroke {
     float thisTextSize = 150;
     public ActionNumbers(Context context) {
         super(context);
-        CHAR_WIDTH = paint.measureText("0  ") / 3f + 2; // tune width :(
+        CHAR_WIDTH = paint.measureText("0  ") / 3f + 3; // tune width :(
         stringBuilder = new StringBuilder();
     }
 
@@ -32,7 +32,6 @@ public class ActionNumbers extends ActionStroke {
         // only add numbers when drawing, not revising
         if (e.getActionMasked() != MotionEvent.ACTION_DOWN) {
             // threshold to bypass multitouch
-//            distMoved += dist(lX, lY, e.getX(), e.getY()) < 200 ? dist(lX, lY, e.getX(), e.getY()) : 0;
             distMoved += dist(lX, lY, e.getX(), e.getY());
         }
         lX = e.getX();
@@ -49,11 +48,14 @@ public class ActionNumbers extends ActionStroke {
 
     @Override
     protected void onDraw(Canvas canvas) {
+
+        super.onDraw(canvas);
+
+
         paint.setColor(thisColor);
         paint.setStrokeCap(thisCap);
         paint.setStrokeWidth(thisWidth);
         paint.setStrokeJoin(thisJoin);
-        canvas.translate(pathOffsetX, pathOffsetY);
 
         if (currentState == ActionState.REVISING || currentState == ActionState.STARTED) {
             paint.setStyle(Paint.Style.STROKE);
@@ -74,5 +76,7 @@ public class ActionNumbers extends ActionStroke {
     public void setStyle(Paint p) {
         super.setStyle(p);
         thisTextSize = p.getTextSize();
+        paint.setTextSize(thisTextSize);
+        CHAR_WIDTH = paint.measureText("0  ") / 3f + 3; // tune width :(
     }
 }

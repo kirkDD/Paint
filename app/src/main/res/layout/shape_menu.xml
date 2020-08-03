@@ -16,6 +16,8 @@
         android:clickable="false"
         android:contentDescription="@string/rect_desc"
         android:focusable="true"
+        android:textSize="@dimen/shape_button_text_size"
+        android:padding="@dimen/shape_button_padding"
 
         />
     <Button
@@ -29,6 +31,9 @@
         android:clickable="false"
         android:contentDescription="@string/oval_desc"
         android:focusable="true"
+        android:textSize="@dimen/shape_button_text_size"
+        android:padding="@dimen/shape_button_padding"
+
         />
     <Button
         android:id="@+id/line"
@@ -41,6 +46,9 @@
         android:clickable="false"
         android:contentDescription="@string/line_desc"
         android:focusable="true"
+        android:textSize="@dimen/shape_button_text_size"
+        android:padding="@dimen/shape_button_padding"
+
         />
     <Button
         android:id="@+id/arrow"
@@ -53,6 +61,9 @@
         android:clickable="false"
         android:contentDescription="@string/arrow_desc"
         android:focusable="true"
+        android:textSize="@dimen/shape_button_text_size"
+        android:padding="@dimen/shape_button_padding"
+
         />
     <Button
         android:id="@+id/stroke"
@@ -65,6 +76,9 @@
         android:clickable="false"
         android:contentDescription="@string/stroke_desc"
         android:focusable="true"
+        android:textSize="@dimen/shape_button_text_size"
+        android:padding="@dimen/shape_button_padding"
+
         />
     <Button
         android:id="@+id/number"
@@ -77,9 +91,15 @@
         android:clickable="false"
         android:contentDescription="@string/number_desc"
         android:focusable="true"
+        android:textSize="@dimen/shape_button_text_size"
+        android:padding="@dimen/shape_button_padding"
+
         />
     <Button
         android:id="@+id/letters"
+        android:textSize="@dimen/shape_button_text_size"
+        android:padding="@dimen/shape_button_padding"
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/letter"

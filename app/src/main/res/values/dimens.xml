@@ -1,4 +1,7 @@
 <resources>
+<!--    was 24 -->
     <dimen name="fab_label_margin">24dp</dimen>
     <dimen name="fab_parent_margin">16dp</dimen>
+    <dimen name="shape_button_text_size">30sp</dimen>
+    <dimen name="shape_button_padding">5dp</dimen>
 </resources>

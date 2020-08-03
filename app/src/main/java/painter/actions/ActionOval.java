@@ -10,12 +10,10 @@ public class ActionOval extends ActionRectangle {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    void onDraw2(Canvas canvas) {
         paint.setStyle(myStyle);
         paint.setColor(myColor);
         paint.setStrokeWidth(myWidth);
-
-
         if (rotateAngle != 0) {
             canvas.translate((coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2);
             canvas.rotate(-rotateAngle);
@@ -28,8 +26,6 @@ public class ActionOval extends ActionRectangle {
                 Math.max(coors[0], coors[2]),
                 Math.max(coors[1], coors[3]),
                 paint);
-
-        conditionalDrawHighlight(canvas);
     }
 
     @Override

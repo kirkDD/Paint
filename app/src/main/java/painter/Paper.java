@@ -45,7 +45,7 @@ public class Paper extends FrameLayout {
     // current action
     AbstractPaintActionExtendsView action;
     // current action's class
-    Class<? extends AbstractPaintActionExtendsView> actionClass = ActionLetters.class;
+    Class<? extends AbstractPaintActionExtendsView> actionClass = ActionStroke.class;
     static Paint theOneAndOnlyPaint;
 
     int background_color = -1;

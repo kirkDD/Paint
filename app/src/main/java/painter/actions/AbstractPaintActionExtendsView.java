@@ -9,10 +9,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Xfermode;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import cse340.undo.R;
 
 /**
  * parent of all actions
@@ -25,28 +29,82 @@ public abstract class AbstractPaintActionExtendsView extends View {
     static final float HIGHLIGHT_STROKE_WIDTH = 4f;
     static final int HIGHLIGHT_ALPHA = 125;
 
+    static Paint abstractActionPaint;
+
     public AbstractPaintActionExtendsView(Context context) {
         super(context);
         currentState = ActionState.NEW;
+        if (abstractActionPaint == null) {
+            abstractActionPaint = new Paint();
+            abstractActionPaint.setStyle(Paint.Style.STROKE);
+            abstractActionPaint.setStrokeWidth(10);
+            abstractActionPaint.setColor(Color.GREEN);
+            abstractActionPaint.setStrokeCap(Paint.Cap.ROUND);
+
+            abstractActionPaint.setXfermode(HIGHLIGHT_PAINT_MODE);
+            abstractActionPaint.setTextAlign(Paint.Align.CENTER);
+        }
     }
+
+    static RectF quickEditBox;
+    static final int quickBoxWidth = 70;
+    // draw some quick clickable actions
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        Log.e(TAG, "onDraw: don't call default onDraw");
-        Paint paint = new Paint();
-        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setTextSize(100);
-        paint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText(TAG + " fk, not implemented", getWidth() / 2f, getHeight() / 2f, paint);
+        // default drawings
+        // draw action box
+        if (!shouldShowQuickAction ||
+                currentState == ActionState.NEW ||
+                currentState == ActionState.STARTED) {
+            return;
+        }
+        if (quickEditBox == null) {
+            quickEditBox = new RectF(getWidth() - quickBoxWidth ,
+                    getHeight() / 2f - quickBoxWidth,
+                    getWidth(),
+                    getHeight() / 2f + quickBoxWidth);
+        }
+        abstractActionPaint.setTextSize(quickBoxWidth / 1.5f);
+        canvas.drawRect(quickEditBox, abstractActionPaint);
+        canvas.drawText("\u17d2", quickEditBox.centerX(), quickEditBox.centerY(), abstractActionPaint);
     }
 
+    boolean actionBoxTouched(float x, float y) {
+        return shouldShowQuickAction && currentState != ActionState.NEW &&
+                currentState != ActionState.STARTED && quickEditBox != null &&
+                 quickEditBox.contains(x, y);
+    }
+
+
+
+    boolean abstractSkippingEvent;
     /**
      * main way to draw/interact with user
+     *
      * @param e the touch event
      */
-    public abstract boolean handleTouch(MotionEvent e);
+    public boolean handleTouch(MotionEvent e) {
+        // handle click on quick box
+        if (abstractSkippingEvent) {
+            if (e.getActionMasked() == MotionEvent.ACTION_UP) {
+                abstractSkippingEvent = false;
+            }
+            return true;
+        }
+        if (e.getActionMasked() == MotionEvent.ACTION_DOWN &&
+            e.getPointerCount() == 1 && actionBoxTouched(e.getX(), e.getY())) {
+            if (currentState == ActionState.FINISHED) {
+                currentState = ActionState.REVISING;
+            } else if (currentState == ActionState.REVISING) {
+                currentState = ActionState.FINISHED;
+                abstractSkippingEvent = true;
+                return true;
+                // skip this event
+            }
+        }
+        return false;
+    }
 
     /**
      * set the styles, ie color, thickness, ...
@@ -54,15 +112,28 @@ public abstract class AbstractPaintActionExtendsView extends View {
      */
     public abstract void setStyle(Paint p);
 
+    // currState -> FINISHED
+    // shouldShowQuickAction -> false
     UnaryOperator<AbstractPaintActionExtendsView> callWhenDone;
+    UnaryOperator<AbstractPaintActionExtendsView> callWhenDoneSuper;
+
     public void setOnCompletion(UnaryOperator<AbstractPaintActionExtendsView> calledWhenDone) {
-        callWhenDone = calledWhenDone;
+        callWhenDoneSuper = calledWhenDone;
+        callWhenDone = abstractPaintActionExtendsView -> {
+            callWhenDoneSuper.apply(this);
+            currentState = ActionState.FINISHED;
+            shouldShowQuickAction = false;
+            invalidate();
+            return null;
+        };
+
     }
 
     /**
      * switch to edit, then call callWhenDone
      */
     ActionState currentState;
+    boolean shouldShowQuickAction = true;
     public void editButtonClicked() {
         switch (currentState) {
             case NEW:
@@ -70,9 +141,9 @@ public abstract class AbstractPaintActionExtendsView extends View {
             case STARTED:
             case FINISHED:
                 currentState = ActionState.REVISING;
+                shouldShowQuickAction = true;
                 break;
             case REVISING:
-                currentState = ActionState.FINISHED;
                 callWhenDone.apply(this);
         }
         invalidate();
@@ -84,6 +155,7 @@ public abstract class AbstractPaintActionExtendsView extends View {
      *      false if this is empty
      */
     public boolean focusLost() {
+        shouldShowQuickAction = false;
         if (currentState == ActionState.NEW) {
             return false;
         } else {

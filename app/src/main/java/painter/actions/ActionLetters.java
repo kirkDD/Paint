@@ -23,7 +23,7 @@ public class ActionLetters extends ActionNumbers {
 
         // some fum todo
         try {
-            stringBuilder.append((char) (random.nextInt(0x10FFFF)));
+            stringBuilder.append((char) (0x2000 + random.nextInt(0x2e77 - 0x2000)));
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "addThingToString: failed");
         }

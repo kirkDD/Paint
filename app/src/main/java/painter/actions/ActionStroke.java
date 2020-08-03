@@ -23,7 +23,6 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
 
     static Paint paint;
     Path path, savedPath;
-    float pathOffsetX, pathOffsetY;
     Matrix pathTransform;
     float boundW, boundH, boundCX, boundCY; // remember info about path when updating savdPath
 
@@ -43,13 +42,17 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     }
 
     long lastTimeStamp; // should combine quick strokes
+
+    int action = 0; // 0 move, 1 scale, 2 rotate
+    int secondPointerId = -1;
     int pointerId = -1;
 
     float lastX, lastY;
-    int action = 0; // 0 move, 1 scale, 2 rotate
-    int secondPointerId = -1;
     @Override
     public boolean handleTouch(MotionEvent e) {
+        if (super.handleTouch(e)) {
+            return true;
+        }
         int index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK)
                 >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
         int id = e.getPointerId(index);
@@ -75,34 +78,8 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                         return false;
                     }
                 } else if (currentState == ActionState.REVISING) {
-                    // editing?
-                    if (action == 2) return true;  // rotating, ignores new finger
-                    if (e.getPointerCount() == 1) {
-                        pointerId = id;
-                        action = 0;
-                        lastX = e.getX(index);
-                        lastY = e.getY(index);
-                    } else if (e.getPointerCount() == 2) {
-                        if (bound.contains(e.getX(index) - pathOffsetX, e.getY(index) - pathOffsetY)) {
-                            action = 1;
-                            // scale
-                            secondPointerId = id;
-                            path.offset(-bound.centerX(), -bound.centerY());
-                            pathOffsetX = (e.getX(e.findPointerIndex(pointerId)) + e.getX(e.findPointerIndex(secondPointerId))) / 2f;
-                            pathOffsetY = (e.getY(e.findPointerIndex(pointerId)) + e.getY(e.findPointerIndex(secondPointerId))) / 2f;
-                            boundW = bound.width();
-                            boundH = bound.height();
-                        } else {
-                            action = 2;
-                            // rotate
-                            pathTransform.setScale(1, 1);
-                            boundCX = bound.centerX();
-                            boundCY = bound.centerY();
-                        }
-                        savedPath.rewind();
-                        savedPath.addPath(path);
-
-                    }
+                    // editing
+                    revising_ptr_down(e, index, id);
                 }
                 invalidate();
                 return true;
@@ -120,30 +97,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                     }
                 } else if (currentState == ActionState.REVISING) {
                     // translate
-                    if (action == 0) {
-                        pathOffsetX += e.getX(index) - lastX;
-                        pathOffsetY += e.getY(index) - lastY;
-                        lastX = e.getX(index);
-                        lastY = e.getY(index);
-                    } else if (action == 1) {
-                        if (e.findPointerIndex(pointerId) == -1 || e.findPointerIndex(secondPointerId) == -1) {
-                            return true; // finger disappeared
-                        }
-                        pathTransform.setScale(
-                                -(e.getX(e.findPointerIndex(pointerId)) - e.getX(e.findPointerIndex(secondPointerId))) / boundW,
-                                -(e.getY(e.findPointerIndex(pointerId)) - e.getY(e.findPointerIndex(secondPointerId))) / boundH,
-                                    bound.centerX(), bound.centerY());
-                        savedPath.transform(pathTransform, path);
-                        // also translate
-                        pathOffsetX = (e.getX(e.findPointerIndex(pointerId)) + e.getX(e.findPointerIndex(secondPointerId))) / 2f;
-                        pathOffsetY = (e.getY(e.findPointerIndex(pointerId)) + e.getY(e.findPointerIndex(secondPointerId))) / 2f;
-                    } else if (action == 2) {
-                        // rotate
-                        pathTransform.setRotate(
-                                snapAngle((float) -angleBetween(boundCX + pathOffsetX, boundCY + pathOffsetY, e.getX(), e.getY())),
-                                boundCX, boundCY);
-                        savedPath.transform(pathTransform, path);
-                    }
+                    revising_ptr_move(e, index, id);
                     invalidate();
                 }
                 return true;
@@ -154,15 +108,10 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                     lastTimeStamp = System.currentTimeMillis();
                 } else if (currentState == ActionState.REVISING) {
                     // revising
-                    if (action == 1 && e.getPointerCount() == 2) {
+                    if ((action == 1 && e.getPointerCount() == 2) || (action == 2 && e.getPointerCount() == 1)) {
                         action = 0; // back to move
-                        lastX = e.getX(e.findPointerIndex(pointerId));
-                        lastY = e.getY(e.findPointerIndex(pointerId));
-                    } if (action == 2 && e.getPointerCount() == 1) {
-                        // stop
-                        action = 0;
-                        lastX = e.getX(e.findPointerIndex(pointerId));
-                        lastY = e.getY(e.findPointerIndex(pointerId));
+                        boundCX = bound.centerX();
+                        boundCY = bound.centerY();  // stop
                     }
                 }
                 invalidate();
@@ -171,6 +120,58 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                 return false;
         }
     }
+
+
+    void revising_ptr_down(MotionEvent e, int index, int id) {
+        if (action == 2 || action == 1) return;  // rotating, ignores new finger
+        if (e.getPointerCount() == 1) {
+            pointerId = id;
+            action = 0;
+            lastX = e.getX(index);
+            lastY = e.getY(index);
+        } else if (e.getPointerCount() == 2) {
+            if (bound.contains(e.getX(index), e.getY(index))) {
+                action = 1;
+                // scale
+                secondPointerId = id;
+            } else {
+                action = 2;
+                // rotate
+            }
+        }
+        pathTransform.reset();
+        boundW = bound.width();
+        boundH = bound.height();
+        boundCX = bound.centerX();
+        boundCY = bound.centerY();
+        savedPath.rewind();
+        savedPath.addPath(path);
+    }
+
+    void revising_ptr_move(MotionEvent e, int index, int id) {
+        if (action == 0) {
+            pathTransform.setTranslate(e.getX(index) - lastX, e.getY(index) - lastY);
+        } else if (action == 1) {
+            if (e.findPointerIndex(pointerId) == -1 || e.findPointerIndex(secondPointerId) == -1) {
+                return; // finger disappeared
+            }
+            pathTransform.setScale(
+                    -(e.getX(e.findPointerIndex(pointerId)) - e.getX(e.findPointerIndex(secondPointerId))) / boundW,
+                    -(e.getY(e.findPointerIndex(pointerId)) - e.getY(e.findPointerIndex(secondPointerId))) / boundH,
+                    boundCX, boundCY);
+            pathTransform.postTranslate(
+                    (e.getX(e.findPointerIndex(pointerId)) + e.getX(e.findPointerIndex(secondPointerId))) / 2f - boundCX,
+                    (e.getY(e.findPointerIndex(pointerId)) + e.getY(e.findPointerIndex(secondPointerId))) / 2f - boundCY);
+            // also translate
+        } else if (action == 2) {
+            // rotate
+            pathTransform.setRotate(
+                    snapAngle((float) -angleBetween(boundCX, boundCY, e.getX(), e.getY())),
+                    boundCX, boundCY);
+        }
+        savedPath.transform(pathTransform, path);
+    }
+
 
     @Override
     public void setStyle(Paint p) {
@@ -184,13 +185,13 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     float animate;
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
 
         paint.setColor(thisColor);
         paint.setStrokeCap(thisCap);
         paint.setStrokeWidth(thisWidth);
         paint.setStrokeJoin(thisJoin);
         paint.setStyle(Paint.Style.STROKE);
-        canvas.translate(pathOffsetX, pathOffsetY);
 
         canvas.drawPath(path, paint);
 
@@ -224,9 +225,8 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     Path containsPath;
     @Override
     public boolean contains(float x, float y, float radius) {
-        containsPath.moveTo(x + pathOffsetX, y + pathOffsetY);
-        containsPath.addCircle(x + pathOffsetX, y + pathOffsetY,
-                radius, Path.Direction.CW);
+        containsPath.moveTo(x, y);
+        containsPath.addCircle(x, y, radius, Path.Direction.CW);
         containsPath.op(path, Path.Op.INTERSECT);
         boolean re = !containsPath.isEmpty();
         containsPath.rewind();
