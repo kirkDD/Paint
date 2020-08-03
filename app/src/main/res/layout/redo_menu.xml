@@ -5,23 +5,23 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|center"
-        android:text="@string/redo_label"
-        android:textAlignment="center"
-        android:textColor="@android:color/black" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_redo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
-        android:layout_marginTop="@dimen/fab_label_margin"
+        android:layout_marginBottom="@dimen/fab_label_margin"
         android:tint="@android:color/white"
         android:contentDescription="@string/redo_desc"
         android:focusable="true"
         app:srcCompat="@drawable/ic_redo" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:text="@string/redo_label"
+        android:textAlignment="center"
+        android:textColor="@android:color/black" />
 
 </FrameLayout>

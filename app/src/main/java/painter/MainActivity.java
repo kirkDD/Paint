@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
         // set up undo/redo button
         mUndoMenu = (ViewGroup) getLayoutInflater().inflate(R.layout.undo_menu, mLayout , false);
         mRedoMenu = (ViewGroup) getLayoutInflater().inflate(R.layout.redo_menu, mLayout , false);
-        addMenu(mUndoMenu, ConstraintSet.TOP, ConstraintSet.START);
-        addMenu(mRedoMenu, ConstraintSet.TOP, ConstraintSet.START);
+        addMenu(mUndoMenu, ConstraintSet.BOTTOM, ConstraintSet.START);
+        addMenu(mRedoMenu, ConstraintSet.BOTTOM, ConstraintSet.START);
 
 
 

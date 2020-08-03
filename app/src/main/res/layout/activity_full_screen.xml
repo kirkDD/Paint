@@ -20,7 +20,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
-
-
 </FrameLayout>
+    <cse340.undo.app.ColorPickerView
+        android:id="@+id/colorpicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="100dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="invisible"
+        android:clickable="false"
+        android:focusable="false" />
 </android.support.constraint.ConstraintLayout>

@@ -3,20 +3,21 @@ package painter;
 import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.constraint.ConstraintSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import cse340.undo.R;
-import cse340.undo.actions.ChangeThicknessAction;
+import cse340.undo.app.AbstractColorPickerView;
+import cse340.undo.app.ColorPickerView;
 
-public class DrawingActivity extends MainActivity{
+public class DrawingActivity extends MainActivity implements AbstractColorPickerView.ColorChangeListener{
 
     /** List of menu item FABs for action menu. */
     @IdRes
@@ -35,22 +36,37 @@ public class DrawingActivity extends MainActivity{
     /** State variables used to track whether menus are open. */
     private boolean isActionMenuOpen;
     private boolean isShapeMenuOpen;
-
+    private boolean isColorMenuOpen;
+    /** the ColorPicker that selects color */
+    protected ColorPickerView mColorPickerView;
 
     @SuppressLint({"PrivateResource", "ClickableViewAccessibility"})
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMiniFabSize = getResources().getDimensionPixelSize(R.dimen.design_fab_size_mini);
 
-        addCollapsableMenu(R.layout.action_menu, ConstraintSet.BOTTOM, ConstraintSet.END, ACTION_MENU_ITEMS, this::onActionMenuSelected);
+        mColorPickerView =findViewById(R.id.colorpicker);
+        mColorPickerView.setColor(AbstractColorPickerView.DEFAULT_COLOR);
+        mColorPickerView.addColorChangeListener(this);
+
+        View colorMenu = getLayoutInflater().inflate(R.layout.color_menu, mLayout, false);
+        addMenu(colorMenu, ConstraintSet.BOTTOM, ConstraintSet.START);
+        findViewById(R.id.fab_color).setOnClickListener((v) -> {
+            enableCollapsibleMenu(R.id.fab_action,ACTION_MENU_ITEMS, isColorMenuOpen);
+            enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, isColorMenuOpen);
+            isColorMenuOpen = showColorPicker(isColorMenuOpen);
+        });
+        addCollapsableMenu(R.layout.action_menu, ConstraintSet.BOTTOM, ConstraintSet.START, ACTION_MENU_ITEMS, this::onActionMenuSelected);
         findViewById(R.id.fab_action).setOnClickListener((v) -> {
             enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, isActionMenuOpen);
+            enableFAB(R.id.fab_color, isActionMenuOpen);
             isActionMenuOpen = toggleMenu(ACTION_MENU_ITEMS, isActionMenuOpen);
         });
 
-        addCollapsableMenu(R.layout.shape_menu, ConstraintSet.BOTTOM, ConstraintSet.END, SHAPE_MENU_ITEMS, this::onShapeMenuSelected);
+        addCollapsableMenu(R.layout.shape_menu, ConstraintSet.BOTTOM, ConstraintSet.START, SHAPE_MENU_ITEMS, this::onShapeMenuSelected);
         findViewById(R.id.fab_shape).setOnClickListener((v) -> {
             enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, isShapeMenuOpen);
+            enableFAB(R.id.fab_color, isShapeMenuOpen);
             isShapeMenuOpen = toggleMenu(SHAPE_MENU_ITEMS, isShapeMenuOpen);
         });
 
@@ -59,18 +75,43 @@ public class DrawingActivity extends MainActivity{
                 if (event.getActionMasked() == MotionEvent.ACTION_UP && event.getPointerCount() == 1) {
                     isShapeMenuOpen = toggleMenu(SHAPE_MENU_ITEMS, isShapeMenuOpen);
                     enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, !isShapeMenuOpen);
+                    enableFAB(R.id.fab_color, !isShapeMenuOpen);
                 }
                 return true;
             } else if (isActionMenuOpen) {
                 if (event.getActionMasked() == MotionEvent.ACTION_UP && event.getPointerCount() == 1) {
                     isActionMenuOpen = toggleMenu(ACTION_MENU_ITEMS, isActionMenuOpen);
                     enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, !isActionMenuOpen);
+                    enableFAB(R.id.fab_color, !isActionMenuOpen);
+                }
+                return true;
+            } else if (isColorMenuOpen) {
+                if (event.getActionMasked() == MotionEvent.ACTION_UP && event.getPointerCount() == 1) {
+                    isColorMenuOpen = showColorPicker(isColorMenuOpen);
+                    enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, !isColorMenuOpen);
+                    enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, !isColorMenuOpen);
                 }
                 return true;
             } else {
                 return paper.onTouchEvent(event);
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //  deregister the color change listener
+        mColorPickerView.removeColorChangeListener(this);
+    }
+    /**
+     * callback for creating an action when the user changes the shape.
+     * @param view The FAB the user clicked on.
+     */
+    private void onColorMenuSelected(View view) {
+        isColorMenuOpen = showColorPicker(isColorMenuOpen);
+        enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, !isColorMenuOpen);
+        enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, !isColorMenuOpen);
     }
     /**
      * Callback for creating an action when the user changes the shape.
@@ -103,6 +144,7 @@ public class DrawingActivity extends MainActivity{
         }
         isShapeMenuOpen = toggleMenu(SHAPE_MENU_ITEMS, isShapeMenuOpen);
         enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, !isShapeMenuOpen);
+        enableFAB(R.id.fab_color, !isShapeMenuOpen);
     }
 
     /**
@@ -124,6 +166,8 @@ public class DrawingActivity extends MainActivity{
         }
         isActionMenuOpen = toggleMenu(ACTION_MENU_ITEMS, isActionMenuOpen);
         enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, !isActionMenuOpen);
+        enableCollapsibleMenu(R.id.fab_color, new int[0], !isActionMenuOpen);
+        //enableFAB(R.id.fab_color, !isActionMenuOpen);
     }
 
     /**
@@ -182,4 +226,34 @@ public class DrawingActivity extends MainActivity{
                 getResources().getColor(R.color.colorAccent) : Color.LTGRAY));
     }
 
+    /**
+     * toggles the visibility of ColorPicker
+     * @param open whether the ColorPicker was open or not
+     * @return !open
+     */
+    private boolean showColorPicker(boolean open) {
+        enableFAB(R.id.fab_undo, open);
+        enableFAB(R.id.fab_redo, open);
+        View colorpicker = findViewById(R.id.colorpicker);
+        if (!open) {
+            colorpicker.setVisibility(View.VISIBLE);
+            colorpicker.setFocusable(true);
+            colorpicker.setClickable(true);
+            return true;
+        } else {
+            colorpicker.setVisibility(View.INVISIBLE);
+            colorpicker.setFocusable(false);
+            colorpicker.setClickable(false);
+            return false;
+        }
+    }
+    @Override
+    public void onColorSelected(int color) {
+        isColorMenuOpen = showColorPicker(isColorMenuOpen);
+        enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, !isColorMenuOpen);
+        enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, !isColorMenuOpen);
+        Paint p = paper.getPaintToEdit();
+        p.setColor(color);
+       paper.applyPaintEdit();
+    }
 }
