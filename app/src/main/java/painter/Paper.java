@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import java.lang.reflect.InvocationTargetException;
@@ -184,13 +185,13 @@ public class Paper extends FrameLayout {
 
     public void undo() {
         finishAction();
-        if (history.size() > 0) {
+        if (canUndo()) {
             redoStack.push(history.remove(history.size() - 1));
             removeView(redoStack.peek());
         } else {
             Log.i(TAG, "unDo: nothing to undo");
         }
-        if (history.size() > 0) {
+        if (canUndo()) {
             action = history.get(history.size() - 1);
         } else {
             initCurrentAction();
@@ -199,7 +200,7 @@ public class Paper extends FrameLayout {
     }
 
     public void redo() {
-        if (redoStack.size() > 0) {
+        if (canRedo()) {
             finishAction();
             history.add(redoStack.pop());
             action = history.get(history.size() - 1);
@@ -220,6 +221,14 @@ public class Paper extends FrameLayout {
         history.clear();
         removeAllViews();
         initCurrentAction();
+    }
+
+    public boolean canUndo() {
+        return !history.isEmpty();
+    }
+
+    public boolean canRedo() {
+        return !redoStack.isEmpty();
     }
 
     float currPointerX, currPointerY;
@@ -277,7 +286,7 @@ public class Paper extends FrameLayout {
             // check current
             finishAction();
         } else {
-            if (history.size() > 0) {
+            if (canUndo()) {
                 action = history.get(history.size() - 1);
             } else {
                 initCurrentAction();
@@ -371,7 +380,7 @@ public class Paper extends FrameLayout {
             if (e.getActionMasked() == MotionEvent.ACTION_UP) {
                 // deal with current action
                 finishAction(); // zero size array
-                if (history.size() == 0) {
+                if (!canUndo()) {
                     initCurrentAction();
                     return true;
                 }
