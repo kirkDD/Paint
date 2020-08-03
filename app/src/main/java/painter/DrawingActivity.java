@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.constraint.ConstraintSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -55,12 +56,16 @@ public class DrawingActivity extends MainActivity{
 
         paper.setOnTouchListener((view, event) -> {
             if (isShapeMenuOpen) {
-                isActionMenuOpen = toggleMenu(ACTION_MENU_ITEMS, isActionMenuOpen);
-                enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, !isActionMenuOpen);
+                if (event.getActionMasked() == MotionEvent.ACTION_UP && event.getPointerCount() == 1) {
+                    isShapeMenuOpen = toggleMenu(SHAPE_MENU_ITEMS, isShapeMenuOpen);
+                    enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, !isShapeMenuOpen);
+                }
                 return true;
             } else if (isActionMenuOpen) {
-                isShapeMenuOpen = toggleMenu(SHAPE_MENU_ITEMS, isShapeMenuOpen);
-                enableCollapsibleMenu(R.id.fab_action, ACTION_MENU_ITEMS, !isShapeMenuOpen);
+                if (event.getActionMasked() == MotionEvent.ACTION_UP && event.getPointerCount() == 1) {
+                    isActionMenuOpen = toggleMenu(ACTION_MENU_ITEMS, isActionMenuOpen);
+                    enableCollapsibleMenu(R.id.fab_shape, SHAPE_MENU_ITEMS, !isActionMenuOpen);
+                }
                 return true;
             } else {
                 return paper.onTouchEvent(event);

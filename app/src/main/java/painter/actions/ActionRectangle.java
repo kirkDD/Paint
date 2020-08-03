@@ -50,6 +50,11 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
     float lastX, lastY;
     @Override
     public boolean handleTouch(MotionEvent e) {
+
+        if (super.handleTouch(e)) {
+            return true;
+        }
+
         int index = (e.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK)
                 >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
         int id = e.getPointerId(index);
@@ -143,10 +148,15 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
     float time = 0;
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
 
-        paint.setColor(myColor);
-        paint.setStrokeWidth(myWidth);
-        paint.setStyle(myStyle);
+        onDraw2(canvas);
+
+        // show editing
+        conditionalDrawHighlight(canvas);
+    }
+
+    void onDraw2(Canvas canvas) {
 
         if (rotateAngle != 0) {
             canvas.translate((coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2);
@@ -154,15 +164,16 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
             canvas.translate(-(coors[0] + coors[2]) / 2, -(coors[1] + coors[3]) / 2);
         }
 
+        paint.setColor(myColor);
+        paint.setStrokeWidth(myWidth);
+        paint.setStyle(myStyle);
+
         canvas.drawRect(
                 Math.min(coors[0], coors[2]),
                 Math.min(coors[1], coors[3]),
                 Math.max(coors[0], coors[2]),
                 Math.max(coors[1], coors[3]),
                 paint);
-
-        // show editing
-        conditionalDrawHighlight(canvas);
     }
 
 
@@ -201,7 +212,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
             paint.setStyle(Paint.Style.STROKE);
             paint.setXfermode(HIGHLIGHT_PAINT_MODE);
             canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f,
-                    (float) (dist(coors[0], coors[1], coors[2], coors[3]) / 20f * (0.1 * Math.sin(time) + 1)),
+                    (float) (dist(coors[0], coors[1], coors[2], coors[3]) / 30f * (0.1 * Math.sin(time) + 1)) + 10,
                     paint);
             paint.setXfermode(null);
             time += 0.08;
@@ -209,4 +220,19 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         }
     }
 
+
+    // subclassing
+
+
+    @Override
+    void toggleFill() {
+        if (myStyle == Paint.Style.FILL) {
+            myStyle = Paint.Style.STROKE;
+        } else if (myStyle == Paint.Style.STROKE) {
+            myStyle = Paint.Style.FILL;
+        } else {
+            myStyle = Paint.Style.FILL;
+        }
+        invalidate();
+    }
 }

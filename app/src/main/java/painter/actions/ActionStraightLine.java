@@ -38,6 +38,9 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
     float lastX, lastY;
     @Override
     public boolean handleTouch(MotionEvent e) {
+        if (super.handleTouch(e)) {
+            return true;
+        }
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 if (currentState == ActionState.NEW) {
@@ -71,10 +74,12 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_UP:
                 if (currentIndex == -1) { // move both
-                    coors[0] -= lastX - e.getX();
-                    coors[1] -= lastY - e.getY();
-                    coors[2] -= lastX - e.getX();
-                    coors[3] -= lastY - e.getY();
+                    if (Math.abs(lastX - e.getX()) < 250 && Math.abs(lastY - e.getY()) < 250) {
+                        coors[0] -= lastX - e.getX();
+                        coors[1] -= lastY - e.getY();
+                        coors[2] -= lastX - e.getX();
+                        coors[3] -= lastY - e.getY();
+                    }
                     lastX = e.getX();
                     lastY = e.getY();
                 } else { // move one end point
@@ -109,6 +114,8 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
     float animate = 0;
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
         // draw line
         paint.setColor(thisColor);
         paint.setStrokeWidth(thisWidth);
@@ -116,6 +123,8 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
 
         // draw high light
         conditionalDrawHighlight(canvas);
+
+
     }
 
 
@@ -124,8 +133,10 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         if (currentState == ActionState.REVISING || currentState == ActionState.STARTED) {
             paint.setAlpha(HIGHLIGHT_ALPHA);
             paint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
+            paint.setXfermode(HIGHLIGHT_PAINT_MODE);
             canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f,
                     thisWidth * 3 * (float) (1 + Math.sin(animate) * 0.1), paint);
+            paint.setXfermode(null);
             animate += 0.08;
             invalidate();
         }
