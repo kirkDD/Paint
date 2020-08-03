@@ -157,15 +157,16 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
     }
 
     void onDraw2(Canvas canvas) {
-        paint.setColor(myColor);
-        paint.setStrokeWidth(myWidth);
-        paint.setStyle(myStyle);
 
         if (rotateAngle != 0) {
             canvas.translate((coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2);
             canvas.rotate(-rotateAngle);
             canvas.translate(-(coors[0] + coors[2]) / 2, -(coors[1] + coors[3]) / 2);
         }
+
+        paint.setColor(myColor);
+        paint.setStrokeWidth(myWidth);
+        paint.setStyle(myStyle);
 
         canvas.drawRect(
                 Math.min(coors[0], coors[2]),
@@ -219,4 +220,19 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         }
     }
 
+
+    // subclassing
+
+
+    @Override
+    void toggleFill() {
+        if (myStyle == Paint.Style.FILL) {
+            myStyle = Paint.Style.STROKE;
+        } else if (myStyle == Paint.Style.STROKE) {
+            myStyle = Paint.Style.FILL;
+        } else {
+            myStyle = Paint.Style.FILL;
+        }
+        invalidate();
+    }
 }

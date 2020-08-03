@@ -47,10 +47,7 @@ public class ActionNumbers extends ActionStroke {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-
-        super.onDraw(canvas);
-
+    void onDraw2(Canvas canvas) {
 
         paint.setColor(thisColor);
         paint.setStrokeCap(thisCap);
@@ -66,10 +63,6 @@ public class ActionNumbers extends ActionStroke {
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(thisTextSize);
         canvas.drawTextOnPath(stringBuilder.toString(), path, 0, 0, paint);
-
-
-        conditionalDrawHighlight(canvas);
-
     }
 
     @Override

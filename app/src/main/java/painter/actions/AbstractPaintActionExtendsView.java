@@ -37,12 +37,13 @@ public abstract class AbstractPaintActionExtendsView extends View {
         if (abstractActionPaint == null) {
             abstractActionPaint = new Paint();
             abstractActionPaint.setStyle(Paint.Style.STROKE);
-            abstractActionPaint.setStrokeWidth(10);
+            abstractActionPaint.setStrokeWidth(4);
             abstractActionPaint.setColor(Color.GREEN);
             abstractActionPaint.setStrokeCap(Paint.Cap.ROUND);
 
             abstractActionPaint.setXfermode(HIGHLIGHT_PAINT_MODE);
             abstractActionPaint.setTextAlign(Paint.Align.CENTER);
+            abstractActionPaint.setTextSize(quickBoxWidth / 1.5f);
         }
     }
 
@@ -64,16 +65,38 @@ public abstract class AbstractPaintActionExtendsView extends View {
                     getHeight() / 2f - quickBoxWidth,
                     getWidth(),
                     getHeight() / 2f + quickBoxWidth);
+            toggleFillBox = new RectF(getWidth() - quickBoxWidth ,
+                    getHeight() / 2f - quickBoxWidth * 3,
+                    getWidth(),
+                    getHeight() / 2f - quickBoxWidth);
+
         }
-        abstractActionPaint.setTextSize(quickBoxWidth / 1.5f);
+
+
+        if (animateQuickButton) {
+            canvas.save();
+            canvas.clipRect(animateBounds);
+            abstractActionPaint.setAlpha(animateQBAlpha);
+            abstractActionPaint.setStyle(Paint.Style.FILL);
+            abstractActionPaint.setXfermode(null);
+            canvas.drawCircle(animateX, animateY, animateQBRadius, abstractActionPaint);
+            canvas.restore();
+            if (animateQBRadius < quickBoxWidth * 2) {
+                animateQBRadius += (quickBoxWidth * 2 - animateQBRadius) * 0.08 + 1;
+                animateQBAlpha = (int) (255 - 255 * (animateQBRadius / (quickBoxWidth * 2)));
+                invalidate();
+            }
+        }
+
+        abstractActionPaint.setXfermode(HIGHLIGHT_PAINT_MODE);
+        abstractActionPaint.setStyle(Paint.Style.STROKE);
+        abstractActionPaint.setAlpha(255);
         canvas.drawRect(quickEditBox, abstractActionPaint);
         canvas.drawText("\u17d2", quickEditBox.centerX(), quickEditBox.centerY(), abstractActionPaint);
-    }
 
-    boolean actionBoxTouched(float x, float y) {
-        return shouldShowQuickAction && currentState != ActionState.NEW &&
-                currentState != ActionState.STARTED && quickEditBox != null &&
-                 quickEditBox.contains(x, y);
+        canvas.drawRect(toggleFillBox, abstractActionPaint);
+        canvas.drawText("\u176e", toggleFillBox.centerX(), toggleFillBox.centerY(), abstractActionPaint);
+
     }
 
 
@@ -93,14 +116,25 @@ public abstract class AbstractPaintActionExtendsView extends View {
             return true;
         }
         if (e.getActionMasked() == MotionEvent.ACTION_DOWN &&
-            e.getPointerCount() == 1 && actionBoxTouched(e.getX(), e.getY())) {
-            if (currentState == ActionState.FINISHED) {
-                currentState = ActionState.REVISING;
-            } else if (currentState == ActionState.REVISING) {
-                currentState = ActionState.FINISHED;
+            e.getPointerCount() == 1) {
+            if (actionBoxTouched(e.getX(), e.getY())) {
+                if (currentState == ActionState.FINISHED) {
+                    currentState = ActionState.REVISING;
+                    abstractSkippingEvent = true;
+                    startButtonClickedAnimation(quickEditBox, e.getX(), e.getY());
+                    return true;
+                } else if (currentState == ActionState.REVISING) {
+                    currentState = ActionState.FINISHED;
+                    abstractSkippingEvent = true;
+                    startButtonClickedAnimation(quickEditBox, e.getX(), e.getY());
+                    return true;
+                    // skip this event
+                }
+            } else if (toggleFillBoxTouched(e.getX(), e.getY())) {
+                toggleFill();
                 abstractSkippingEvent = true;
+                startButtonClickedAnimation(toggleFillBox, e.getX(), e.getY());
                 return true;
-                // skip this event
             }
         }
         return false;
@@ -207,6 +241,40 @@ public abstract class AbstractPaintActionExtendsView extends View {
 
     public enum ActionState {
         NEW, STARTED, FINISHED, REVISING;
+
+    }
+
+    // quick buttons
+    boolean animateQuickButton;
+    RectF animateBounds;
+    float animateQBRadius, animateX, animateY;
+    int animateQBAlpha = 255;
+    void startButtonClickedAnimation(RectF bounds, float x, float y) {
+        animateQBRadius = 0;
+        animateQBAlpha = 255;
+        animateQuickButton = true;
+        animateX = x;
+        animateY = y;
+        animateBounds = bounds;
+        invalidate();
+    }
+
+
+    boolean actionBoxTouched(float x, float y) {
+        return shouldShowQuickAction && currentState != ActionState.NEW &&
+                currentState != ActionState.STARTED && quickEditBox != null &&
+                quickEditBox.contains(x, y);
+    }
+
+    static RectF toggleFillBox;
+
+    boolean toggleFillBoxTouched(float x, float y) {
+        return toggleFillBox != null && toggleFillBox.contains(x, y);
+    }
+
+
+    // internal sub classing
+    void toggleFill() {
 
     }
 

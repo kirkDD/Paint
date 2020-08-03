@@ -187,6 +187,13 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        onDraw2(canvas);
+
+        conditionalDrawHighlight(canvas);
+
+    }
+
+    void onDraw2(Canvas canvas) {
         paint.setColor(thisColor);
         paint.setStrokeCap(thisCap);
         paint.setStrokeWidth(thisWidth);
@@ -194,9 +201,6 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
         paint.setStyle(Paint.Style.STROKE);
 
         canvas.drawPath(path, paint);
-
-        conditionalDrawHighlight(canvas);
-
     }
 
     void conditionalDrawHighlight(Canvas canvas) {
