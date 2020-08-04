@@ -87,6 +87,20 @@ public class ActionGroupSelect extends AbstractSuperAction {
                 }
                 selectionPath.close();
                 selectionPath.rewind();
+                // text
+                AbstractPaintActionExtendsView combined = new ActionStroke(context);
+                Path combinedPath = new Path();
+                for (AbstractPaintActionExtendsView act : selected) {
+                    act.addToPath(combinedPath);
+                    myPaper.history.remove(act);
+                    myPaper.removeView(act);
+                }
+                combined.setStrokePath(combinedPath);
+                myPaper.history.add(combined);
+                myPaper.addView(combined);
+                myPaper.action = combined;
+                myPaper.applyPaintEdit();
+                done = true;
         }
 
         return true;

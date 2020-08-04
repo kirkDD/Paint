@@ -50,7 +50,7 @@ public class Paper extends FrameLayout {
     public ArrayList<AbstractPaintActionExtendsView> history;
     public Stack<AbstractPaintActionExtendsView> redoStack;
     // current action
-    AbstractPaintActionExtendsView action;
+    public AbstractPaintActionExtendsView action;
     // current action's class
     Class<? extends AbstractPaintActionExtendsView> actionClass = ActionStroke.class;
     static Paint theOneAndOnlyPaint;

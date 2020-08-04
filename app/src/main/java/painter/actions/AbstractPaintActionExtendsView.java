@@ -227,8 +227,21 @@ public abstract class AbstractPaintActionExtendsView extends View {
         return touchesPath(containsPath);
     }
 
+    // touches by path: group select
     public boolean touchesPath(Path origin) {
         return containsPath.op(myPath, origin, Path.Op.INTERSECT) && !containsPath.isEmpty();
+    }
+
+    // combining actions
+    public void addToPath(Path dst) {
+        dst.addPath(myPath);
+    }
+
+    public void setStrokePath(Path src) {
+        myPath.reset();
+        myPath.addPath(src);
+        currentState = ActionState.REVISING; // for Paper.setStyle to work
+        invalidate();
     }
 
     /**

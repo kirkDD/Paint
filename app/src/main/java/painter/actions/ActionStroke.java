@@ -12,6 +12,9 @@ import android.view.MotionEvent;
 
 
 public class ActionStroke extends AbstractPaintActionExtendsView {
+    
+    static final String TAG = "-=-= ActionStroke";
+    
 
     public static final float MIN_MOVE_DIST = 5;
     static final long NEW_INSTANCE_DELAY_MS = 300;
@@ -36,6 +39,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
         savedPath = new Path();
         bound = new RectF();
         pathTransform = new Matrix();
+        Log.d(TAG, "ActionStroke: init");
     }
 
     long lastTimeStamp; // should combine quick strokes
@@ -173,6 +177,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     @Override
     public void setStyle(Paint p) {
         super.setStyle(p);
+        Log.d(TAG, "setStyle: style " + p.getStrokeCap());
         thisColor = p.getColor();
         thisWidth = p.getStrokeWidth();
         thisCap = p.getStrokeCap();
@@ -192,6 +197,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     }
 
     void onDraw2(Canvas canvas) {
+        Log.d(TAG, "onDraw2: cap " + thisCap);
         paint.setColor(thisColor);
         paint.setStrokeCap(thisCap);
         paint.setStrokeWidth(thisWidth);
