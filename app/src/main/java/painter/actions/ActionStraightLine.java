@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.util.Log;
 import android.view.MotionEvent;
 
 /**
@@ -28,8 +30,6 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
             paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setAntiAlias(true);
         }
-        thisColor = Color.RED; // default
-        thisWidth = 10f; // default
         coors = new float[4];
     }
 
@@ -69,6 +69,11 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                         currentIndex = -1;
                     }
                 }
+                myPath.rewind();
+                myPath.moveTo(coors[0], coors[1]);
+                myPath.lineTo(coors[2], coors[3]);
+                myPath.lineTo(coors[2] + 1, coors[3] + 1);
+
                 invalidate();
                 return true;
             case MotionEvent.ACTION_MOVE:
@@ -93,7 +98,14 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                         coors[currentIndex + 1] = coors[2 - currentIndex + 1];
                     }
                 }
+
+                myPath.rewind();
+                myPath.moveTo(coors[0], coors[1]);
+                myPath.lineTo(coors[2], coors[3]);
+                myPath.lineTo(coors[2] + 1, coors[3] + 1);
+
                 invalidate();
+
                 if (e.getPointerCount() == 1 &&
                         e.getActionMasked() == MotionEvent.ACTION_UP &&
                         currentState == ActionState.STARTED) { // change this to click done or clicked edit
@@ -143,8 +155,4 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         }
     }
 
-    @Override
-    public boolean contains(float x, float y, float radius) {
-        return false;
-    }
 }

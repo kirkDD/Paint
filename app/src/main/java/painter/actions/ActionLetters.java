@@ -16,7 +16,7 @@ public class ActionLetters extends ActionNumbers {
 
 
 
-    int letter = (int) 'A';
+    int letter = 'A';
     @Override
     void addThingToString() {
 //        stringBuilder.append((char) letter++).append("  ");

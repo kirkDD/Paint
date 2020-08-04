@@ -57,6 +57,12 @@ public abstract class AbstractSuperAction {
         return done;
     }
 
+    // selected and is in currentAction
+    public void focusChange(boolean active) {
+
+    }
+
+    public abstract String getName();
 
 
 }

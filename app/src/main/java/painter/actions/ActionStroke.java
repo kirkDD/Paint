@@ -13,7 +13,7 @@ import android.view.MotionEvent;
 
 public class ActionStroke extends AbstractPaintActionExtendsView {
 
-    static final float MIN_MOVE_DIST = 5;
+    public static final float MIN_MOVE_DIST = 5;
     static final long NEW_INSTANCE_DELAY_MS = 300;
 
     int thisColor;
@@ -22,7 +22,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     Paint.Join thisJoin;
 
     static Paint paint;
-    Path path, savedPath;
+    Path savedPath;
     Matrix pathTransform;
     float boundW, boundH, boundCX, boundCY; // remember info about path when updating savdPath
 
@@ -33,12 +33,9 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
             paint.setStyle(Paint.Style.STROKE);
             paint.setAntiAlias(true);
         }
-        path = new Path();
         savedPath = new Path();
         bound = new RectF();
         pathTransform = new Matrix();
-
-        containsPath = new Path();
     }
 
     long lastTimeStamp; // should combine quick strokes
@@ -63,7 +60,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                     pointerId = id;
                     lastX = e.getX(index);
                     lastY = e.getY(index);
-                    path.moveTo(lastX, lastY);
+                    myPath.moveTo(lastX, lastY);
                     currentState = ActionState.STARTED;
                 } else if (currentState == ActionState.FINISHED) {
                     if (System.currentTimeMillis() - lastTimeStamp <= NEW_INSTANCE_DELAY_MS) {
@@ -71,7 +68,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                         pointerId = id;
                         lastX = e.getX(index);
                         lastY = e.getY(index);
-                        path.moveTo(lastX, lastY);
+                        myPath.moveTo(lastX, lastY);
                         currentState = ActionState.STARTED;
                     } else {
                         callWhenDone.apply(this);
@@ -88,7 +85,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                 if (index == -1) return true;
                 if (currentState == ActionState.STARTED) {
                     if (dist(lastX, lastY, e.getX(index), e.getY(index)) >= MIN_MOVE_DIST) {
-                        path.quadTo(lastX,lastY,
+                        myPath.quadTo(lastX,lastY,
                                 (lastX + e.getX(index)) / 2f,
                                 (lastY + e.getY(index)) / 2f);
                         lastX = e.getX(index);
@@ -145,7 +142,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
         boundCX = bound.centerX();
         boundCY = bound.centerY();
         savedPath.rewind();
-        savedPath.addPath(path);
+        savedPath.addPath(myPath);
     }
 
     void revising_ptr_move(MotionEvent e, int index, int id) {
@@ -169,7 +166,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                     snapAngle((float) -angleBetween(boundCX, boundCY, e.getX(), e.getY())),
                     boundCX, boundCY);
         }
-        savedPath.transform(pathTransform, path);
+        savedPath.transform(pathTransform, myPath);
     }
 
 
@@ -201,7 +198,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
         paint.setStrokeJoin(thisJoin);
         paint.setStyle(Paint.Style.STROKE);
 
-        canvas.drawPath(path, paint);
+        canvas.drawPath(myPath, paint);
     }
 
     void conditionalDrawHighlight(Canvas canvas) {
@@ -219,22 +216,11 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                 animate += 0.1;
                 invalidate();
                 // or bound?
-                path.computeBounds(bound, false);
+                myPath.computeBounds(bound, false);
                 paint.setStyle(Paint.Style.STROKE);
                 canvas.drawRect(bound, paint);
             }
         }
     }
 
-
-    Path containsPath;
-    @Override
-    public boolean contains(float x, float y, float radius) {
-        containsPath.moveTo(x, y);
-        containsPath.addCircle(x, y, radius, Path.Direction.CW);
-        containsPath.op(path, Path.Op.INTERSECT);
-        boolean re = !containsPath.isEmpty();
-        containsPath.rewind();
-        return re;
-    }
 }

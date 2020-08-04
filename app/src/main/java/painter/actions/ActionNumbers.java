@@ -56,13 +56,13 @@ public class ActionNumbers extends ActionStroke {
 
         if (currentState == ActionState.REVISING || currentState == ActionState.STARTED) {
             paint.setStyle(Paint.Style.STROKE);
-            canvas.drawPath(path, paint);
+            canvas.drawPath(myPath, paint);
         }
 
         // add texts
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(thisTextSize);
-        canvas.drawTextOnPath(stringBuilder.toString(), path, 0, 0, paint);
+        canvas.drawTextOnPath(stringBuilder.toString(), myPath, 0, 0, paint);
     }
 
     @Override

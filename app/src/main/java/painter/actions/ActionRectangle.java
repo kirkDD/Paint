@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
@@ -35,11 +37,6 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         }
         idMap = new HashMap<>();
         coors = new float[4];
-        // default
-        myColor = Color.GREEN;
-        myWidth = 10;
-        myStyle = Paint.Style.STROKE;
-        rotateAngle = 0;
     }
 
 
@@ -92,6 +89,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                         }
                     }
                 }
+                updateMyPath();
                 invalidate();
                 return true;
             case MotionEvent.ACTION_MOVE:
@@ -120,6 +118,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                         }
                     }
                 }
+                updateMyPath();
                 invalidate();
                 return true;
             case MotionEvent.ACTION_POINTER_UP:
@@ -130,11 +129,27 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                         currentState = ActionState.FINISHED;
                     }
                 }
+                updateMyPath();
                 invalidate();
                 return true;
             default:
                 return false;
         }
+    }
+
+    Matrix rotationMatrix;
+    void updateMyPath() {
+        if (rotationMatrix == null) {
+            rotationMatrix = new Matrix();
+        }
+        rotationMatrix.setRotate(-rotateAngle, (coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f);
+        myPath.rewind();
+        myPath.addRect(
+                Math.min(coors[0], coors[2]),
+                Math.min(coors[1], coors[3]),
+                Math.max(coors[0], coors[2]),
+                Math.max(coors[1], coors[3]), Path.Direction.CW);
+        myPath.transform(rotationMatrix);
     }
 
     @Override
@@ -178,33 +193,6 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
     }
 
 
-    @Override
-    public boolean contains(float x, float y, float radius) {
-        // due to rotation, we need to shift x,y as well
-        x -= (coors[0] + coors[2]) / 2f;
-        y -= (coors[1] + coors[3]) / 2f;
-        // rotate
-        double r = dist(x, y, 0, 0);
-        double ang = 90 + angleBetween(x, y, 0, 0) - rotateAngle;  // 90 is the offset needed
-        x = (float) (Math.cos(ang / 180 * Math.PI) * r);
-        y = (float) (Math.sin(ang / 180 * Math.PI) * r);
-        // go back
-        x += (coors[0] + coors[2]) / 2f;
-        y += (coors[1] + coors[3]) / 2f;
-
-        if (coors[0] < coors[2]) {
-            if (coors[0] > x + radius || coors[2] < x - radius) return false;
-        } else {
-            if (coors[0] < x - radius || coors[2] > x + radius) return false;
-        }
-        if (coors[1] < coors[3]) {
-            return !(coors[1] > y + radius) && !(coors[3] < y - radius); // intelliJ is good!
-        } else {
-            if (coors[1] < y - radius || coors[3] > y + radius) return false;
-        }
-        return true;
-    }
-
     void conditionalDrawHighlight(Canvas canvas) {
         if (currentState == ActionState.REVISING || currentState == ActionState.STARTED) {
             // draw indicator
@@ -221,9 +209,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         }
     }
 
-
     // subclassing
-
 
     @Override
     void toggleFill() {

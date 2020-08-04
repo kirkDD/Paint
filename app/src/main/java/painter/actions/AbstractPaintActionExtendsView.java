@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
@@ -31,9 +32,11 @@ public abstract class AbstractPaintActionExtendsView extends View {
 
     static Paint abstractActionPaint;
 
+    // for all shapes
+    Path containsPath;
+    Path myPath;
     public AbstractPaintActionExtendsView(Context context) {
         super(context);
-        currentState = ActionState.NEW;
         if (abstractActionPaint == null) {
             abstractActionPaint = new Paint();
             abstractActionPaint.setStyle(Paint.Style.STROKE);
@@ -45,6 +48,9 @@ public abstract class AbstractPaintActionExtendsView extends View {
             abstractActionPaint.setTextAlign(Paint.Align.CENTER);
             abstractActionPaint.setTextSize(quickBoxWidth / 1.5f);
         }
+        currentState = ActionState.NEW;
+        containsPath = new Path();
+        myPath = new Path();
     }
 
     static RectF quickEditBox;
@@ -214,8 +220,16 @@ public abstract class AbstractPaintActionExtendsView extends View {
      * @param x,y location
      * @param radius the bound to allow
      */
-    public abstract boolean contains(float x, float y, float radius);
+    public boolean contains(float x, float y, float radius) {
+        containsPath.rewind();
+        containsPath.moveTo(x, y);
+        containsPath.addCircle(x, y, radius, Path.Direction.CW);
+        return touchesPath(containsPath);
+    }
 
+    public boolean touchesPath(Path origin) {
+        return containsPath.op(myPath, origin, Path.Op.INTERSECT) && !containsPath.isEmpty();
+    }
 
     /**
      * useful helpers

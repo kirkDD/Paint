@@ -2,6 +2,8 @@ package painter.actions;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Path;
 
 public class ActionOval extends ActionRectangle {
 
@@ -29,23 +31,19 @@ public class ActionOval extends ActionRectangle {
     }
 
     @Override
-    public boolean contains(float x, float y, float radius) {
-        // (x-h)^2/a^2 + (y-k)^2/b^2 <= 1
-
-        // due to rotation, we need to shift x,y as well
-        x -= (coors[0] + coors[2]) / 2f;
-        y -= (coors[1] + coors[3]) / 2f;
-        // rotate
-        double r = dist(x, y, 0, 0);
-        double ang = 90 + angleBetween(x, y, 0, 0) - rotateAngle;  // 90 is the offset needed
-        x = (float) (Math.cos(ang / 180 * Math.PI) * r);
-        y = (float) (Math.sin(ang / 180 * Math.PI) * r);
-        // go back
-        x += (coors[0] + coors[2]) / 2f;
-        y += (coors[1] + coors[3]) / 2f;
-
-        double magicEq = Math.pow((x - (coors[0] + coors[2]) / 2f), 2) / Math.pow((coors[0] - coors[2]) / 2f, 2) +
-                Math.pow((y - (coors[1] + coors[3]) / 2f), 2) / Math.pow((coors[1] - coors[3]) / 2f, 2);
-        return magicEq <= 1;
+    void updateMyPath() {
+        if (rotationMatrix == null) {
+            rotationMatrix = new Matrix();
+        }
+        rotationMatrix.setRotate(-rotateAngle, (coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f);
+        myPath.rewind();
+        myPath.addOval(
+                Math.min(coors[0], coors[2]),
+                Math.min(coors[1], coors[3]),
+                Math.max(coors[0], coors[2]),
+                Math.max(coors[1], coors[3]), Path.Direction.CW);
+        myPath.transform(rotationMatrix);
     }
+
+
 }

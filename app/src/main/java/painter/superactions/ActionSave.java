@@ -32,22 +32,13 @@ public class ActionSave extends AbstractSuperAction {
         super(c, paper);
     }
 
-
     @Override
-    public boolean handleTouch(MotionEvent e) {
-        if (super.handleTouch(e)) {
-            done = true;
-            return true;
-        }
-        done = false;
-        // do work
-        if (e.getActionMasked() == MotionEvent.ACTION_UP) {
-            // done
-            done = true;
-            // to toash properly
+    public void focusChange(boolean active) {
+        super.focusChange(active);
+        if (active) {
             new Thread(() -> new Handler(Looper.getMainLooper()).post(this::saveCurrentPaper)).start();
         }
-        return true;
+        done = true;
     }
 
 
@@ -62,5 +53,8 @@ public class ActionSave extends AbstractSuperAction {
         Toast.makeText(context,"saved to Images", Toast.LENGTH_LONG).show();
     }
 
-
+    @Override
+    public String getName() {
+        return "save";
+    }
 }
