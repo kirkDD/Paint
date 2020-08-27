@@ -51,39 +51,29 @@ public class MainActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) getSupportActionBar().hide();
 
         setContentView(R.layout.activity_full_screen);
-        mLayout = findViewById(R.id.layout);
-        mFabMargin = getResources().getDimensionPixelSize(R.dimen.fab_parent_margin);
-        mMenusLastId = new SparseIntArray();
+//        mLayout = findViewById(R.id.layout);
+//        mFabMargin = getResources().getDimensionPixelSize(R.dimen.fab_parent_margin);
+//        mMenusLastId = new SparseIntArray();
         paper = findViewById(R.id.paper);
         paper.setBackgroundColor(Color.WHITE);
 
         // set up undo/redo button
-        mUndoMenu = (ViewGroup) getLayoutInflater().inflate(R.layout.undo_menu, mLayout , false);
-        mRedoMenu = (ViewGroup) getLayoutInflater().inflate(R.layout.redo_menu, mLayout , false);
-        addMenu(mUndoMenu, ConstraintSet.BOTTOM, ConstraintSet.START);
-        addMenu(mRedoMenu, ConstraintSet.BOTTOM, ConstraintSet.START);
+//        mUndoMenu = (ViewGroup) getLayoutInflater().inflate(R.layout.undo_menu, mLayout , false);
+//        mRedoMenu = (ViewGroup) getLayoutInflater().inflate(R.layout.redo_menu, mLayout , false);
+//        addMenu(mUndoMenu, ConstraintSet.BOTTOM, ConstraintSet.START);
+//        addMenu(mRedoMenu, ConstraintSet.BOTTOM, ConstraintSet.START);
 
 
 
-        findViewById(R.id.fab_undo).setOnClickListener((v) -> paper.undo());
-        findViewById(R.id.fab_redo).setOnClickListener((v) -> paper.redo());
+//        findViewById(R.id.fab_undo).setOnClickListener((v) -> paper.undo());
+//        findViewById(R.id.fab_redo).setOnClickListener((v) -> paper.redo());
 
         SuperActionManager superActionManager = new SuperActionManager(this);
         superActionManager.setPaper(paper);
 
+        ((PaperController) findViewById(R.id.paperController)).setPaper(paper);
 
         addContentView(superActionManager, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-//        new Thread(() -> {
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            Log.d(TAG, " sending intent ");
-//            Intent i = new Intent(this, ReversibleDrawingActivity.class);
-//            startActivity(i);
-//        }).start();
 
         getPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
 
@@ -98,12 +88,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 
 
     /**

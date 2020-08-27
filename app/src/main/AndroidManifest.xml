@@ -13,17 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="cse340.undo.app.ReversibleDrawingActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN_nope" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="painter.DrawingActivity"
+            android:name="painter.MainActivity"
             android:label="Paint"
             android:theme="@style/FullscreenTheme">
             <intent-filter>

@@ -20,6 +20,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
+
+    <painter.PaperController
+        android:id="@+id/paperController"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 </FrameLayout>
     <cse340.undo.app.ColorPickerView
         android:id="@+id/colorpicker"

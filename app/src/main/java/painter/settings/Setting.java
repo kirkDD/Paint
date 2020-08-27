@@ -1,33 +1,81 @@
 package painter.settings;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.view.MotionEvent;
+import android.view.View;
 
 import painter.Paper;
 
 /**
  * knobs and dials for paper and paint objects
  */
-public interface Setting { // ????????????????
+public abstract class Setting { // ????????????????
 
     /**
      * set the paper that this setting works on
      * @param paper the paper to be setted
      */
-    void setPaper(Paper paper);
+    Paper paper;
+    Paint paint;
+    int iW, iH, mW, mH, iTop, iLeft;
+    public void init(Paper paper, int iconW, int iconH, int mainW, int mainH, int iconTop, int iconLeft) {
+        paint = new Paint();
+        this.paper = paper;
+        iW = iconW;
+        iH = iconH;
+        mW = mainW;
+        mH = mainH;
+        iTop = iconTop;
+        iLeft = iconLeft;
+    }
+
+    /**
+     * where init for certain class happens
+     */
+    abstract void privateInit();
+
+    public boolean inIcon(float xPos, float yPos) {
+        return xPos >= iLeft && xPos <= iLeft + iW &&
+                yPos >= iTop && yPos <= iTop + iH;
+    }
+
 
     /**
      * draw the setting icon
-     * @param canvas
      */
-    void drawIcon(Canvas canvas);
+    public abstract void drawIcon(Canvas canvas);
+
+    /**
+     * quick event on the Icon
+     */
+    public abstract boolean handleQuickEvent(MotionEvent e);
+
+    Runnable START_MAIN_ACTION;
+    public void setStartMainAction(Runnable r) {
+        START_MAIN_ACTION = r;
+    }
+    Runnable END_MAIN_ACTION;
+    public void setEndMainAction(Runnable r) {
+        END_MAIN_ACTION = r;
+    }
+
+    /**
+     * draw the whole UI
+     */
+    public abstract void drawMain(Canvas canvas);
 
     /**
      * interact with tool
-     * @param e
-     * @return
      */
-    boolean handleEvent(MotionEvent e);
+    public abstract boolean handleMainEvent(MotionEvent e);
 
+    View PARENT_VIEW;
+    public void setView(View v) {
+        PARENT_VIEW = v;
+    }
+    public void invalidate() {
+        PARENT_VIEW.invalidate();
+    }
 
 }

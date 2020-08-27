@@ -65,6 +65,7 @@ public class Paper extends FrameLayout {
         theOneAndOnlyPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         theOneAndOnlyPaint.setStrokeWidth(10);
         theOneAndOnlyPaint.setTextSize(120);
+        theOneAndOnlyPaint.setStrokeCap(Paint.Cap.ROUND);
 
         history = new ArrayList<>();
         redoStack = new Stack<>();
@@ -252,15 +253,6 @@ public class Paper extends FrameLayout {
         }
     }
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-//        if (histY == 0) {
-//            Log.d(TAG, "onLayout: 1st time");
-//            histY = 0;
-//            histYTarget = histY;
-//        }
-    }
 
 
     // let actions know if they are editing or done
