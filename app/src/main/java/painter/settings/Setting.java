@@ -28,6 +28,7 @@ public abstract class Setting { // ????????????????
         mH = mainH;
         iTop = iconTop;
         iLeft = iconLeft;
+        privateInit();
     }
 
     /**
@@ -78,4 +79,17 @@ public abstract class Setting { // ????????????????
         PARENT_VIEW.invalidate();
     }
 
+
+    // helpers
+
+    float dist(float x, float y, float a, float b) {
+        return (float) Math.sqrt(Math.pow(x - a, 2) + Math.pow(y - b, 2));
+    }
+
+    float map(float val, float vLow, float vHigh, float tLow, float tHigh) {
+        // scale and shift
+        val *= (tHigh - tLow) / (vHigh - vLow);
+        val += (tLow - vLow);
+        return val;
+    }
 }

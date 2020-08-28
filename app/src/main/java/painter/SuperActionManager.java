@@ -86,7 +86,7 @@ public class SuperActionManager extends FrameLayout {
 
     void setPaper(Paper paper) {
         this.paper = paper;
-        init();
+//        init(); todo paused super actions
     }
 
 
