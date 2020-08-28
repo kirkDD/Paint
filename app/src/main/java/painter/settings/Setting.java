@@ -1,6 +1,7 @@
 package painter.settings;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 import android.view.View;
@@ -11,6 +12,8 @@ import painter.Paper;
  * knobs and dials for paper and paint objects
  */
 public abstract class Setting { // ????????????????
+
+    static final int BACKGROUND_COLOR = Color.argb(150, 0, 0, 0);
 
     /**
      * set the paper that this setting works on

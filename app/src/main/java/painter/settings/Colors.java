@@ -133,7 +133,7 @@ public class Colors extends Setting {
     static final int MAIN_MARGIN = 80;
     @Override
     public void drawMain(Canvas canvas) {
-        paint.setColor(Color.argb(150, 0, 0, 0));
+        paint.setColor(BACKGROUND_COLOR);
         canvas.drawRect(0, 0, mW, mH, paint);
         paint.setColor(colors[currColorIndex]);
         canvas.drawRect(0, 0, mW, mH / 2f, paint);
