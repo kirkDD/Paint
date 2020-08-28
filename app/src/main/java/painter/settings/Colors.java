@@ -56,7 +56,7 @@ public class Colors extends Setting {
                     iTop + i * (boxH + BOX_GAP) + boxH);
         }
         for (int i = 0; i < mainColorBoxes.length; i++) {
-            mainColorBoxes[i].set(40, mH * 0.6f + i * 100, mW - 40, mH * 0.6f + i * 100 + 40);
+            mainColorBoxes[i].set(MAIN_MARGIN, mH * 0.6f + i * 100, mW - MAIN_MARGIN, mH * 0.6f + i * 100 + 40);
         }
         changeColor();
     }
@@ -130,40 +130,46 @@ public class Colors extends Setting {
     }
 
     RectF[] mainColorBoxes;
+    static final int MAIN_MARGIN = 80;
     @Override
     public void drawMain(Canvas canvas) {
-        paint.setColor(Color.argb(100, 0, 0, 0));
+        paint.setColor(Color.argb(150, 0, 0, 0));
         canvas.drawRect(0, 0, mW, mH, paint);
-        for (int i = 0; i < mW; i+=8) {
-            for (int j = 0; j < mH / 2; j+=8) {
-                paint.setColor(Color.rgb(i * 255 / mW, j * 255 / mH, Color.blue(colors[currColorIndex])));
-                paint.setAlpha(Color.alpha(colors[currColorIndex]));
-                canvas.drawRect(i, j, i + 8, j + 8, paint);
+        paint.setColor(colors[currColorIndex]);
+        canvas.drawRect(0, 0, mW, mH / 2f, paint);
+        for (int i = MAIN_MARGIN; i < mW - MAIN_MARGIN; i+=16) {
+            for (int j = MAIN_MARGIN; j < mH / 2 - MAIN_MARGIN; j+=16) {
+                paint.setColor(Color.argb(
+                        Color.alpha(colors[currColorIndex]),
+                        (int) map(i, MAIN_MARGIN, mW - MAIN_MARGIN, 0, 255),
+                        (int) map(j, MAIN_MARGIN, mH / 2f - MAIN_MARGIN, 0, 255),
+                        Color.blue(colors[currColorIndex])));
+                canvas.drawRect(i, j, i + 16, j + 16, paint);
             }
         }
         // draw where the current point in
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.STROKE);
-        canvas.drawCircle(map(Color.red(colors[currColorIndex]), 0, 255, 40, mW - 40),
-                map(Color.green(colors[currColorIndex]), 0, 255, 0, mH / 2f), 20, paint);
+        canvas.drawCircle(map(Color.red(colors[currColorIndex]), 0, 255, MAIN_MARGIN, mW - MAIN_MARGIN),
+                map(Color.green(colors[currColorIndex]), 0, 255, MAIN_MARGIN, mH / 2f - MAIN_MARGIN), 20, paint);
         // draw interactor
         for (int i = 0; i < 4; i++) {
             float buttonXPos;
             switch (i) {
                 case 0:
                     paint.setColor(Color.RED);
-                    buttonXPos = 40 + Color.red(colors[currColorIndex]) * (mW - 80) / 255f;
+                    buttonXPos = MAIN_MARGIN + Color.red(colors[currColorIndex]) * (mW - MAIN_MARGIN * 2) / 255f;
                     break;
                 case 1:
                     paint.setColor(Color.GREEN);
-                    buttonXPos = 40 + Color.green(colors[currColorIndex]) * (mW - 80) / 255f;
+                    buttonXPos = MAIN_MARGIN + Color.green(colors[currColorIndex]) * (mW - MAIN_MARGIN * 2) / 255f;
                     break;
                 case 2:
                     paint.setColor(Color.BLUE);
-                    buttonXPos = 40 + Color.blue(colors[currColorIndex]) * (mW - 80) / 255f;
+                    buttonXPos = MAIN_MARGIN + Color.blue(colors[currColorIndex]) * (mW - MAIN_MARGIN * 2) / 255f;
                     break;
                 default:
-                    buttonXPos = 40 + Color.alpha(colors[currColorIndex]) * (mW - 80) / 255f;
+                    buttonXPos = MAIN_MARGIN + Color.alpha(colors[currColorIndex]) * (mW - MAIN_MARGIN * 2) / 255f;
                     paint.setColor(Color.BLACK);
             }
             paint.setStyle(Paint.Style.FILL);
@@ -175,12 +181,26 @@ public class Colors extends Setting {
     }
 
     int movingColorBoxIndex = -1;
+    boolean skipping = false;
+
     @Override
     public boolean handleMainEvent(MotionEvent e) {
+        if (skipping) {
+            if (e.getPointerCount() == 1 && e.getActionMasked() == MotionEvent.ACTION_UP) {
+                skipping = false;
+                END_MAIN_ACTION.run();
+            }
+            return true;
+        }
         float eX = e.getX() - iW;
         float eY = e.getY();
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
+                if (eX < 0) {
+                    movingColorBoxIndex = -1;
+                    skipping = true;
+                    return true;
+                }
             case MotionEvent.ACTION_MOVE:
                 if (movingColorBoxIndex == -1) {
                     // which one?
@@ -199,7 +219,7 @@ public class Colors extends Setting {
                 if (movingColorBoxIndex != -1) {
                     // move it
                     int co = colors[currColorIndex];
-                    int newColComponent = (int) Math.max(0, Math.min(255, (eX - 40) * 255 / (mW - 80)));
+                    int newColComponent = (int) Math.max(0, Math.min(255, (eX - MAIN_MARGIN) * 255 / (mW - MAIN_MARGIN * 2)));
                     switch (movingColorBoxIndex) {
                         case 0:
                             colors[currColorIndex] = Color.argb(Color.alpha(co), newColComponent, Color.green(co), Color.blue(co));
@@ -212,11 +232,12 @@ public class Colors extends Setting {
                             break;
                         case 3:
                             colors[currColorIndex] = Color.argb(newColComponent, Color.red(co), Color.green(co), Color.blue(co));
+                            break;
                         default: // from gradient
-                            int boundX = (int) Math.max(0, Math.min(mW - iW, eX));
-                            int boundY = (int) Math.max(0, Math.min(mH / 2f, eY));
-                            boundX = (int) map(boundX, 0, mW - iW, 0, 255);
-                            boundY = (int) map(boundY, 0, mH / 2f, 0, 255);
+                            int boundX = (int) Math.max(MAIN_MARGIN, Math.min(mW - MAIN_MARGIN, eX));
+                            int boundY = (int) Math.max(MAIN_MARGIN, Math.min(mH / 2f - MAIN_MARGIN, eY));
+                            boundX = (int) map(boundX, MAIN_MARGIN, mW - MAIN_MARGIN, 0, 255);
+                            boundY = (int) map(boundY, MAIN_MARGIN, mH / 2f - MAIN_MARGIN, 0, 255);
                             colors[currColorIndex] = Color.argb(Color.alpha(co), boundX, boundY, Color.blue(co));
                     }
                     invalidate();

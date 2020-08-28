@@ -14,6 +14,7 @@ import java.util.HashMap;
 
 import painter.settings.Colors;
 import painter.settings.Setting;
+import painter.settings.Strokes;
 
 
 /**
@@ -39,6 +40,10 @@ public class PaperController extends View {
         vBarState = SettingTouchState.IDLE;
         verticalSettings = new ArrayList<>();
         verticalSettings.add(new Colors(6));
+        verticalSettings.add(new Strokes());
+
+
+
         Runnable startMain = () -> {
             if (activeSettingIndex >= 0 && activeSettingIndex < verticalSettings.size()) {
                 vBarState = SettingTouchState.MAIN_ACTION;
@@ -73,6 +78,8 @@ public class PaperController extends View {
         // make rooms todo
         int yTop = H / 4;
         verticalSettings.get(0).init(paper, BAR_W, (int) (H * 0.3), W - BAR_W, H, yTop, 0);
+        yTop += H * 0.3 + 50;
+        verticalSettings.get(1).init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
     }
 
 

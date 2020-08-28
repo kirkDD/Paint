@@ -87,9 +87,10 @@ public abstract class Setting { // ????????????????
     }
 
     float map(float val, float vLow, float vHigh, float tLow, float tHigh) {
-        // scale and shift
-        val *= (tHigh - tLow) / (vHigh - vLow);
-        val += (tLow - vLow);
+        // shift to 0, scale and shift
+        val -= vLow;
+        val = val * (tHigh - tLow) / (vHigh - vLow);
+        val += tLow;
         return val;
     }
 }
