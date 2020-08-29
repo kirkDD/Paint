@@ -98,10 +98,20 @@ public abstract class AbstractPaintActionExtendsView extends View {
         abstractActionPaint.setStyle(Paint.Style.STROKE);
         abstractActionPaint.setAlpha(255);
         canvas.drawRect(quickEditBox, abstractActionPaint);
-        canvas.drawText("\u17d2", quickEditBox.centerX(), quickEditBox.centerY(), abstractActionPaint);
+        if (currentState == ActionState.FINISHED) {
+            canvas.drawText("\u2704",
+                    quickEditBox.centerX(),
+                    quickEditBox.centerY() + abstractActionPaint.descent(),
+                    abstractActionPaint);
+        } else {
+            canvas.drawText("\u2713",
+                    quickEditBox.centerX(),
+                    quickEditBox.centerY() + abstractActionPaint.descent(),
+                    abstractActionPaint);
+        }
 
-        canvas.drawRect(toggleFillBox, abstractActionPaint);
-        canvas.drawText("\u176e", toggleFillBox.centerX(), toggleFillBox.centerY(), abstractActionPaint);
+//        canvas.drawRect(toggleFillBox, abstractActionPaint);
+//        canvas.drawText("\u176e", toggleFillBox.centerX(), toggleFillBox.centerY(), abstractActionPaint);
 
     }
 
@@ -136,11 +146,11 @@ public abstract class AbstractPaintActionExtendsView extends View {
                     return true;
                     // skip this event
                 }
-            } else if (toggleFillBoxTouched(e.getX(), e.getY())) {
-                toggleFill();
-                abstractSkippingEvent = true;
-                startButtonClickedAnimation(toggleFillBox, e.getX(), e.getY());
-                return true;
+//            } else if (toggleFillBoxTouched(e.getX(), e.getY())) {
+//                toggleFill();
+//                abstractSkippingEvent = true;
+//                startButtonClickedAnimation(toggleFillBox, e.getX(), e.getY());
+//                return true;
             }
         }
         return false;

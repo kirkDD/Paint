@@ -12,6 +12,7 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import painter.settings.Backgrounds;
 import painter.settings.Colors;
 import painter.settings.Setting;
 import painter.settings.Shapes;
@@ -36,14 +37,24 @@ public class PaperController extends View {
     }
 
     Paint paint;
+    Colors colors;
+    Strokes strokes;
+    Shapes shapes;
+    Backgrounds backgrounds;
     void init() {
         paint = new Paint();
         vBarState = SettingTouchState.IDLE;
         verticalSettings = new ArrayList<>();
-        verticalSettings.add(new Colors(6));  // 0
-        verticalSettings.add(new Strokes());  // 1 strokes
-        verticalSettings.add(new Shapes());  // 2 shapes
 
+        colors = new Colors(6);  // 0
+        strokes = new Strokes();  // 1 strokes
+        shapes = new Shapes();  // 2 shapes
+        backgrounds = new Backgrounds();
+
+        verticalSettings.add(colors);
+        verticalSettings.add(strokes);
+        verticalSettings.add(shapes);
+        verticalSettings.add(backgrounds);
 
 
         Runnable startMain = () -> {
@@ -77,13 +88,13 @@ public class PaperController extends View {
         W = right - left;
         H = bottom - top;
 
-        // make rooms todo
         int yTop = H / 4;
-        verticalSettings.get(0).init(paper, BAR_W, (int) (H * 0.3), W - BAR_W, H, yTop, 0);
-        yTop += H * 0.3 + 50;
-        verticalSettings.get(1).init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
-        yTop += 80 + 50;
-        verticalSettings.get(2).init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
+        backgrounds.init(paper, BAR_W, 120, W - BAR_W, H, yTop - 190, 0);
+        colors.init(paper, BAR_W, (int) (H * 0.3), W - BAR_W, H, yTop, 0);
+        yTop += H * 0.3 + 80;
+        strokes.init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
+        yTop += 80 + 80;
+        shapes.init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
     }
 
 

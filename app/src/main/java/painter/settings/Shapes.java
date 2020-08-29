@@ -98,14 +98,20 @@ public class Shapes extends Setting {
         canvas.drawRect(0, 0, mW, mH, paint);
         paint.setTextSize(shapeBoxes[0].height() * 0.5f);
         for (int i = 0; i < shapeBoxes.length; i++) {
-            paint.setColor(Color.argb(200, 200, 200, 200));
+            if (paper.getCurrentAction() == indexToShape.get(i)) {
+                paint.setColor(Color.argb(120, 200, 200, 200));
+            } else if (nextShapeIndex == i) {
+                paint.setColor(Color.argb(160, 200, 200, 200));
+            } else {
+                paint.setColor(Color.argb(220, 200, 200, 200));
+            }
             canvas.drawRoundRect(shapeBoxes[i], 10, 10, paint);
 
             // draw text
             paint.setColor(Color.BLACK);
             int actionStringId = shapesMap.get(indexToShape.get(i));
             canvas.drawText(paper.getContext().getResources().getString(actionStringId),
-                    shapeBoxes[i].centerX(), shapeBoxes[i].centerY() + paint.getTextSize() / 2, paint);
+                    shapeBoxes[i].centerX(), shapeBoxes[i].centerY() + paint.getTextSize() / 2 - paint.descent() / 2, paint);
         }
     }
 
@@ -118,6 +124,7 @@ public class Shapes extends Setting {
                 for (int i = 0; i < shapeBoxes.length; i++) {
                     if (shapeBoxes[i].contains(e.getX() - iW, e.getY())) {
                         nextShapeIndex = i;
+                        invalidate();
                         break;
                     }
                 }
@@ -127,13 +134,10 @@ public class Shapes extends Setting {
                     if (paper.getCurrentAction() != indexToShape.get(nextShapeIndex)) {
                         // change
                         paper.setDrawAction(indexToShape.get(nextShapeIndex));
-                        // quit
-                        END_MAIN_ACTION.run();
                     }
-                } else {
-                    // quit
-                    END_MAIN_ACTION.run();
                 }
+                // quit
+                END_MAIN_ACTION.run();
                 nextShapeIndex = -1;
         }
         return true;
