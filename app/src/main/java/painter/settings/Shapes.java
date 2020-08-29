@@ -1,0 +1,141 @@
+package painter.settings;
+
+import android.app.Notification;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.view.MotionEvent;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import cse340.undo.R;
+import painter.actions.AbstractPaintActionExtendsView;
+import painter.actions.ActionArrow;
+import painter.actions.ActionLetters;
+import painter.actions.ActionNumbers;
+import painter.actions.ActionOval;
+import painter.actions.ActionRectangle;
+import painter.actions.ActionStraightLine;
+import painter.actions.ActionStroke;
+
+public class Shapes extends Setting {
+
+    HashMap<Class<? extends AbstractPaintActionExtendsView>, Integer> shapesMap;
+    HashMap<Integer, Class<? extends AbstractPaintActionExtendsView>> indexToShape;
+    RectF[] shapeBoxes;
+    public Shapes() {
+        shapesMap = new HashMap<>();
+        shapesMap.put(ActionStroke.class, R.string.stroke);
+        shapesMap.put(ActionStraightLine.class, R.string.line);
+        shapesMap.put(ActionArrow.class, R.string.arrow);
+        shapesMap.put(ActionLetters.class, R.string.letter);
+        shapesMap.put(ActionNumbers.class, R.string.number);
+        shapesMap.put(ActionRectangle.class, R.string.rect);
+        shapesMap.put(ActionOval.class, R.string.oval);
+        shapeBoxes = new RectF[shapesMap.keySet().size()];
+        for (int i = 0; i < shapeBoxes.length; i++) {
+            shapeBoxes[i] = new RectF();
+        }
+        indexToShape = new HashMap<>();
+        int i = 0;
+        for (Class<? extends AbstractPaintActionExtendsView> cls : shapesMap.keySet()) {
+            indexToShape.put(i, cls);
+            i += 1;
+        }
+    }
+
+    static final int MAIN_MARGIN = 80;
+    @Override
+    void privateInit() {
+        paint.setTextAlign(Paint.Align.CENTER);
+        // draw boxes evenly
+        float boxSpace = mH / 1.0f / (shapeBoxes.length);
+        float boxH = boxSpace * 0.8f;
+        for (int i = 0; i < shapeBoxes.length; i++) {
+            shapeBoxes[i].set(
+                    MAIN_MARGIN,
+                    boxSpace * 0.1f + boxSpace * i,
+                    mW - MAIN_MARGIN,
+                    boxSpace * 0.1f + boxSpace * i + boxH);
+        }
+
+    }
+
+    @Override
+    public void drawIcon(Canvas canvas) {
+        Class<? extends AbstractPaintActionExtendsView> action = paper.getCurrentAction();
+        if (action == null) {
+            return;
+        }
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(iH * 0.7f);
+        int actionStringId = shapesMap.get(action);
+        canvas.drawText(paper.getContext().getResources().getString(actionStringId), iLeft + iW / 2f, iTop + iH / 2f, paint);
+    }
+
+    @Override
+    public boolean handleQuickEvent(MotionEvent e) {
+        switch (e.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_MOVE:
+                break;
+            case MotionEvent.ACTION_UP:
+                if (inIcon(e.getX(), e.getY())) {
+                    START_MAIN_ACTION.run();
+                } else {
+                    END_MAIN_ACTION.run();
+                }
+        }
+        return true;
+    }
+
+    @Override
+    public void drawMain(Canvas canvas) {
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(BACKGROUND_COLOR);
+        canvas.drawRect(0, 0, mW, mH, paint);
+        paint.setTextSize(shapeBoxes[0].height() * 0.5f);
+        for (int i = 0; i < shapeBoxes.length; i++) {
+            paint.setColor(Color.argb(200, 200, 200, 200));
+            canvas.drawRoundRect(shapeBoxes[i], 10, 10, paint);
+
+            // draw text
+            paint.setColor(Color.BLACK);
+            int actionStringId = shapesMap.get(indexToShape.get(i));
+            canvas.drawText(paper.getContext().getResources().getString(actionStringId),
+                    shapeBoxes[i].centerX(), shapeBoxes[i].centerY() + paint.getTextSize() / 2, paint);
+        }
+    }
+
+    int nextShapeIndex;
+    @Override
+    public boolean handleMainEvent(MotionEvent e) {
+        switch (e.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_MOVE:
+                for (int i = 0; i < shapeBoxes.length; i++) {
+                    if (shapeBoxes[i].contains(e.getX() - iW, e.getY())) {
+                        nextShapeIndex = i;
+                        break;
+                    }
+                }
+                return true;
+            case MotionEvent.ACTION_UP:
+                if (nextShapeIndex != -1) {
+                    if (paper.getCurrentAction() != indexToShape.get(nextShapeIndex)) {
+                        // change
+                        paper.setDrawAction(indexToShape.get(nextShapeIndex));
+                        // quit
+                        END_MAIN_ACTION.run();
+                    }
+                } else {
+                    // quit
+                    END_MAIN_ACTION.run();
+                }
+                nextShapeIndex = -1;
+        }
+        return true;
+    }
+}

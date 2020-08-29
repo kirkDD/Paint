@@ -14,6 +14,7 @@ import java.util.HashMap;
 
 import painter.settings.Colors;
 import painter.settings.Setting;
+import painter.settings.Shapes;
 import painter.settings.Strokes;
 
 
@@ -39,8 +40,9 @@ public class PaperController extends View {
         paint = new Paint();
         vBarState = SettingTouchState.IDLE;
         verticalSettings = new ArrayList<>();
-        verticalSettings.add(new Colors(6));
-        verticalSettings.add(new Strokes());
+        verticalSettings.add(new Colors(6));  // 0
+        verticalSettings.add(new Strokes());  // 1 strokes
+        verticalSettings.add(new Shapes());  // 2 shapes
 
 
 
@@ -80,6 +82,8 @@ public class PaperController extends View {
         verticalSettings.get(0).init(paper, BAR_W, (int) (H * 0.3), W - BAR_W, H, yTop, 0);
         yTop += H * 0.3 + 50;
         verticalSettings.get(1).init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
+        yTop += 80 + 50;
+        verticalSettings.get(2).init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
     }
 
 

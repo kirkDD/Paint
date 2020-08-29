@@ -119,6 +119,10 @@ public class Paper extends FrameLayout {
         initCurrentAction();
     }
 
+    public Class<? extends AbstractPaintActionExtendsView> getCurrentAction() {
+        return actionClass;
+    }
+
 
 
     @Override
