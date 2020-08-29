@@ -80,7 +80,7 @@ public class Backgrounds extends Setting {
         float tY = map(Color.green(COLOR), 0, 255, 0, mH / 2f);
         canvas.save();
         canvas.clipRect(tX - s, tY - s, tX + s, tY + s);
-        s = 100;
+        s = 150;
         canvas.clipOutRect(tX - s, tY - s, tX + s, tY + s);
         s = 200;
         canvas.drawRect(tX - s, tY - s, tX + s, tY + s, paint);
@@ -90,17 +90,32 @@ public class Backgrounds extends Setting {
         tY = mH / 2f + map(Color.blue(COLOR), 0, 255, 0, mH / 2f);
         canvas.save();
         canvas.clipRect(tX - s, tY - s, tX + s, tY + s);
-        s = 100;
+        s = 150;
         canvas.clipOutRect(tX - s, tY - s, tX + s, tY + s);
         s = 200;
         canvas.drawRect(tX - s, tY - s, tX + s, tY + s, paint);
         canvas.restore();
     }
 
+    boolean skip = false;
     @Override
     public boolean handleMainEvent(MotionEvent e) {
         float x = Math.max(0, Math.min(mW, e.getX() - iW));
         float y = e.getY();
+        if (e.getActionMasked() == MotionEvent.ACTION_DOWN && x < iW) {
+            skip = true;
+        }
+        if (skip) {
+            if (x < iW) {
+                if (e.getActionMasked() == MotionEvent.ACTION_UP ) {
+                    END_MAIN_ACTION.run();
+                    skip = false;
+                }
+                return true;
+            } else {
+                skip = false;
+            }
+        }
         if (y < mH / 2f) {
             // top
             COLOR = Color.rgb(
@@ -117,9 +132,6 @@ public class Backgrounds extends Setting {
         }
         invalidate();
         changeBackgroundColor();
-        if (e.getActionMasked() == MotionEvent.ACTION_UP && x < iW) {
-            END_MAIN_ACTION.run();
-        }
         return true;
     }
 }

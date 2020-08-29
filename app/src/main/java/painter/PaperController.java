@@ -17,6 +17,7 @@ import painter.settings.Colors;
 import painter.settings.Setting;
 import painter.settings.Shapes;
 import painter.settings.Strokes;
+import painter.settings.UndoRedoClear;
 
 
 /**
@@ -41,6 +42,7 @@ public class PaperController extends View {
     Strokes strokes;
     Shapes shapes;
     Backgrounds backgrounds;
+    UndoRedoClear undoRedoClear;
     void init() {
         paint = new Paint();
         vBarState = SettingTouchState.IDLE;
@@ -50,11 +52,13 @@ public class PaperController extends View {
         strokes = new Strokes();  // 1 strokes
         shapes = new Shapes();  // 2 shapes
         backgrounds = new Backgrounds();
+        undoRedoClear = new UndoRedoClear();
 
         verticalSettings.add(colors);
         verticalSettings.add(strokes);
         verticalSettings.add(shapes);
         verticalSettings.add(backgrounds);
+        verticalSettings.add(undoRedoClear);
 
 
         Runnable startMain = () -> {
@@ -95,6 +99,10 @@ public class PaperController extends View {
         strokes.init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
         yTop += 80 + 80;
         shapes.init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
+        yTop += 80 + 80;
+        undoRedoClear.init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
+
+
     }
 
 
