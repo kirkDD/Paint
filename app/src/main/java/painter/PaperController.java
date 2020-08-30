@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -107,7 +108,7 @@ public class PaperController extends View {
         yTop += 80 + 80;
         undoRedoClear.init(paper, BAR_W, 120, W - BAR_W, H, yTop, 0);
 
-        toggleUI.init(paper, W / 8, W / 8, W - BAR_W, H, 0, 0);
+        toggleUI.init(paper, W / 8, W / 8, W - BAR_W, H, 80, 80);
 
     }
 
@@ -116,6 +117,16 @@ public class PaperController extends View {
     SettingTouchState vBarState;
     @Override
     public boolean onTouchEvent(MotionEvent e) {
+        if (hideUI) {
+            if (toggleUI.inIcon(e.getX(), e.getY())) {
+                vBarState = SettingTouchState.QUICK_ACTION;
+            }
+            if (vBarState == SettingTouchState.QUICK_ACTION)
+                return toggleUI.handleQuickEvent(e);
+            if (vBarState == SettingTouchState.MAIN_ACTION)
+                return toggleUI.handleMainEvent(e);
+            return false;
+        }
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 if(vBarState == SettingTouchState.IDLE) {
@@ -144,10 +155,8 @@ public class PaperController extends View {
     float vBarXOff;
     @Override
     protected void onDraw(Canvas canvas) {
-        if (hideUI) {
-            canvas.save();
-            canvas.translate(vBarXOff, 0);
-        }
+        canvas.save();
+        canvas.translate(vBarXOff, 0);
         if (vBarState == SettingTouchState.MAIN_ACTION) {
             // draw bound
             paint.setColor(Color.argb(50,50, 50, 50));
@@ -156,6 +165,11 @@ public class PaperController extends View {
         }
 
         for (int i = 0; i < verticalSettings.size(); i++) {
+            if (verticalSettings.get(i) == toggleUI) {
+                // draw toggle ui here since it position should not change
+                canvas.save();
+                canvas.translate(-vBarXOff, 0);
+            }
             verticalSettings.get(i).drawIcon(canvas);
             if (activeSettingIndex == i && vBarState == SettingTouchState.MAIN_ACTION) {
                 canvas.save();
@@ -164,18 +178,33 @@ public class PaperController extends View {
                 verticalSettings.get(i).drawMain(canvas);
                 canvas.restore();
             }
+            if (verticalSettings.get(i) == toggleUI) {
+                // draw toggle ui here since it position should not change
+                canvas.restore();
+            }
         }
+
+        canvas.restore();
 
         if (hideUI) {
-            canvas.restore();
+            if (vBarXOff > -BAR_W) {
+                vBarXOff += (-BAR_W - vBarXOff) * 0.2 - 1;
+            }
+            invalidate();
+        } else if (vBarXOff < 0) {
+            vBarXOff += - vBarXOff * 0.2 + 1;
+            if (vBarXOff > 0) {
+                vBarXOff = 0;
+            }
+            invalidate();
         }
         // animate
-
     }
 
     boolean hideUI = false;
     void toggleUI() {
         hideUI = !hideUI;
+        invalidate();
     }
 
 

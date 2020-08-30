@@ -16,7 +16,13 @@ public class Fab extends Setting {
     @Override
     public void drawIcon(Canvas canvas) {
         super.drawIcon(canvas);
+        paint.setColor(getContrastColor(paper.getBackgroundColor()));
+        canvas.drawCircle(iLeft + iW / 2f, iTop + iH / 2f, Math.min(iW, iH) / 2f, paint);
+    }
 
+    @Override
+    public boolean inIcon(float xPos, float yPos) {
+        return dist(xPos, yPos, iLeft + iW / 2f, iTop + iH / 2f) < Math.min(iW, iH) / 2f;
     }
 
     float sX, sY;
@@ -34,10 +40,8 @@ public class Fab extends Setting {
                     dragging = true;
                 }
                 if (dragging) {
-                    iLeft += e.getX() - sX;
-                    iTop += e.getY() - sY;
-                    sX = e.getX();
-                    sY = e.getY();
+                    iLeft = (int) (e.getX() - iW / 2);
+                    iTop = (int) (e.getY() - iH / 2);
                     invalidate();
                 }
                 break;

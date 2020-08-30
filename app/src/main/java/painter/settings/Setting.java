@@ -44,8 +44,8 @@ public abstract class Setting { // ????????????????
      */
     public void drawIcon(Canvas canvas) {
         // BACKGROUND & ANIMATION ONLY
-        paint.setColor(Color.argb(100, 0, 0, 0));
-        canvas.drawRoundRect(iLeft, iTop, iLeft + iW, iTop + iH, 5, 5, paint);
+//        paint.setColor(Color.argb(100, 0, 0, 0));
+//        canvas.drawRoundRect(iLeft, iTop, iLeft + iW, iTop + iH, 5, 5, paint);
         if (SU_clickSize < 100) {
             // animate touch
             paint.setColor(getContrastColor(paper.getBackgroundColor()));
