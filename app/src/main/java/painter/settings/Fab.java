@@ -40,7 +40,7 @@ public class Fab extends AbstractSetting {
                 sX = e.getX();
                 sY = e.getY();
             case MotionEvent.ACTION_MOVE:
-                if (!dragging && dist(sX, sY, e.getX(), e.getY()) > 20) {
+                if (!dragging && dist(sX, sY, e.getX(), e.getY()) > 40) {
                     dragging = true;
                 }
                 if (dragging) {

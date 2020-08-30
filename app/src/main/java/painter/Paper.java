@@ -67,6 +67,8 @@ public class Paper extends FrameLayout {
         theOneAndOnlyPaint.setTextSize(120);
         theOneAndOnlyPaint.setStrokeCap(Paint.Cap.ROUND);
 
+        // internal use
+        internalPaint = new Paint();
         history = new ArrayList<>();
         redoStack = new Stack<>();
 
@@ -143,10 +145,10 @@ public class Paper extends FrameLayout {
             invalidate();
             return true;
         } else if (action != null) {
-            // editing historys
-            if (selectingHistoryAction(event)) {
-                return true;
-            }
+//            // editing history
+//            if (selectingHistoryAction(event)) {
+//                return true;
+//            }
             // real action with Actions
             boolean b = action.handleTouch(event);
             if (!b) { // action has changed through call back
@@ -238,7 +240,7 @@ public class Paper extends FrameLayout {
     // you can undo a clear, slowly
     public void clear() {
         finishAction();
-        for (int i = 0; i < history.size(); i++) {
+        for (int i = history.size() - 1; i > -1; i--) {
             redoStack.push(history.get(history.size() - 1 - i));
         }
         history.clear();
@@ -309,6 +311,10 @@ public class Paper extends FrameLayout {
         invalidate();
     }
 
+    public boolean isErasing() {
+        return erasing;
+    }
+
     void eraseAction(MotionEvent event) {
         currPointerX = event.getX();
         currPointerY = event.getY();
@@ -316,6 +322,7 @@ public class Paper extends FrameLayout {
             if (history.get(i).contains(currPointerX, currPointerY, eraserRadius)) {
                 redoStack.add(history.remove(i));
                 removeView(redoStack.peek());
+                return;
             }
         }
     }

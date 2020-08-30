@@ -15,6 +15,7 @@ import painter.settings.Backgrounds;
 import painter.settings.Colors;
 import painter.settings.Fab;
 import painter.settings.AbstractSetting;
+import painter.settings.PaperStates;
 import painter.settings.Shapes;
 import painter.settings.Strokes;
 import painter.settings.UndoRedoClear;
@@ -43,6 +44,7 @@ public class PaperController extends View {
     Shapes shapes;
     Backgrounds backgrounds;
     UndoRedoClear undoRedoClear;
+    PaperStates paperStates;
     Fab toggleUI;
     void init() {
         paint = new Paint();
@@ -55,6 +57,7 @@ public class PaperController extends View {
         backgrounds = new Backgrounds();
         undoRedoClear = new UndoRedoClear();
         toggleUI = new Fab();
+        paperStates = new PaperStates();
 
         verticalSettings.add(toggleUI); // check for first
         verticalSettings.add(colors);
@@ -62,6 +65,8 @@ public class PaperController extends View {
         verticalSettings.add(shapes);
         verticalSettings.add(backgrounds);
         verticalSettings.add(undoRedoClear);
+        verticalSettings.add(paperStates);
+
 
         toggleUI.setToggleWork(this::toggleUI);
 
@@ -96,7 +101,7 @@ public class PaperController extends View {
         W = right - left;
         H = bottom - top;
 
-        int yTop = H / 4;
+        int yTop = (int) (H / 4.5);
         backgrounds.init(paper, BAR_W, 120, W - BAR_W, H, yTop - 190, 0);
         colors.init(paper, BAR_W, (int) (H * 0.3), W - BAR_W, H, yTop, 0);
         yTop += H * 0.3 + 80;
@@ -105,7 +110,10 @@ public class PaperController extends View {
         shapes.init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
         yTop += 80 + 80;
         undoRedoClear.init(paper, BAR_W, 120, W - BAR_W, H, yTop, 0);
+        yTop += 80 + 80;
+        paperStates.init(paper, BAR_W, 120, W - BAR_W, H, yTop, 0);
 
+        // free icon, position not fixed
         toggleUI.init(paper, W / 8, W / 8, W - BAR_W, H, 80, 80);
 
     }
