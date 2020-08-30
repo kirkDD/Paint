@@ -1,13 +1,11 @@
 package painter.settings;
 
-import android.app.Notification;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import cse340.undo.R;
@@ -60,23 +58,26 @@ public class Shapes extends Setting {
                     mW - MAIN_MARGIN,
                     boxSpace * 0.1f + boxSpace * i + boxH);
         }
-
     }
 
     @Override
     public void drawIcon(Canvas canvas) {
+        super.drawIcon(canvas);
+
         Class<? extends AbstractPaintActionExtendsView> action = paper.getCurrentAction();
         if (action == null) {
             return;
         }
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(iH * 0.7f);
+        paint.setColor(getContrastColor(paper.getBackgroundColor()));
+        paint.setTextSize(iH * 0.75f);
         int actionStringId = shapesMap.get(action);
-        canvas.drawText(paper.getContext().getResources().getString(actionStringId), iLeft + iW / 2f, iTop + iH / 2f, paint);
+        canvas.drawText(paper.getContext().getResources().getString(actionStringId),
+                iLeft + iW / 2f, iTop + iH / 2f + paint.getTextSize() / 2 - paint.descent() / 2, paint);
     }
 
     @Override
     public boolean handleQuickEvent(MotionEvent e) {
+        super.handleQuickEvent(e);
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
@@ -115,7 +116,7 @@ public class Shapes extends Setting {
         }
     }
 
-    int nextShapeIndex;
+    int nextShapeIndex = -1;
     @Override
     public boolean handleMainEvent(MotionEvent e) {
         switch (e.getActionMasked()) {

@@ -17,7 +17,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     
 
     public static final float MIN_MOVE_DIST = 5;
-    static final long NEW_INSTANCE_DELAY_MS = 300;
+    static final long NEW_INSTANCE_DELAY_MS = 100;
 
     int thisColor;
     float thisWidth;

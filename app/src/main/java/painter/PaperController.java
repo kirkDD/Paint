@@ -14,6 +14,7 @@ import java.util.HashMap;
 
 import painter.settings.Backgrounds;
 import painter.settings.Colors;
+import painter.settings.Fab;
 import painter.settings.Setting;
 import painter.settings.Shapes;
 import painter.settings.Strokes;
@@ -43,6 +44,7 @@ public class PaperController extends View {
     Shapes shapes;
     Backgrounds backgrounds;
     UndoRedoClear undoRedoClear;
+    Fab toggleUI;
     void init() {
         paint = new Paint();
         vBarState = SettingTouchState.IDLE;
@@ -53,13 +55,16 @@ public class PaperController extends View {
         shapes = new Shapes();  // 2 shapes
         backgrounds = new Backgrounds();
         undoRedoClear = new UndoRedoClear();
+        toggleUI = new Fab();
 
         verticalSettings.add(colors);
         verticalSettings.add(strokes);
         verticalSettings.add(shapes);
         verticalSettings.add(backgrounds);
         verticalSettings.add(undoRedoClear);
+        verticalSettings.add(toggleUI);
 
+        toggleUI.setToggleWork(this::toggleUI);
 
         Runnable startMain = () -> {
             if (activeSettingIndex >= 0 && activeSettingIndex < verticalSettings.size()) {
@@ -100,8 +105,9 @@ public class PaperController extends View {
         yTop += 80 + 80;
         shapes.init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
         yTop += 80 + 80;
-        undoRedoClear.init(paper, BAR_W, 80, W - BAR_W, H, yTop, 0);
+        undoRedoClear.init(paper, BAR_W, 120, W - BAR_W, H, yTop, 0);
 
+        toggleUI.init(paper, W / 8, W / 8, W - BAR_W, H, 0, 0);
 
     }
 
@@ -112,64 +118,39 @@ public class PaperController extends View {
     public boolean onTouchEvent(MotionEvent e) {
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                return touchDown(e);
-            case MotionEvent.ACTION_MOVE:
-                return touchMove(e);
-            case MotionEvent.ACTION_UP:
-                return touchUp(e);
-            default:
-                return false;
-        }
-    }
-
-    boolean touchDown(MotionEvent e) {
-        switch (vBarState) {
-            case IDLE:
-                for (int i = 0; i < verticalSettings.size(); i++) {
-                    if (verticalSettings.get(i).inIcon(e.getX(), e.getY())) {
-                        activeSettingIndex = i;
-                        vBarState = SettingTouchState.QUICK_ACTION;
-                        return verticalSettings.get(i).handleQuickEvent(e);
+                if(vBarState == SettingTouchState.IDLE) {
+                    for (int i = 0; i < verticalSettings.size(); i++) {
+                        if (verticalSettings.get(i).inIcon(e.getX(), e.getY())) {
+                            activeSettingIndex = i;
+                            vBarState = SettingTouchState.QUICK_ACTION;
+                            return verticalSettings.get(i).handleQuickEvent(e);
+                        }
                     }
+                    break;
                 }
-                break;
-            case QUICK_ACTION:
-                return verticalSettings.get(activeSettingIndex).handleQuickEvent(e);
-            case MAIN_ACTION:
-                return verticalSettings.get(activeSettingIndex).handleMainEvent(e);
+            case MotionEvent.ACTION_MOVE:
+            case MotionEvent.ACTION_UP:
+                switch (vBarState) {
+                    case QUICK_ACTION:
+                        return verticalSettings.get(activeSettingIndex).handleQuickEvent(e);
+                    case MAIN_ACTION:
+                        return verticalSettings.get(activeSettingIndex).handleMainEvent(e);
+                }
         }
         return false;
     }
 
-    boolean touchMove(MotionEvent e) {
-        switch (vBarState) {
-            case IDLE:
-                return false;
-            case QUICK_ACTION:
-                return verticalSettings.get(activeSettingIndex).handleQuickEvent(e);
-            case MAIN_ACTION:
-                return verticalSettings.get(activeSettingIndex).handleMainEvent(e);
-        }
-        return false;
-    }
 
-    boolean touchUp(MotionEvent e) {
-        switch (vBarState) {
-            case IDLE:
-                return false;
-            case QUICK_ACTION:
-                return verticalSettings.get(activeSettingIndex).handleQuickEvent(e);
-            case MAIN_ACTION:
-                return verticalSettings.get(activeSettingIndex).handleMainEvent(e);
-        }
-        return false;
-    }
-
+    float vBarXOff;
     @Override
     protected void onDraw(Canvas canvas) {
+        if (hideUI) {
+            canvas.save();
+            canvas.translate(vBarXOff, 0);
+        }
         if (vBarState == SettingTouchState.MAIN_ACTION) {
             // draw bound
-            paint.setColor(Color.rgb(50, 50, 50));
+            paint.setColor(Color.argb(50,50, 50, 50));
             paint.setStyle(Paint.Style.FILL);
             canvas.drawRect(0, 0, BAR_W, H, paint);
         }
@@ -184,7 +165,19 @@ public class PaperController extends View {
                 canvas.restore();
             }
         }
+
+        if (hideUI) {
+            canvas.restore();
+        }
+        // animate
+
     }
+
+    boolean hideUI = false;
+    void toggleUI() {
+        hideUI = !hideUI;
+    }
+
 
     enum SettingTouchState {
         IDLE, QUICK_ACTION, MAIN_ACTION

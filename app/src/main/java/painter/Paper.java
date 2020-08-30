@@ -128,15 +128,15 @@ public class Paper extends FrameLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // show/hide history
-        if (action.contains(getWidth() / 2f, getHeight() * -0.1f, getWidth() / 2f)) {
-            // hide
-            histYTarget = getHeight() * -0.1f;
-            delayCount += 1;
-            postDelayed(showHistory, 200);
-            performClick(); // weird lint issue
-        } else {
-            histYTarget = 0;
-        }
+//        if (action.contains(getWidth() / 2f, getHeight() * -0.1f, getWidth() / 2f)) {
+//            // hide
+//            histYTarget = getHeight() * -0.1f;
+//            delayCount += 1;
+//            postDelayed(showHistory, 200);
+//            performClick(); // weird lint issue
+//        } else {
+//            histYTarget = 0;
+//        }
         // erasing
         if (erasing) {
             eraseAction(event);
@@ -197,23 +197,30 @@ public class Paper extends FrameLayout {
     // manage itself
     ////////////////////
 
-    public void undo() {
+    public boolean undo() {
         finishAction();
         if (canUndo()) {
             redoStack.push(history.remove(history.size() - 1));
             removeView(redoStack.peek());
+            if (canUndo()) {
+                action = history.get(history.size() - 1);
+            } else {
+                Log.d(TAG, "undo: initing");
+                initCurrentAction();
+            }
+            invalidate();
+            return true;
         } else {
             Log.i(TAG, "unDo: nothing to undo");
+            // add action back to view
+            history.add(action);
+            addView(action);
+            invalidate();
+            return false;
         }
-        if (canUndo()) {
-            action = history.get(history.size() - 1);
-        } else {
-            initCurrentAction();
-        }
-        invalidate();
     }
 
-    public void redo() {
+    public boolean redo() {
         if (canRedo()) {
             finishAction();
             history.add(redoStack.pop());
@@ -221,8 +228,10 @@ public class Paper extends FrameLayout {
             addView(action);
             histTranslateX = getWidth() * 11;
             invalidate();
+            return true;
         } else {
             Log.i(TAG, "redo: nothing to redo");
+            return false;
         }
     }
 
@@ -250,7 +259,7 @@ public class Paper extends FrameLayout {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        drawHistory(canvas);
+//        drawHistory(canvas);
 
         if (erasing) {
             // show touch

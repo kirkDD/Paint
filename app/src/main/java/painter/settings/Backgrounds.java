@@ -24,16 +24,16 @@ public class Backgrounds extends Setting {
 
     @Override
     public void drawIcon(Canvas canvas) {
-        paint.setColor(Color.BLACK);
-        canvas.drawRoundRect(iLeft, iTop, iLeft + iW, iTop + iH, 50, 50, paint);
+        super.drawIcon(canvas);
 //        canvas.drawCircle(iLeft + iW / 2f, iTop + iH / 2f, Math.min(iW, iH) / 2f, paint);
-        paint.setColor(Color.WHITE);
+        paint.setColor(getContrastColor(paper.getBackgroundColor()));
         canvas.drawText("\u274f", iLeft + iW / 2f,
                 iTop + iH / 2f + paint.descent() + 5, paint);
     }
 
     @Override
     public boolean handleQuickEvent(MotionEvent e) {
+        super.handleQuickEvent(e);
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:

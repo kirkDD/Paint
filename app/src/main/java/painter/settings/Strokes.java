@@ -48,6 +48,8 @@ public class Strokes extends Setting {
 
     @Override
     public void drawIcon(Canvas canvas) {
+        super.drawIcon(canvas);
+
         // draw an animated size
         if (quickActionActive) {
             paint.setColor(BACKGROUND_COLOR);
@@ -58,11 +60,11 @@ public class Strokes extends Setting {
 
         // draw icon
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.rgb(60,60,60));
+        paint.setColor(getContrastColor(paper.getBackgroundColor()));
         canvas.drawCircle(iconBox.centerX(), iconBox.centerY(), iW / 3f, paint);
-
-        paint.setColor(Color.rgb(180,180,180));
+        paint.setColor(getContrastColor(paper.getBackgroundColor()));
         paint.setStyle(Paint.Style.FILL);
+        paint.setAlpha(200);
         canvas.drawCircle(iconBox.centerX(), iconBox.centerY(), iW / 5f, paint);
 
     }
@@ -72,6 +74,7 @@ public class Strokes extends Setting {
 
     @Override
     public boolean handleQuickEvent(MotionEvent e) {
+        super.handleQuickEvent(e);
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 cX = e.getX();

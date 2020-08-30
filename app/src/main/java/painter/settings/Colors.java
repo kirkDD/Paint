@@ -72,6 +72,8 @@ public class Colors extends Setting {
     @Override
     public void drawIcon(Canvas canvas) {
         // draw the color boxes
+        super.drawIcon(canvas);
+
         paint.setStyle(Paint.Style.FILL);
         for (int i = 0; i < colorBoxes.length; i++) {
             paint.setColor(colors[i]);
@@ -88,7 +90,7 @@ public class Colors extends Setting {
         }
         if (selectedColorXOff < X_OFFSET_AMOUNT) {
             float diff = X_OFFSET_AMOUNT - selectedColorXOff;
-            selectedColorXOff += 0.2 * diff + diff > 0 ? 1 : -1;
+            selectedColorXOff += 0.4 * diff + (diff > 0 ? 1 : -1);
             invalidate();
         }
 
@@ -100,6 +102,7 @@ public class Colors extends Setting {
 
     @Override
     public boolean handleQuickEvent(MotionEvent e) {
+        super.handleQuickEvent(e);
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
