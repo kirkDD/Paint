@@ -54,9 +54,11 @@ public class UndoRedoClear extends Setting {
                 if (targetState == 0) {
                     // see if quick undo or clear
                     clear = e.getX() - iW * 2 > mW * 0.7;
-                    if (!clear && e.getX() - iW - iW > mW / 3f) {
+                    if (!clear && e.getX() - iW - iW > mW / 4f) {
                         targetState = -1;
                     }
+                } else {
+                    clear = false;
                 }
                 while (state != targetState) {
                     if (targetState > state) {
