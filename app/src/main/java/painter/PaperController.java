@@ -6,17 +6,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import painter.settings.Backgrounds;
 import painter.settings.Colors;
 import painter.settings.Fab;
-import painter.settings.Setting;
+import painter.settings.AbstractSetting;
 import painter.settings.Shapes;
 import painter.settings.Strokes;
 import painter.settings.UndoRedoClear;
@@ -27,7 +25,7 @@ import painter.settings.UndoRedoClear;
  */
 public class PaperController extends View {
 
-    ArrayList<Setting> verticalSettings;
+    ArrayList<AbstractSetting> verticalSettings;
 
     public PaperController(Context context) {
         super(context);
@@ -78,7 +76,7 @@ public class PaperController extends View {
             vBarState = SettingTouchState.IDLE;
             invalidate();
         };
-        for (Setting s : verticalSettings) {
+        for (AbstractSetting s : verticalSettings) {
             s.setView(this);
             s.setStartMainAction(startMain);
             s.setEndMainAction(stopMain);

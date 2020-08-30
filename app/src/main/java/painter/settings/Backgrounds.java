@@ -7,7 +7,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.view.MotionEvent;
 
-public class Backgrounds extends Setting {
+public class Backgrounds extends AbstractSetting {
 
     int COLOR;
 

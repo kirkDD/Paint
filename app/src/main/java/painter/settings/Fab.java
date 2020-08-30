@@ -1,14 +1,13 @@
 package painter.settings;
 
 import android.graphics.Canvas;
-import android.util.Log;
 import android.view.MotionEvent;
 
 
 /**
  * a draggable FAB that toggles
  */
-public class Fab extends Setting {
+public class Fab extends AbstractSetting {
     @Override
     void privateInit() {
 

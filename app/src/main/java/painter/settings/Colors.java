@@ -3,16 +3,11 @@ package painter.settings;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
-import android.support.annotation.ColorRes;
-import android.telephony.AccessNetworkConstants;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import painter.Paper;
-
-public class Colors extends Setting {
+public class Colors extends AbstractSetting {
     static final String TAG = "[][] Color Settings";
 
     static final int BOX_GAP = 20;

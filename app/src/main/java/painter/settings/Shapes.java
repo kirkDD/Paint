@@ -18,7 +18,7 @@ import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
 import painter.actions.ActionStroke;
 
-public class Shapes extends Setting {
+public class Shapes extends AbstractSetting {
 
     HashMap<Class<? extends AbstractPaintActionExtendsView>, Integer> shapesMap;
     HashMap<Integer, Class<? extends AbstractPaintActionExtendsView>> indexToShape;

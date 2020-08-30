@@ -6,7 +6,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 
-public class Strokes extends Setting {
+public class Strokes extends AbstractSetting {
 
     static final float MIN_STROKE_W = 5;
 

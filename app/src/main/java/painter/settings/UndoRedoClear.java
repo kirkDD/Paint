@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
-public class UndoRedoClear extends Setting {
+public class UndoRedoClear extends AbstractSetting {
     @Override
     void privateInit() {
         paint.setStrokeWidth(4);
