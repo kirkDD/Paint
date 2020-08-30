@@ -1,6 +1,7 @@
 package painter.settings;
 
 import android.graphics.Canvas;
+import android.util.Log;
 import android.view.MotionEvent;
 
 
@@ -18,11 +19,14 @@ public class Fab extends Setting {
         super.drawIcon(canvas);
         paint.setColor(getContrastColor(paper.getBackgroundColor()));
         canvas.drawCircle(iLeft + iW / 2f, iTop + iH / 2f, Math.min(iW, iH) / 2f, paint);
+        if (snapToEdge) {
+            snapToEdge();
+        }
     }
 
     @Override
     public boolean inIcon(float xPos, float yPos) {
-        return dist(xPos, yPos, iLeft + iW / 2f, iTop + iH / 2f) < Math.min(iW, iH) / 2f;
+        return dist(xPos, yPos, iLeft + iW / 2f, iTop + iH / 2f) < Math.min(iW, iH) / 2f + 20; // 20 spare
     }
 
     float sX, sY;
@@ -33,6 +37,7 @@ public class Fab extends Setting {
         // click vs drag?
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
+                snapToEdge = false;
                 sX = e.getX();
                 sY = e.getY();
             case MotionEvent.ACTION_MOVE:
@@ -51,9 +56,31 @@ public class Fab extends Setting {
                     toggle.run();
                 }
                 dragging = false;
+                snapToEdge();
                 END_MAIN_ACTION.run();
         }
         return true;
+    }
+
+    boolean snapToEdge;
+    void snapToEdge() {
+        float dist = iLeft + iW / 2f - (mW + 80) / 2f;
+        if (Math.abs(dist) > (mW + 80) / 2f * 0.7) {
+            // snapping
+            if (dist > 0) {
+                iLeft += Math.abs((mW + 80) / 2f - dist) * 0.2 + 1;
+            } else {
+                iLeft -= ((mW + 80) / 2 + dist) * 0.2 + 1;
+            }
+            invalidate();
+            if (iLeft + iW / 2 < 0 || Math.abs(iLeft + iW / 2) > mW + 80) {
+                snapToEdge = false;
+            } else {
+                snapToEdge = true;
+            }
+        } else {
+            snapToEdge = false;
+        }
     }
 
     @Override

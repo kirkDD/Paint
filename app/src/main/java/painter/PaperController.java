@@ -58,12 +58,12 @@ public class PaperController extends View {
         undoRedoClear = new UndoRedoClear();
         toggleUI = new Fab();
 
+        verticalSettings.add(toggleUI); // check for first
         verticalSettings.add(colors);
         verticalSettings.add(strokes);
         verticalSettings.add(shapes);
         verticalSettings.add(backgrounds);
         verticalSettings.add(undoRedoClear);
-        verticalSettings.add(toggleUI);
 
         toggleUI.setToggleWork(this::toggleUI);
 
@@ -164,7 +164,7 @@ public class PaperController extends View {
             canvas.drawRect(0, 0, BAR_W, H, paint);
         }
 
-        for (int i = 0; i < verticalSettings.size(); i++) {
+        for (int i = verticalSettings.size() - 1; i > -1; i--) {
             if (verticalSettings.get(i) == toggleUI) {
                 // draw toggle ui here since it position should not change
                 canvas.save();
