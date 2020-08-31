@@ -12,14 +12,20 @@ public class Fab extends AbstractSetting {
     void privateInit() {
 
     }
-
+    int iconAlpha = 0;
+    int targetIconAlpha = 100;
     @Override
     public void drawIcon(Canvas canvas) {
         super.drawIcon(canvas);
         paint.setColor(getContrastColor(paper.getBackgroundColor()));
+        paint.setAlpha(iconAlpha);
         canvas.drawCircle(iLeft + iW / 2f, iTop + iH / 2f, Math.min(iW, iH) / 2f, paint);
         if (snapToEdge) {
             snapToEdge();
+        }
+        if (iconAlpha != targetIconAlpha) {
+            iconAlpha += (targetIconAlpha - iconAlpha) * 0.2;
+            invalidate();
         }
     }
 
@@ -39,6 +45,8 @@ public class Fab extends AbstractSetting {
                 snapToEdge = false;
                 sX = e.getX();
                 sY = e.getY();
+                targetIconAlpha = 222;
+                invalidate();
             case MotionEvent.ACTION_MOVE:
                 if (!dragging && dist(sX, sY, e.getX(), e.getY()) > 40) {
                     dragging = true;
@@ -56,6 +64,17 @@ public class Fab extends AbstractSetting {
                 }
                 dragging = false;
                 snapToEdge();
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                    if (!dragging) {
+                        targetIconAlpha = 100;
+                        invalidate();
+                    }
+                }).start();
                 END_MAIN_ACTION.run();
         }
         return true;
