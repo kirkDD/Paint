@@ -179,9 +179,14 @@ public class Paper extends FrameLayout {
 
     // apply settings
     public void applyPaintEdit() {
-        if (action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.REVISING ||
-                action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.NEW) {
-            action.setStyle(theOneAndOnlyPaint);
+        if (isPanning()) {
+            // apply edits to current panning thing
+            history.get(panningIndex).setStyle(theOneAndOnlyPaint);
+        } else {
+            if (action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.REVISING ||
+                    action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.NEW) {
+                action.setStyle(theOneAndOnlyPaint);
+            }
         }
     }
 
@@ -205,6 +210,7 @@ public class Paper extends FrameLayout {
     public boolean undo() {
         finishAction();
         if (canUndo()) {
+            clearPaperStates();
             redoStack.push(history.remove(history.size() - 1));
             removeView(redoStack.peek());
             if (canUndo()) {
@@ -227,6 +233,7 @@ public class Paper extends FrameLayout {
 
     public boolean redo() {
         if (canRedo()) {
+            clearPaperStates();
             finishAction();
             history.add(redoStack.pop());
             action = history.get(history.size() - 1);
@@ -242,6 +249,7 @@ public class Paper extends FrameLayout {
 
     // you can undo a clear, slowly
     public void clear() {
+        clearPaperStates();
         finishAction();
         for (int i = history.size() - 1; i > -1; i--) {
             redoStack.push(history.get(history.size() - 1 - i));
@@ -356,6 +364,7 @@ public class Paper extends FrameLayout {
             if (panningIndex != -1) {
                 // deactivate this view
                 history.get(panningIndex).focusLost();
+                panningIndex = -1;
             }
             if (canUndo()) {
                 action = history.get(history.size() - 1);
@@ -376,18 +385,22 @@ public class Paper extends FrameLayout {
     boolean skipPan;
     RectF panMoveToFrontBox;
     RectF panMoveToBackBox;
+    RectF panDuplicateBox;
     void drawPanningQuickActionBox(Canvas c) {
         if (panMoveToFrontBox == null) {
             float top = getHeight() / 1.5f;
             panMoveToFrontBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
             top += 100;
             panMoveToBackBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
+            top += 100;
+            panDuplicateBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
         }
         // draw boxes
         internalPaint.setColor(Color.BLACK);
         internalPaint.setStyle(Paint.Style.FILL);
         c.drawRect(panMoveToFrontBox,internalPaint);
         c.drawRect(panMoveToBackBox, internalPaint);
+        c.drawRect(panDuplicateBox, internalPaint);
         internalPaint.setTextSize(panMoveToFrontBox.height() / 2);
         internalPaint.setTextAlign(Paint.Align.CENTER);
         internalPaint.setColor(Color.WHITE);
@@ -396,6 +409,10 @@ public class Paper extends FrameLayout {
                 internalPaint);
         c.drawText("▼", panMoveToBackBox.centerX(),
                 panMoveToBackBox.centerY() + internalPaint.getTextSize() / 2 - internalPaint.descent() / 2,
+                internalPaint);
+
+        c.drawText("⧉", panDuplicateBox.centerX(),
+                panDuplicateBox.centerY() + internalPaint.getTextSize() / 2 - internalPaint.descent() / 2,
                 internalPaint);
     }
 
@@ -408,7 +425,7 @@ public class Paper extends FrameLayout {
         if (panningIndex == -1) {
             // selecting
             for (int i = history.size() - 1; i > -1; i--) {
-                if (history.get(i).contains(e.getX(), e.getY(), 3)) {
+                if (history.get(i).contains(e.getX(), e.getY(), 15)) {
                     panningIndex = i;
                     break;
                 }
@@ -452,6 +469,17 @@ public class Paper extends FrameLayout {
                         panningIndex -= 1;
                     }
                     skipPan = true;
+                } else if (panDuplicateBox.contains(e.getX(), e.getY())) {
+                    // duplicate
+                    AbstractPaintActionExtendsView dup = history.get(panningIndex).duplicate();
+                    if (dup != null) {
+                        history.add(dup);
+                        addView(dup);
+                        history.get(panningIndex).focusLost();
+                        panningIndex = history.size() - 1;
+                        history.get(panningIndex).editButtonClicked();
+                    }
+                    skipPan = true;
                 } else {
                     panX = e.getX();
                     panY = e.getY();
@@ -465,6 +493,13 @@ public class Paper extends FrameLayout {
         }
         return true;
 
+    }
+
+    void clearPaperStates() {
+        if (isPanning())
+            togglePanningMode();
+        if (isErasing())
+            toggleEraseMode();
     }
 
     // EXPERIMENTTs

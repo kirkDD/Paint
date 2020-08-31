@@ -45,4 +45,23 @@ public class ActionArrow extends ActionStraightLine {
         canvas.drawVertices(Canvas.VertexMode.TRIANGLE_FAN, 6, triangle, 0, null, 0,
                 colors, 0, null, 0, 0, paint);
     }
+
+    @Override
+    AbstractPaintActionExtendsView duplicateImp() {
+        ActionArrow re = new ActionArrow(getContext());
+        for (int i = 0; i < coors.length; i++) {
+            re.coors[i] = coors[i] + DUPLICATE_OFFSET;
+        }
+        re.thisColor = thisColor;
+        re.thisWidth = thisWidth;
+        for (int i = 0; i < triangle.length; i++) {
+            re.triangle[i] = triangle[i];
+        }
+        for (int i = 0; i < colors.length; i++) {
+            re.colors[i] = colors[i];
+        }
+        re.updateMyPath();
+        re.currentState = ActionState.FINISHED;
+        return re;
+    }
 }

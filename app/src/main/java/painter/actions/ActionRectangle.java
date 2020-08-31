@@ -13,6 +13,7 @@ import android.graphics.Shader;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.ClosedDirectoryStreamException;
 import java.util.HashMap;
 
@@ -82,7 +83,9 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                         lastX = e.getX(index);
                         lastY = e.getY(index);
                     } else if (e.getPointerCount() == 2) {
-                        if (dist((coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2,e.getX(index), e.getY(index)) <
+
+                        if (contains(e.getX(index),e.getY(index),5) &&
+                                dist((coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2,e.getX(index), e.getY(index)) <
                                 Math.max(Math.abs(coors[2] - coors[0]), Math.abs(coors[3] - coors[1]))) {
                             action = 0; // resize
                         } else {
@@ -222,5 +225,22 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
             myStyle = Paint.Style.FILL;
         }
         invalidate();
+    }
+
+
+    @Override
+    public AbstractPaintActionExtendsView duplicateImp() {
+        ActionRectangle act2 = new ActionRectangle(getContext());
+        act2.currentState = ActionState.FINISHED;
+        for (int i = 0; i < coors.length; i++) {
+            act2.coors[i] = coors[i] + DUPLICATE_OFFSET; // shifted
+        }
+        act2.myColor = myColor;
+        act2.myWidth = myWidth;
+        act2.myStyle = myStyle;
+        act2.rotateAngle = rotateAngle;
+        act2.updateMyPath(); // since no actual touch is on the new path,
+                                // manually add to path
+        return act2;
     }
 }

@@ -1,5 +1,6 @@
 package painter.actions;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Currency;
 import java.util.function.UnaryOperator;
 
@@ -316,6 +317,22 @@ public abstract class AbstractPaintActionExtendsView extends View {
     // internal sub classing
     void toggleFill() {
 
+    }
+
+    /**
+     * for copy paste, if failed return null
+     */
+    public AbstractPaintActionExtendsView duplicate() {
+        AbstractPaintActionExtendsView re = duplicateImp();
+        if (re != null) {
+            re.setOnCompletion(callWhenDoneSuper);
+        }
+        return re;
+    }
+
+    static final int DUPLICATE_OFFSET = 100;
+    AbstractPaintActionExtendsView duplicateImp() {
+        return null;
     }
 
 }

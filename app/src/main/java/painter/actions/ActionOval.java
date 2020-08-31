@@ -45,5 +45,19 @@ public class ActionOval extends ActionRectangle {
         myPath.transform(rotationMatrix);
     }
 
-
+    @Override
+    public AbstractPaintActionExtendsView duplicateImp() {
+        ActionOval act2 = new ActionOval(getContext());
+        act2.currentState = ActionState.FINISHED;
+        for (int i = 0; i < coors.length; i++) {
+            act2.coors[i] = coors[i] + DUPLICATE_OFFSET; // shifted
+        }
+        act2.myColor = myColor;
+        act2.myWidth = myWidth;
+        act2.myStyle = myStyle;
+        act2.rotateAngle = rotateAngle;
+        act2.updateMyPath(); // since no actual touch is on the new path,
+        // manually add to path
+        return act2;
+    }
 }

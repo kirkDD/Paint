@@ -29,4 +29,26 @@ public class ActionLetters extends ActionNumbers {
         }
         stringBuilder.append("  ");
     }
+
+    @Override
+    AbstractPaintActionExtendsView duplicateImp() {
+        ActionLetters re = new ActionLetters(getContext());
+        re.thisColor = thisColor;
+        re.thisWidth = thisWidth;
+        re.thisCap = thisCap;
+        re.thisJoin = thisJoin;
+        re.savedPath.addPath(savedPath);
+        re.myPath.addPath(myPath);
+        re.currentState = ActionState.FINISHED;
+        re.pathTransform.reset();
+        re.pathTransform.setTranslate(DUPLICATE_OFFSET, DUPLICATE_OFFSET);
+        re.myPath.transform(re.pathTransform);
+        re.pathTransform.set(pathTransform);
+
+        re.thisTextSize = thisTextSize;
+        re.CHAR_WIDTH = CHAR_WIDTH;
+        re.nextIntToAdd = nextIntToAdd;
+        re.stringBuilder.append(stringBuilder.toString());
+        return re;
+    }
 }

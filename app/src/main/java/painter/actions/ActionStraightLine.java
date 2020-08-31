@@ -69,10 +69,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                         currentIndex = -1;
                     }
                 }
-                myPath.rewind();
-                myPath.moveTo(coors[0], coors[1]);
-                myPath.lineTo(coors[2], coors[3]);
-                myPath.lineTo(coors[2] + 1, coors[3] + 1);
+                updateMyPath();
 
                 invalidate();
                 return true;
@@ -99,10 +96,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     }
                 }
 
-                myPath.rewind();
-                myPath.moveTo(coors[0], coors[1]);
-                myPath.lineTo(coors[2], coors[3]);
-                myPath.lineTo(coors[2] + 1, coors[3] + 1);
+                updateMyPath();
 
                 invalidate();
 
@@ -115,6 +109,13 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
             default:
                 return false;
         }
+    }
+
+    void updateMyPath() {
+        myPath.rewind();
+        myPath.moveTo(coors[0], coors[1]);
+        myPath.lineTo(coors[2], coors[3]);
+        myPath.lineTo(coors[2] + 1, coors[3] + 1);
     }
 
     @Override
@@ -155,4 +156,16 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         }
     }
 
+    @Override
+    AbstractPaintActionExtendsView duplicateImp() {
+        ActionStraightLine re = new ActionStraightLine(getContext());
+        for (int i = 0; i < coors.length; i++) {
+            re.coors[i] = coors[i] + DUPLICATE_OFFSET;
+        }
+        re.thisColor = thisColor;
+        re.thisWidth = thisWidth;
+        re.currentState = ActionState.FINISHED;
+        re.updateMyPath();
+        return re;
+    }
 }

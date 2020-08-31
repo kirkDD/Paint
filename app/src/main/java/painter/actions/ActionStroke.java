@@ -228,4 +228,20 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
         }
     }
 
+    @Override
+    AbstractPaintActionExtendsView duplicateImp() {
+        ActionStroke re = new ActionStroke(getContext());
+        re.thisColor = thisColor;
+        re.thisWidth = thisWidth;
+        re.thisCap = thisCap;
+        re.thisJoin = thisJoin;
+        re.savedPath.addPath(savedPath);
+        re.myPath.addPath(myPath);
+        re.currentState = ActionState.FINISHED;
+        re.pathTransform.reset();
+        re.pathTransform.setTranslate(DUPLICATE_OFFSET, DUPLICATE_OFFSET);
+        re.myPath.transform(re.pathTransform);
+        re.pathTransform.set(pathTransform);
+        return re;
+    }
 }

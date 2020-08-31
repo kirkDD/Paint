@@ -19,6 +19,7 @@ public class ActionNumbers extends ActionStroke {
     }
 
 
+
     float lX, lY, distMoved;
     @Override
     public boolean handleTouch(MotionEvent e) {
@@ -71,5 +72,28 @@ public class ActionNumbers extends ActionStroke {
         thisTextSize = p.getTextSize();
         paint.setTextSize(thisTextSize);
         CHAR_WIDTH = paint.measureText("0  ") / 3f + 3; // tune width :(
+    }
+
+    @Override
+    AbstractPaintActionExtendsView duplicateImp() {
+
+        ActionNumbers re = new ActionNumbers(getContext());
+        re.thisColor = thisColor;
+        re.thisWidth = thisWidth;
+        re.thisCap = thisCap;
+        re.thisJoin = thisJoin;
+        re.savedPath.addPath(savedPath);
+        re.myPath.addPath(myPath);
+        re.currentState = ActionState.FINISHED;
+        re.pathTransform.reset();
+        re.pathTransform.setTranslate(DUPLICATE_OFFSET, DUPLICATE_OFFSET);
+        re.myPath.transform(re.pathTransform);
+        re.pathTransform.set(pathTransform);
+
+        re.thisTextSize = thisTextSize;
+        re.CHAR_WIDTH = CHAR_WIDTH;
+        re.nextIntToAdd = nextIntToAdd;
+        re.stringBuilder.append(stringBuilder.toString());
+        return re;
     }
 }
