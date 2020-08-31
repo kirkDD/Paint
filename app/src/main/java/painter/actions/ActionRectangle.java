@@ -82,7 +82,8 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                         lastX = e.getX(index);
                         lastY = e.getY(index);
                     } else if (e.getPointerCount() == 2) {
-                        if (contains(e.getX(index), e.getY(index),0)) {
+                        if (dist((coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2,e.getX(index), e.getY(index)) <
+                                Math.max(Math.abs(coors[2] - coors[0]), Math.abs(coors[3] - coors[1]))) {
                             action = 0; // resize
                         } else {
                             action = 2; // rotate

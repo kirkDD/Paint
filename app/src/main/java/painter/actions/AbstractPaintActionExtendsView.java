@@ -162,6 +162,7 @@ public abstract class AbstractPaintActionExtendsView extends View {
      */
     public void setStyle(Paint p) {
         invalidate();
+        abstractActionPaint.setColor(p.getColor());
     }
 
     // currState -> FINISHED

@@ -42,6 +42,10 @@ public class PaperStates extends AbstractSetting {
             canvas.drawText(icons[2], iLeft + iW / 2f,
                     iTop + iH / 2f + paint.getTextSize() / 2 - paint.descent() / 2,
                     paint);
+        } else if (paper.isPanning()) {
+            canvas.drawText(icons[1], iLeft + iW / 2f,
+                    iTop + iH / 2f + paint.getTextSize() / 2 - paint.descent() / 2,
+                    paint);
         } else {
             canvas.drawText(icons[0], iLeft + iW / 2f,
                     iTop + iH / 2f + paint.getTextSize() / 2 - paint.descent() / 2,
@@ -100,6 +104,13 @@ public class PaperStates extends AbstractSetting {
     void performAction(int iconIndex) {
         if (iconIndex == 2) {
             paper.toggleEraseMode();
+        } else if (iconIndex == 1) {
+            paper.togglePanningMode();
+        } else if (iconIndex == 0) {
+            if (paper.isPanning())
+                paper.togglePanningMode();
+            if (paper.isErasing())
+                paper.toggleEraseMode();
         }
     }
 }

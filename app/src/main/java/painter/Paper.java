@@ -4,12 +4,14 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
+import android.webkit.WebHistoryItem;
 import android.widget.FrameLayout;
 
 import java.lang.reflect.InvocationTargetException;
@@ -42,9 +44,9 @@ public class Paper extends FrameLayout {
 
     /**
      * invariant if u can keep it:
-     *      action is not null
-     *      action is added to view, view group
-     *      action is not "not" in history, changed Sunday
+     * action is not null
+     * action is added to view, view group
+     * action is not "not" in history, changed Sunday
      */
 
     public ArrayList<AbstractPaintActionExtendsView> history;
@@ -126,7 +128,6 @@ public class Paper extends FrameLayout {
     }
 
 
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // show/hide history
@@ -144,6 +145,8 @@ public class Paper extends FrameLayout {
             eraseAction(event);
             invalidate();
             return true;
+        } else if (panning) {
+            return panningAction(event);
         } else if (action != null) {
 //            // editing history
 //            if (selectingHistoryAction(event)) {
@@ -177,7 +180,7 @@ public class Paper extends FrameLayout {
     // apply settings
     public void applyPaintEdit() {
         if (action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.REVISING ||
-            action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.NEW) {
+                action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.NEW) {
             action.setStyle(theOneAndOnlyPaint);
         }
     }
@@ -257,6 +260,7 @@ public class Paper extends FrameLayout {
     }
 
     float currPointerX, currPointerY;
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -266,9 +270,13 @@ public class Paper extends FrameLayout {
         if (erasing) {
             // show touch
             canvas.drawCircle(currPointerX, currPointerY, eraserRadius, internalPaint);
+        } else if (panning) {
+            if (panningIndex != -1) {
+                // show meta actions of current action
+                drawPanningQuickActionBox(canvas);
+            }
         }
     }
-
 
 
     // let actions know if they are editing or done
@@ -295,12 +303,16 @@ public class Paper extends FrameLayout {
      * erase action
      */
     boolean erasing;
-    float eraserRadius = 10;
+    float eraserRadius = 15;
+
     public void toggleEraseMode() {
         erasing = !erasing;
         if (erasing) {
             // check current
             finishAction();
+            if (isPanning()) {
+                togglePanningMode();
+            }
         } else {
             if (canUndo()) {
                 action = history.get(history.size() - 1);
@@ -328,9 +340,137 @@ public class Paper extends FrameLayout {
     }
 
 
+    /**
+     * moving action
+     */
+    boolean panning;
+
+    public void togglePanningMode() {
+        panning = !panning;
+        if (panning) {
+            if (isErasing()) {
+                toggleEraseMode();
+            }
+            finishAction();
+        } else {
+            if (panningIndex != -1) {
+                // deactivate this view
+                history.get(panningIndex).focusLost();
+            }
+            if (canUndo()) {
+                action = history.get(history.size() - 1);
+            } else {
+                initCurrentAction();
+            }
+        }
+        invalidate();
+    }
+
+    public boolean isPanning() {
+        return panning;
+    }
+
+    int panningIndex = -1;
+    long lastTapTime;
+    float panX, panY;
+    boolean skipPan;
+    RectF panMoveToFrontBox;
+    RectF panMoveToBackBox;
+    void drawPanningQuickActionBox(Canvas c) {
+        if (panMoveToFrontBox == null) {
+            float top = getHeight() / 1.5f;
+            panMoveToFrontBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
+            top += 100;
+            panMoveToBackBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
+        }
+        // draw boxes
+        internalPaint.setColor(Color.BLACK);
+        internalPaint.setStyle(Paint.Style.FILL);
+        c.drawRect(panMoveToFrontBox,internalPaint);
+        c.drawRect(panMoveToBackBox, internalPaint);
+        internalPaint.setTextSize(panMoveToFrontBox.height() / 2);
+        internalPaint.setTextAlign(Paint.Align.CENTER);
+        internalPaint.setColor(Color.WHITE);
+        c.drawText("▲", panMoveToFrontBox.centerX(),
+                panMoveToFrontBox.centerY() + internalPaint.getTextSize() / 2 - internalPaint.descent() / 2,
+                internalPaint);
+        c.drawText("▼", panMoveToBackBox.centerX(),
+                panMoveToBackBox.centerY() + internalPaint.getTextSize() / 2 - internalPaint.descent() / 2,
+                internalPaint);
+    }
+
+    boolean panningAction(MotionEvent e) {
+        if (skipPan) {
+            if (e.getActionMasked() == MotionEvent.ACTION_UP)
+                skipPan = false;
+            return true;
+        }
+        if (panningIndex == -1) {
+            // selecting
+            for (int i = history.size() - 1; i > -1; i--) {
+                if (history.get(i).contains(e.getX(), e.getY(), 3)) {
+                    panningIndex = i;
+                    break;
+                }
+            }
+            // see if got any
+            if (panningIndex != -1) {
+                history.get(panningIndex).editButtonClicked();
+                // skip this event
+                skipPan = true;
+                invalidate();
+            }
+        } else {
+            if (e.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                // record time
+                if (Math.abs(panX - e.getX()) + Math.abs(panY - e.getY()) < 80 &&
+                        System.currentTimeMillis() - lastTapTime < 200) {
+                    // cancel
+                    history.get(panningIndex).focusLost();
+                    panningIndex = -1;
+                    skipPan = true;
+                    invalidate();
+                } else if (panMoveToFrontBox.contains(e.getX(), e.getY())) {
+                    // moving to front
+                    if (history.size() > panningIndex + 1) {
+                        removeView(history.get(panningIndex));
+                        addView(history.get(panningIndex), panningIndex + 1);
+                        AbstractPaintActionExtendsView temp = history.get(panningIndex);
+                        history.set(panningIndex, history.get(panningIndex + 1));
+                        history.set(panningIndex + 1, temp);
+                        panningIndex += 1;
+                    }
+                    skipPan = true;
+                } else if (panMoveToBackBox.contains(e.getX(), e.getY())) {
+                    // moving to back
+                    if (panningIndex > 0) {
+                        removeView(history.get(panningIndex));
+                        addView(history.get(panningIndex), panningIndex - 1);
+                        AbstractPaintActionExtendsView temp = history.get(panningIndex);
+                        history.set(panningIndex, history.get(panningIndex - 1));
+                        history.set(panningIndex - 1, temp);
+                        panningIndex -= 1;
+                    }
+                    skipPan = true;
+                } else {
+                    panX = e.getX();
+                    panY = e.getY();
+                    lastTapTime = System.currentTimeMillis();
+
+                }
+            }
+            if (panningIndex != -1) {
+                return history.get(panningIndex).handleTouch(e);
+            }
+        }
+        return true;
+
+    }
+
     // EXPERIMENTTs
     static Paint internalPaint;
     float histTranslateX, histY, histYTarget;
+
     void drawHistory(Canvas canvas) {
         if (history == null) {
             return;
@@ -376,7 +516,7 @@ public class Paper extends FrameLayout {
 
     int delayCount = 0;
     Runnable showHistory = () -> {
-        delayCount --;
+        delayCount--;
         if (delayCount == 0) {
             histYTarget = 0;
             invalidate();
@@ -384,8 +524,8 @@ public class Paper extends FrameLayout {
     };
 
 
-
     boolean selectingHistory = false;
+
     // select history
     boolean selectingHistoryAction(MotionEvent e) {
         if (history.size() == 0) {
