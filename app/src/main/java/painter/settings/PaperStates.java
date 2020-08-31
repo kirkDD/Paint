@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 public class PaperStates extends AbstractSetting {
 
     RectF[] states;
-    static final String[] icons = new String[]{"✎", "⏍", "ි", "⧉", "⬚"};
+    static final String[] icons = new String[]{"✎", "⏍", "ි", "⬚"};
     public PaperStates() {
         states = new RectF[icons.length];
         for (int i = 0; i < icons.length; i++) {
