@@ -1,14 +1,26 @@
 package painter.settings;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.MotionEvent;
+import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import cse340.undo.R;
 
 public class PaperStates extends AbstractSetting {
 
     RectF[] states;
-    static final String[] icons = new String[]{"✎", "⏍", "ි", "⬚"};
+    static final String[] icons = new String[]{"✎", "⏍", "ි", "⬚", ".jpg"};
     public PaperStates() {
         states = new RectF[icons.length];
         for (int i = 0; i < icons.length; i++) {
@@ -111,6 +123,43 @@ public class PaperStates extends AbstractSetting {
                 paper.togglePanningMode();
             if (paper.isErasing())
                 paper.toggleEraseMode();
+        } else if (iconIndex == 4) {
+            // save to jpg
+            paper.clearPaperStates();
+            saveCurrentPaper();
         }
+    }
+
+    // save to jpg
+    void saveCurrentPaper() {
+        Bitmap bitmap = Bitmap.createBitmap(paper.getWidth(), paper.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        paper.drawSelf(canvas);
+        String fileName = paper.getContext()
+                .getResources()
+                .getString(R.string.app_name) +
+                (System.currentTimeMillis() / 1000 % 100000) + ".png";
+        try {
+            File dir = new File(paper.getContext().getExternalMediaDirs()[0].getAbsolutePath() + "/images");
+            if (!dir.exists()) {
+                if (!dir.mkdirs()) {
+                    Toast.makeText(paper.getContext(),"making directory failed", Toast.LENGTH_LONG).show();
+                }
+            }
+            File outFile = new File(dir.getAbsolutePath() + "/" + fileName);
+            outFile.createNewFile();
+            FileOutputStream out = new FileOutputStream(outFile);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            MediaStore.Images.Media.insertImage(
+                    paper.getContext().getContentResolver(),
+                    outFile.getAbsolutePath(),
+                    fileName,
+                    "saved drawing");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(paper.getContext(),"save failed", Toast.LENGTH_LONG).show();
+            return;
+        }
+        Toast.makeText(paper.getContext(),"saved to Images", Toast.LENGTH_LONG).show();
     }
 }

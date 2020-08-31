@@ -495,7 +495,7 @@ public class Paper extends FrameLayout {
 
     }
 
-    void clearPaperStates() {
+    public void clearPaperStates() {
         if (isPanning())
             togglePanningMode();
         if (isErasing())
