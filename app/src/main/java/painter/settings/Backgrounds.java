@@ -55,7 +55,8 @@ public class Backgrounds extends AbstractSetting {
         // b combination
         for (int i = 0; i < mW; i+=10) {
             for (int j = 0; j < mH / 2; j+=10) {
-                paint.setColor(Color.rgb(
+                paint.setColor(Color.argb(
+                        Color.alpha(COLOR),
                         (int) map(i, 0, mW, 0, 255),
                         (int) map(j, 0, mH / 2f, 0, 255),
                         Color.blue(COLOR)));
@@ -64,9 +65,10 @@ public class Backgrounds extends AbstractSetting {
         }
         for (int i = 0; i < mW; i+=10) {
             for (int j = 0; j < mH / 2; j+=10) {
-                paint.setColor(Color.rgb(
-                        Color.red(COLOR),
+                paint.setColor(Color.argb(
                         (int) map(i, 0, mW, 0, 255),
+                        Color.red(COLOR),
+                        Color.green(COLOR),
                         (int) map(j, 0, mH / 2f, 0, 255)
                         ));
                 canvas.drawRect(i, mH / 2f + j, i + 10, mH /2f + j + 10, paint);
@@ -86,7 +88,7 @@ public class Backgrounds extends AbstractSetting {
         canvas.drawRect(tX - s, tY - s, tX + s, tY + s, paint);
         canvas.restore();
         // bottom
-        tX = map(Color.green(COLOR), 0, 255, 0, mW);
+        tX = map(Color.alpha(COLOR), 0, 255, 0, mW);
         tY = mH / 2f + map(Color.blue(COLOR), 0, 255, 0, mH / 2f);
         canvas.save();
         canvas.clipRect(tX - s, tY - s, tX + s, tY + s);
@@ -118,17 +120,20 @@ public class Backgrounds extends AbstractSetting {
         }
         if (y < mH / 2f) {
             // top
-            COLOR = Color.rgb(
+            COLOR = Color.argb(
+                    Color.alpha(COLOR),
                     (int) map(x, 0, mW, 0, 255),
                     (int) map(y, 0, mH / 2f, 0, 255),
                     Color.blue(COLOR)
                     );
         } else {
-            COLOR = Color.rgb(
-                    Color.red(COLOR),
+            COLOR = Color.argb(
                     (int) map(x, 0, mW, 0, 255),
+                    Color.red(COLOR),
+                    Color.green(COLOR),
                     (int) map(y - mH / 2f, 0, mH / 2f, 0, 255)
             );
+
         }
         invalidate();
         changeBackgroundColor();
