@@ -20,7 +20,7 @@ import cse340.undo.R;
 public class PaperStates extends AbstractSetting {
 
     RectF[] states;
-    static final String[] icons = new String[]{"✎", "⏍", "ි", "⬚", ".jpg"};
+    static final String[] icons = new String[]{"✎", "⬚", "ි", ".jpg"};
     public PaperStates() {
         states = new RectF[icons.length];
         for (int i = 0; i < icons.length; i++) {
@@ -123,7 +123,7 @@ public class PaperStates extends AbstractSetting {
                 paper.togglePanningMode();
             if (paper.isErasing())
                 paper.toggleEraseMode();
-        } else if (iconIndex == 4) {
+        } else if (iconIndex == 3) {
             // save to jpg
             paper.clearPaperStates();
             saveCurrentPaper();
