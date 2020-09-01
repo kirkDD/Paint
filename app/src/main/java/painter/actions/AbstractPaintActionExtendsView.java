@@ -244,6 +244,12 @@ public abstract class AbstractPaintActionExtendsView extends View {
         return containsPath.op(myPath, origin, Path.Op.INTERSECT) && !containsPath.isEmpty();
     }
 
+    public boolean coveredByPath(Path cover) {
+        containsPath.rewind();
+        containsPath.op(myPath, cover, Path.Op.DIFFERENCE);
+        return !myPath.isEmpty() && containsPath.isEmpty();
+    }
+
     // combining actions
     public void addToPath(Path dst) {
         dst.addPath(myPath);

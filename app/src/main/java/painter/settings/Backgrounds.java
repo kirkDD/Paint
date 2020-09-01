@@ -17,7 +17,7 @@ public class Backgrounds extends AbstractSetting {
 
     @Override
     void privateInit() {
-        paint.setTextSize(iW / 1.7f);
+        paint.setTextSize(iW / 1.3f);
         paint.setTextAlign(Paint.Align.CENTER);
         COLOR = paper.getBackgroundColor();
     }

@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -17,6 +19,9 @@ import android.widget.FrameLayout;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.ClosedDirectoryStreamException;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.Stack;
 
@@ -73,7 +78,9 @@ public class Paper extends FrameLayout {
         internalPaint = new Paint();
         history = new ArrayList<>();
         redoStack = new Stack<>();
-
+        // panning
+        panningIndexes = new HashSet<>();
+        groupSelectPath = new Path();
         initCurrentAction();
     }
 
@@ -181,7 +188,9 @@ public class Paper extends FrameLayout {
     public void applyPaintEdit() {
         if (isPanning()) {
             // apply edits to current panning thing
-            history.get(panningIndex).setStyle(theOneAndOnlyPaint);
+            for (int i : panningIndexes) {
+                history.get(i).setStyle(theOneAndOnlyPaint);
+            }
         } else {
             if (action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.REVISING ||
                     action.getCurrentState() == AbstractPaintActionExtendsView.ActionState.NEW) {
@@ -279,10 +288,17 @@ public class Paper extends FrameLayout {
             // show touch
             canvas.drawCircle(currPointerX, currPointerY, eraserRadius, internalPaint);
         } else if (panning) {
-            if (panningIndex != -1) {
+            if (panningIndexes.size() != 0) {
                 // show meta actions of current action
                 drawPanningQuickActionBox(canvas);
+            } else {
+                // draw path
+                internalPaint.setColor(theOneAndOnlyPaint.getColor());
+                internalPaint.setStyle(Paint.Style.STROKE);
+                internalPaint.setStrokeWidth(10);
+                canvas.drawPath(groupSelectPath,internalPaint);
             }
+
         }
     }
 
@@ -356,15 +372,19 @@ public class Paper extends FrameLayout {
     public void togglePanningMode() {
         panning = !panning;
         if (panning) {
+            // start
             if (isErasing()) {
                 toggleEraseMode();
             }
             finishAction();
         } else {
-            if (panningIndex != -1) {
+            // end
+            if (panningIndexes.size() != 0) {
                 // deactivate this view
-                history.get(panningIndex).focusLost();
-                panningIndex = -1;
+                for (int i : panningIndexes) {
+                    history.get(i).focusLost();
+                }
+                panningIndexes.clear();
             }
             if (canUndo()) {
                 action = history.get(history.size() - 1);
@@ -379,9 +399,12 @@ public class Paper extends FrameLayout {
         return panning;
     }
 
-    int panningIndex = -1;
+    HashSet<Integer> panningIndexes;
+    Path groupSelectPath;
+    float groupSelectPathLength;
     long lastTapTime;
     float panX, panY;
+    float panLastX, panLastY;
     boolean skipPan;
     RectF panMoveToFrontBox;
     RectF panMoveToBackBox;
@@ -422,20 +445,53 @@ public class Paper extends FrameLayout {
                 skipPan = false;
             return true;
         }
-        if (panningIndex == -1) {
+        if (panningIndexes.size() == 0) {
             // selecting
-            for (int i = history.size() - 1; i > -1; i--) {
-                if (history.get(i).contains(e.getX(), e.getY(), 15)) {
-                    panningIndex = i;
-                    break;
+//            groupSelectPath.reset();
+            if (groupSelectPath.isEmpty()) {
+                groupSelectPathLength = 0;
+                panLastX = e.getX();
+                panLastY = e.getY();
+                groupSelectPath.moveTo(panLastX, panLastY);
+                groupSelectPath.lineTo(panLastX + 1, panLastY);
+            } else {
+                // smooth line to
+                if (dist(panLastX, panLastY, e.getX(), e.getY()) >= 5) {
+                    groupSelectPath.quadTo(panLastX, panLastY,
+                            (panLastX + e.getX()) / 2f,
+                            (panLastY + e.getY()) / 2f);
+                    if (groupSelectPathLength < 50) {
+                        groupSelectPathLength += dist(panLastX, panLastY, e.getX(),e.getY());
+                    }
+                    panLastX = e.getX();
+                    panLastY = e.getY();
+                    invalidate();
                 }
             }
             // see if got any
-            if (panningIndex != -1) {
-                history.get(panningIndex).editButtonClicked();
-                // skip this event
-                skipPan = true;
-                invalidate();
+            if (e.getActionMasked() == MotionEvent.ACTION_UP) {
+                // now see any hit? which select?
+                if (groupSelectPathLength >= 50) {
+                    // group select
+                    groupSelectPath.close();
+                    for (int i = 0; i < history.size(); i++) {
+                        if (history.get(i).coveredByPath(groupSelectPath)) {
+                            panningIndexes.add(i);
+                            history.get(i).editButtonClicked();
+                        }
+                    }
+                    groupSelectPath.rewind();
+                    invalidate();
+                } else {
+                    // single select
+                    for (int i = history.size() - 1; i > -1; i--) {
+                        if (history.get(i).contains(e.getX(), e.getY(), 15)) {
+                            panningIndexes.add(i);
+                            history.get(i).editButtonClicked();
+                            break;
+                        }
+                    }
+                }
             }
         } else {
             if (e.getActionMasked() == MotionEvent.ACTION_DOWN) {
@@ -443,41 +499,33 @@ public class Paper extends FrameLayout {
                 if (Math.abs(panX - e.getX()) + Math.abs(panY - e.getY()) < 80 &&
                         System.currentTimeMillis() - lastTapTime < 200) {
                     // cancel
-                    history.get(panningIndex).focusLost();
-                    panningIndex = -1;
+                    for (int i : panningIndexes) {
+                        history.get(i).focusLost();
+                    }
+                    panningIndexes.clear();
                     skipPan = true;
                     invalidate();
                 } else if (panMoveToFrontBox.contains(e.getX(), e.getY())) {
                     // moving to front
-                    if (history.size() > panningIndex + 1) {
-                        removeView(history.get(panningIndex));
-                        addView(history.get(panningIndex), panningIndex + 1);
-                        AbstractPaintActionExtendsView temp = history.get(panningIndex);
-                        history.set(panningIndex, history.get(panningIndex + 1));
-                        history.set(panningIndex + 1, temp);
-                        panningIndex += 1;
-                    }
+                    panningIndexes = bringAllOneUp(panningIndexes);
                     skipPan = true;
                 } else if (panMoveToBackBox.contains(e.getX(), e.getY())) {
                     // moving to back
-                    if (panningIndex > 0) {
-                        removeView(history.get(panningIndex));
-                        addView(history.get(panningIndex), panningIndex - 1);
-                        AbstractPaintActionExtendsView temp = history.get(panningIndex);
-                        history.set(panningIndex, history.get(panningIndex - 1));
-                        history.set(panningIndex - 1, temp);
-                        panningIndex -= 1;
-                    }
+                    panningIndexes = bringAllOneDown(panningIndexes);
                     skipPan = true;
                 } else if (panDuplicateBox.contains(e.getX(), e.getY())) {
                     // duplicate
-                    AbstractPaintActionExtendsView dup = history.get(panningIndex).duplicate();
-                    if (dup != null) {
+                    ArrayList<Integer> tempList = new ArrayList<>(panningIndexes);
+                    panningIndexes.clear();
+                    tempList.sort((a, b) -> a - b);
+                    for (int i = 0; i < tempList.size(); i++) {
+                        history.get(i).focusLost();
+                        AbstractPaintActionExtendsView dup = history.get(tempList.get(i)).duplicate();
+                        if (dup == null) continue;
                         history.add(dup);
                         addView(dup);
-                        history.get(panningIndex).focusLost();
-                        panningIndex = history.size() - 1;
-                        history.get(panningIndex).editButtonClicked();
+                        dup.editButtonClicked();
+                        panningIndexes.add(history.size() - 1);
                     }
                     skipPan = true;
                 } else {
@@ -487,12 +535,107 @@ public class Paper extends FrameLayout {
 
                 }
             }
-            if (panningIndex != -1) {
-                return history.get(panningIndex).handleTouch(e);
+            if (panningIndexes.size() != 0) {
+                for (Integer i : panningIndexes) {
+                    history.get(i).handleTouch(e);
+                }
+                return true;
             }
         }
         return true;
 
+    }
+
+    // bring every element of a set (indecies) one up in history
+    HashSet<Integer> bringAllOneUp(HashSet<Integer> targetSet) {
+        Deque<Integer> chain = new LinkedList<>();
+        HashSet<Integer> newSet = new HashSet<>();
+        while (!targetSet.isEmpty()) {
+            int index = targetSet.iterator().next();
+            targetSet.remove(index);
+            // make a chain
+            chain.add(index);
+            while (targetSet.contains(index + 1)) {
+                index ++;
+                chain.addLast(index);
+                targetSet.remove(index);
+            }
+            index = chain.getFirst();
+            while (targetSet.contains(index - 1)) {
+                index --;
+                chain.addFirst(index);
+                targetSet.remove(index);
+            }
+            // clear chain
+            if (chain.getLast() == history.size() - 1) {
+                // cannot do anythin
+                newSet.addAll(chain);
+            } else {
+                // swap
+                for (int i = chain.getLast(); i > chain.getFirst(); i--) {
+                    // swap
+                    removeView(history.get(i));
+                    addView(history.get(i), i + 1);
+                    AbstractPaintActionExtendsView temp = history.get(i);
+                    history.set(i, history.get(i + 1));
+                    history.set(i + 1, temp);
+                    newSet.add(i + 1);
+                }
+            }
+            chain.clear();
+
+
+        }
+        return newSet;
+    }
+
+
+    // bring every element of a set (indecies) one up in history
+    HashSet<Integer> bringAllOneDown(HashSet<Integer> targetSet) {
+        Deque<Integer> chain = new LinkedList<>();
+        HashSet<Integer> newSet = new HashSet<>();
+        while (!targetSet.isEmpty()) {
+            int index = targetSet.iterator().next();
+            targetSet.remove(index);
+            // make a chain
+            chain.add(index);
+            while (targetSet.contains(index + 1)) {
+                index ++;
+                chain.addLast(index);
+                targetSet.remove(index);
+            }
+            index = chain.getFirst();
+            while (targetSet.contains(index - 1)) {
+                index --;
+                chain.addFirst(index);
+                targetSet.remove(index);
+            }
+            // clear chain
+            if (chain.getLast() == 0) {
+                // cannot do anythin
+                newSet.addAll(chain);
+            } else {
+                // swap
+                for (int i = chain.getLast(); i > chain.getFirst(); i--) {
+                    // swap
+                    removeView(history.get(i));
+                    addView(history.get(i), i - 1);
+                    AbstractPaintActionExtendsView temp = history.get(i);
+                    history.set(i, history.get(i - 1));
+                    history.set(i - 1, temp);
+                    newSet.add(i - 1);
+                }
+            }
+            chain.clear();
+
+
+        }
+        return newSet;
+    }
+
+
+    private float dist(float a, float b, float x, float y) {
+        return (float) Math.sqrt(Math.pow(x - a, 2) + Math.pow(y - b, 2));
     }
 
     public void clearPaperStates() {

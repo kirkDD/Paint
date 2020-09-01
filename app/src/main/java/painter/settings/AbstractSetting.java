@@ -24,6 +24,7 @@ public abstract class AbstractSetting { // ????????????????
     int iW, iH, mW, mH, iTop, iLeft;
     public void init(Paper paper, int iconW, int iconH, int mainW, int mainH, int iconTop, int iconLeft) {
         paint = new Paint();
+        paint.setAntiAlias(true);
         this.paper = paper;
         iW = iconW;
         iH = iconH;
