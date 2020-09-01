@@ -45,7 +45,7 @@ public abstract class AbstractPaintActionExtendsView extends View {
             abstractActionPaint.setColor(Color.GREEN);
             abstractActionPaint.setStrokeCap(Paint.Cap.ROUND);
 
-            abstractActionPaint.setXfermode(HIGHLIGHT_PAINT_MODE);
+//            abstractActionPaint.setXfermode(HIGHLIGHT_PAINT_MODE);
             abstractActionPaint.setTextAlign(Paint.Align.CENTER);
             abstractActionPaint.setTextSize(quickBoxWidth / 1.5f);
         }
@@ -85,7 +85,7 @@ public abstract class AbstractPaintActionExtendsView extends View {
             canvas.clipRect(animateBounds);
             abstractActionPaint.setAlpha(animateQBAlpha);
             abstractActionPaint.setStyle(Paint.Style.FILL);
-            abstractActionPaint.setXfermode(null);
+//            abstractActionPaint.setXfermode(null);
             canvas.drawCircle(animateX, animateY, animateQBRadius, abstractActionPaint);
             canvas.restore();
             if (animateQBRadius < quickBoxWidth * 2) {
@@ -95,7 +95,7 @@ public abstract class AbstractPaintActionExtendsView extends View {
             }
         }
 
-        abstractActionPaint.setXfermode(HIGHLIGHT_PAINT_MODE);
+//        abstractActionPaint.setXfermode(HIGHLIGHT_PAINT_MODE);
         abstractActionPaint.setStyle(Paint.Style.STROKE);
         abstractActionPaint.setAlpha(255);
         canvas.drawRect(quickEditBox, abstractActionPaint);

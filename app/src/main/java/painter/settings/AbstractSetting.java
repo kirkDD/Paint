@@ -121,6 +121,9 @@ public abstract class AbstractSetting { // ????????????????
 
      int getContrastColor(int color) {
         int y = (299 * Color.red(color) + 587 * Color.green(color) + 114 * Color.blue(color)) / 1000;
+        if (Color.alpha(color) < 140) {
+            return Color.WHITE;
+        }
         return y >= 128 ? Color.BLACK : Color.WHITE;
     }
 

@@ -88,9 +88,9 @@ public class PaperStates extends AbstractSetting {
         for (int i = 0; i < states.length; i++) {
             RectF box = states[i];
             paint.setColor(getContrastColor(paper.getBackgroundColor()));
-            paint.setAlpha(200);
+            paint.setAlpha(220);
             canvas.drawRoundRect(box, 10, 10, paint);
-            paint.setColor(paper.getBackgroundColor());
+            paint.setColor(getContrastColor(paint.getColor()));
             canvas.drawText(icons[i], box.centerX(), box.centerY() + paint.getTextSize() / 2 - paint.descent() / 2, paint);
         }
     }

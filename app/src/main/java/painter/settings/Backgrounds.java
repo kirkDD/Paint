@@ -134,6 +134,7 @@ public class Backgrounds extends AbstractSetting {
                     (int) map(y - mH / 2f, 0, mH / 2f, 0, 255)
             );
 
+
         }
         invalidate();
         changeBackgroundColor();

@@ -53,6 +53,7 @@ public class Strokes extends AbstractSetting {
         // draw an animated size
         if (quickActionActive) {
             paint.setColor(BACKGROUND_COLOR);
+            paint.setAlpha(80);
             canvas.drawRect(0, 0, mW + iW, mH, paint);
             paint.setColor(Color.WHITE);
             canvas.drawCircle(mW / 2f, mH / 2f, STROKE_WIDTH / 2, paint);

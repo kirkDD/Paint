@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import cse340.undo.R;
@@ -37,8 +38,16 @@ public class Shapes extends AbstractSetting {
             shapeBoxes[i] = new RectF();
         }
         indexToShape = new HashMap<>();
+        ArrayList<Class<? extends AbstractPaintActionExtendsView>> sortedShapeList = new ArrayList<>();
+        sortedShapeList.add(ActionLetters.class);
+        sortedShapeList.add(ActionNumbers.class);
+        sortedShapeList.add(ActionStroke.class);
+        sortedShapeList.add(ActionArrow.class);
+        sortedShapeList.add(ActionStraightLine.class);
+        sortedShapeList.add(ActionRectangle.class);
+        sortedShapeList.add(ActionOval.class);
         int i = 0;
-        for (Class<? extends AbstractPaintActionExtendsView> cls : shapesMap.keySet()) {
+        for (Class<? extends AbstractPaintActionExtendsView> cls : sortedShapeList) {
             indexToShape.put(i, cls);
             i += 1;
         }
