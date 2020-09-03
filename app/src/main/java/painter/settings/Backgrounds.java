@@ -31,12 +31,23 @@ public class Backgrounds extends AbstractSetting {
                 iTop + iH / 2f + paint.descent() + 5, paint);
     }
 
+    float sX, sY;
     @Override
     public boolean handleQuickEvent(MotionEvent e) {
         super.handleQuickEvent(e);
         switch (e.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
+                sX = e.getX();
+                skip = false;
             case MotionEvent.ACTION_MOVE:
+                if (skip) {
+                    break;
+                }
+                if (e.getX() - sX > mW / 3f) {
+                    COLOR = getContrastColor(paper.getBackgroundColor());
+                    paper.setBackgroundColor(COLOR);
+                    skip = true;
+                }
                 break;
             case MotionEvent.ACTION_UP:
                 if (inIcon(e.getX(), e.getY())) {
@@ -44,6 +55,7 @@ public class Backgrounds extends AbstractSetting {
                 } else {
                     END_MAIN_ACTION.run();
                 }
+                skip = false;
         }
         return true;
     }
@@ -81,6 +93,7 @@ public class Backgrounds extends AbstractSetting {
         float tX = map(Color.red(COLOR), 0, 255, 0, mW);
         float tY = map(Color.green(COLOR), 0, 255, 0, mH / 2f);
         canvas.save();
+        canvas.clipRect(0,0,mW,mH / 2);
         canvas.clipRect(tX - s, tY - s, tX + s, tY + s);
         s = 150;
         canvas.clipOutRect(tX - s, tY - s, tX + s, tY + s);
@@ -91,6 +104,7 @@ public class Backgrounds extends AbstractSetting {
         tX = map(Color.alpha(COLOR), 0, 255, 0, mW);
         tY = mH / 2f + map(Color.blue(COLOR), 0, 255, 0, mH / 2f);
         canvas.save();
+        canvas.clipRect(0, mH / 2, mW, mH);
         canvas.clipRect(tX - s, tY - s, tX + s, tY + s);
         s = 150;
         canvas.clipOutRect(tX - s, tY - s, tX + s, tY + s);

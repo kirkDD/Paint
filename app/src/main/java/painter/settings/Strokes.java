@@ -57,7 +57,7 @@ public class Strokes extends AbstractSetting {
             paint.setStyle(Paint.Style.FILL);
             canvas.drawRect(0, 0, mW + iW, mH, paint);
             paint.setColor(Color.WHITE);
-            canvas.drawCircle(mW / 2f, mH / 2f, STROKE_WIDTH / 2, paint);
+            canvas.drawCircle(iW + mW / 2f, mH / 2f, STROKE_WIDTH / 2, paint);
         }
 
         // draw icon
