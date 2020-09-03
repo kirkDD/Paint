@@ -3,8 +3,10 @@ package painter;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PathEffect;
 import android.graphics.RectF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -76,11 +78,13 @@ public class Paper extends FrameLayout {
 
         // internal use
         internalPaint = new Paint();
+
         history = new ArrayList<>();
         redoStack = new Stack<>();
         // panning
         panningIndexes = new HashSet<>();
         groupSelectPath = new Path();
+        groupSelectPathEffect = new DashPathEffect(new float[]{10, 20}, 10);
         initCurrentAction();
     }
 
@@ -115,7 +119,8 @@ public class Paper extends FrameLayout {
      */
     void finishAction() {
         if (!action.focusLost()) {
-            removeView(history.remove(history.size() - 1));
+            if (history.size() > 0)
+                removeView(history.remove(history.size() - 1));
         }
     }
 
@@ -293,10 +298,12 @@ public class Paper extends FrameLayout {
                 drawPanningQuickActionBox(canvas);
             } else {
                 // draw path
+                internalPaint.setPathEffect(groupSelectPathEffect);
                 internalPaint.setColor(theOneAndOnlyPaint.getColor());
                 internalPaint.setStyle(Paint.Style.STROKE);
                 internalPaint.setStrokeWidth(10);
                 canvas.drawPath(groupSelectPath,internalPaint);
+                internalPaint.setPathEffect(null);
             }
 
         }
@@ -376,7 +383,6 @@ public class Paper extends FrameLayout {
             if (isErasing()) {
                 toggleEraseMode();
             }
-            finishAction();
         } else {
             // end
             if (panningIndexes.size() != 0) {
@@ -401,6 +407,7 @@ public class Paper extends FrameLayout {
 
     HashSet<Integer> panningIndexes;
     Path groupSelectPath;
+    PathEffect groupSelectPathEffect;
     float groupSelectPathLength;
     long lastTapTime;
     float panX, panY;
@@ -447,7 +454,6 @@ public class Paper extends FrameLayout {
         }
         if (panningIndexes.size() == 0) {
             // selecting
-//            groupSelectPath.reset();
             if (groupSelectPath.isEmpty()) {
                 groupSelectPathLength = 0;
                 panLastX = e.getX();
@@ -480,8 +486,6 @@ public class Paper extends FrameLayout {
                             history.get(i).editButtonClicked();
                         }
                     }
-                    groupSelectPath.rewind();
-                    invalidate();
                 } else {
                     // single select
                     for (int i = history.size() - 1; i > -1; i--) {
@@ -492,11 +496,37 @@ public class Paper extends FrameLayout {
                         }
                     }
                 }
+                // rewind path
+                groupSelectPath.rewind();
+                invalidate();
             }
         } else {
             if (e.getActionMasked() == MotionEvent.ACTION_DOWN) {
                 // record time
-                if (Math.abs(panX - e.getX()) + Math.abs(panY - e.getY()) < 80 &&
+                if (panMoveToFrontBox.contains(e.getX(), e.getY())) {
+                    // moving to front
+                    panningIndexes = shiftZIndex(panningIndexes, true);
+                    skipPan = true;
+                } else if (panMoveToBackBox.contains(e.getX(), e.getY())) {
+                    // moving to back
+                    panningIndexes = shiftZIndex(panningIndexes, false);
+                    skipPan = true;
+                } else if (panDuplicateBox.contains(e.getX(), e.getY())) {
+                    // duplicate all actions selected
+                    ArrayList<Integer> tempList = new ArrayList<>(panningIndexes);
+                    panningIndexes.clear();
+                    tempList.sort((a, b) -> a - b);
+                    for (int i : tempList) {
+                        history.get(i).focusLost();
+                        AbstractPaintActionExtendsView dup = history.get(i).duplicate();
+                        if (dup == null) continue;
+                        history.add(dup);
+                        addView(dup);
+                        dup.editButtonClicked();
+                        panningIndexes.add(history.size() - 1);
+                    }
+                    skipPan = true;
+                } else if (Math.abs(panX - e.getX()) + Math.abs(panY - e.getY()) < 80 &&
                         System.currentTimeMillis() - lastTapTime < 200) {
                     // cancel
                     for (int i : panningIndexes) {
@@ -505,134 +535,73 @@ public class Paper extends FrameLayout {
                     panningIndexes.clear();
                     skipPan = true;
                     invalidate();
-                } else if (panMoveToFrontBox.contains(e.getX(), e.getY())) {
-                    // moving to front
-                    panningIndexes = bringAllOneUp(panningIndexes);
-                    skipPan = true;
-                } else if (panMoveToBackBox.contains(e.getX(), e.getY())) {
-                    // moving to back
-                    panningIndexes = bringAllOneDown(panningIndexes);
-                    skipPan = true;
-                } else if (panDuplicateBox.contains(e.getX(), e.getY())) {
-                    // duplicate
-                    ArrayList<Integer> tempList = new ArrayList<>(panningIndexes);
-                    panningIndexes.clear();
-                    tempList.sort((a, b) -> a - b);
-                    for (int i = 0; i < tempList.size(); i++) {
-                        history.get(i).focusLost();
-                        AbstractPaintActionExtendsView dup = history.get(tempList.get(i)).duplicate();
-                        if (dup == null) continue;
-                        history.add(dup);
-                        addView(dup);
-                        dup.editButtonClicked();
-                        panningIndexes.add(history.size() - 1);
-                    }
-                    skipPan = true;
-                } else {
+                } else  {
+                    // record time
                     panX = e.getX();
                     panY = e.getY();
                     lastTapTime = System.currentTimeMillis();
-
+                    for (Integer i : panningIndexes) {
+                        history.get(i).handleTouch(e);
+                    }
                 }
-            }
-            if (panningIndexes.size() != 0) {
+            } else {
                 for (Integer i : panningIndexes) {
                     history.get(i).handleTouch(e);
                 }
-                return true;
             }
         }
         return true;
-
     }
 
-    // bring every element of a set (indecies) one up in history
-    HashSet<Integer> bringAllOneUp(HashSet<Integer> targetSet) {
-        Deque<Integer> chain = new LinkedList<>();
+    // bring every element of a set (indecies) one up|down in history
+    HashSet<Integer> shiftZIndex(HashSet<Integer> targetSet, boolean shiftUp) {
         HashSet<Integer> newSet = new HashSet<>();
         while (!targetSet.isEmpty()) {
-            int index = targetSet.iterator().next();
-            targetSet.remove(index);
-            // make a chain
-            chain.add(index);
-            while (targetSet.contains(index + 1)) {
-                index ++;
-                chain.addLast(index);
-                targetSet.remove(index);
+            int low = targetSet.iterator().next();
+            int high = low;
+            targetSet.remove(low);
+            while (targetSet.contains(high + 1)) {
+                high++;
+                targetSet.remove(high);
             }
-            index = chain.getFirst();
-            while (targetSet.contains(index - 1)) {
-                index --;
-                chain.addFirst(index);
-                targetSet.remove(index);
+            while (targetSet.contains(low - 1)) {
+                low--;
+                targetSet.remove(low);
             }
-            // clear chain
-            if (chain.getLast() == history.size() - 1) {
+            // shift things
+            if ((shiftUp && high == history.size() - 1) || (!shiftUp && low == 0)) {
                 // cannot do anythin
-                newSet.addAll(chain);
+                for (int i = low; i <= high; i++) {
+                    newSet.add(i);
+                }
             } else {
-                // swap
-                for (int i = chain.getLast(); i > chain.getFirst(); i--) {
+                // swaps
+                if (shiftUp) {
                     // swap
-                    removeView(history.get(i));
-                    addView(history.get(i), i + 1);
-                    AbstractPaintActionExtendsView temp = history.get(i);
-                    history.set(i, history.get(i + 1));
-                    history.set(i + 1, temp);
-                    newSet.add(i + 1);
+                    for (int i = high; i >= low; i--) {
+                        // swap
+                        AbstractPaintActionExtendsView temp = history.get(i);
+                        removeView(temp);
+                        addView(temp, i + 1);
+                        history.set(i, history.get(i + 1));
+                        history.set(i + 1, temp);
+                        newSet.add(i + 1);
+                    }
+                } else {
+                    for (int i = low; i <= high; i++) {
+                        // swap
+                        AbstractPaintActionExtendsView temp = history.get(i);
+                        removeView(temp);
+                        addView(temp, i - 1);
+                        history.set(i, history.get(i - 1));
+                        history.set(i - 1, temp);
+                        newSet.add(i - 1);
+                    }
                 }
             }
-            chain.clear();
-
-
         }
         return newSet;
     }
-
-
-    // bring every element of a set (indecies) one up in history
-    HashSet<Integer> bringAllOneDown(HashSet<Integer> targetSet) {
-        Deque<Integer> chain = new LinkedList<>();
-        HashSet<Integer> newSet = new HashSet<>();
-        while (!targetSet.isEmpty()) {
-            int index = targetSet.iterator().next();
-            targetSet.remove(index);
-            // make a chain
-            chain.add(index);
-            while (targetSet.contains(index + 1)) {
-                index ++;
-                chain.addLast(index);
-                targetSet.remove(index);
-            }
-            index = chain.getFirst();
-            while (targetSet.contains(index - 1)) {
-                index --;
-                chain.addFirst(index);
-                targetSet.remove(index);
-            }
-            // clear chain
-            if (chain.getLast() == 0) {
-                // cannot do anythin
-                newSet.addAll(chain);
-            } else {
-                // swap
-                for (int i = chain.getLast(); i > chain.getFirst(); i--) {
-                    // swap
-                    removeView(history.get(i));
-                    addView(history.get(i), i - 1);
-                    AbstractPaintActionExtendsView temp = history.get(i);
-                    history.set(i, history.get(i - 1));
-                    history.set(i - 1, temp);
-                    newSet.add(i - 1);
-                }
-            }
-            chain.clear();
-
-
-        }
-        return newSet;
-    }
-
 
     private float dist(float a, float b, float x, float y) {
         return (float) Math.sqrt(Math.pow(x - a, 2) + Math.pow(y - b, 2));
