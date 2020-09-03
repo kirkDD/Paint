@@ -34,7 +34,6 @@ public class Strokes extends AbstractSetting {
     void privateInit() {
         paint.setStrokeWidth(10);
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(mH / 15f);
         iconBox.set(iLeft, iTop, iLeft + iW, iTop + iH);
         for (int i = 0; i < strokeStyleBox.length; i++) {
             strokeStyleBox[i].set(
@@ -44,6 +43,7 @@ public class Strokes extends AbstractSetting {
                     MAIN_MARGIN + i * mH / 5f + mH / 8f);
         }
         STROKE_STYLE = paper.getPaintToEdit().getStyle();
+        paint.setTextSize(strokeStyleBox[0].height() / 3);
     }
 
     @Override
@@ -60,13 +60,14 @@ public class Strokes extends AbstractSetting {
         }
 
         // draw icon
-        paint.setStyle(Paint.Style.STROKE);
+//        paint.setStyle(Paint.Style.FILL);
+//        paint.setColor(getContrastColor(paper.getBackgroundColor()));
+//        paint.setAlpha(200);
+//        canvas.drawCircle(iconBox.centerX(), iconBox.centerY(), iW / 3f, paint);
+
         paint.setColor(getContrastColor(paper.getBackgroundColor()));
+        paint.setStyle(STROKE_STYLE);
         canvas.drawCircle(iconBox.centerX(), iconBox.centerY(), iW / 3f, paint);
-        paint.setColor(getContrastColor(paper.getBackgroundColor()));
-        paint.setStyle(Paint.Style.FILL);
-        paint.setAlpha(200);
-        canvas.drawCircle(iconBox.centerX(), iconBox.centerY(), iW / 5f, paint);
 
     }
 
@@ -104,18 +105,28 @@ public class Strokes extends AbstractSetting {
     public void drawMain(Canvas canvas) {
         // select stroke style
         paint.setColor(BACKGROUND_COLOR);
+        paint.setStyle(Paint.Style.FILL);
         canvas.drawRect(0, 0, mW, mH, paint);
         // draw rects
-        paint.setStrokeWidth(10);
         for (int i = 0; i < strokeStyleBox.length; i++) {
-            paint.setColor(Color.WHITE);
             if (i == 0) paint.setStyle(Paint.Style.FILL);
             if (i == 1) paint.setStyle(Paint.Style.STROKE);
             if (i == 2) paint.setStyle(Paint.Style.FILL_AND_STROKE);
-            canvas.drawRoundRect(strokeStyleBox[i], 10, 10, paint);
+            paint.setColor(Color.rgb(200, 200, 200));
+            canvas.drawRect(strokeStyleBox[i], paint);
+            paint.setColor(Color.BLACK);
+            if (i == 0)
+                canvas.drawText("FILL ONLY", strokeStyleBox[i].centerX(),
+                        strokeStyleBox[i].centerY() + paint.getTextSize() / 2 - paint.descent() / 2, paint);
+            if (i == 1)
+                canvas.drawText("STROKE ONLY", strokeStyleBox[i].centerX(),
+                        strokeStyleBox[i].centerY() + paint.getTextSize() / 2 - paint.descent() / 2, paint);
+            if (i == 2)
+                canvas.drawText("FILL n STROKE", strokeStyleBox[i].centerX(),
+                        strokeStyleBox[i].centerY() + paint.getTextSize() / 2 - paint.descent() / 2, paint);
             if (paint.getStyle() == STROKE_STYLE) {
-                paint.setColor(Color.BLACK);
-                canvas.drawText("SELECTED", strokeStyleBox[i].centerX(), strokeStyleBox[i].centerY(), paint);
+                paint.setStyle(Paint.Style.STROKE);
+                canvas.drawRect(strokeStyleBox[i], paint);
             }
         }
         // draw stroke size
@@ -125,7 +136,6 @@ public class Strokes extends AbstractSetting {
         if (nextStyleIndex == 4) {
             // changing size
             paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(10);
             canvas.drawCircle(strokeStyleBox[0].centerX(), (strokeStyleBox[2].bottom + mH) / 2, STROKE_WIDTH / 2 + 40, paint);
         }
     }

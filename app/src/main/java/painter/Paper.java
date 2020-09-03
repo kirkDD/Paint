@@ -84,7 +84,7 @@ public class Paper extends FrameLayout {
         // panning
         panningIndexes = new HashSet<>();
         groupSelectPath = new Path();
-        groupSelectPathEffect = new DashPathEffect(new float[]{10, 20}, 10);
+        groupSelectPathEffect = new DashPathEffect(new float[]{20, 10}, 0);
         initCurrentAction();
     }
 
@@ -301,8 +301,8 @@ public class Paper extends FrameLayout {
                 internalPaint.setPathEffect(groupSelectPathEffect);
                 internalPaint.setColor(theOneAndOnlyPaint.getColor());
                 internalPaint.setStyle(Paint.Style.STROKE);
-                internalPaint.setStrokeWidth(10);
-                canvas.drawPath(groupSelectPath,internalPaint);
+                internalPaint.setStrokeWidth(7);
+                canvas.drawPath(groupSelectPath, internalPaint);
                 internalPaint.setPathEffect(null);
             }
 
@@ -416,6 +416,7 @@ public class Paper extends FrameLayout {
     RectF panMoveToFrontBox;
     RectF panMoveToBackBox;
     RectF panDuplicateBox;
+    RectF panDeleteBox;
     void drawPanningQuickActionBox(Canvas c) {
         if (panMoveToFrontBox == null) {
             float top = getHeight() / 1.5f;
@@ -424,13 +425,16 @@ public class Paper extends FrameLayout {
             panMoveToBackBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
             top += 100;
             panDuplicateBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
+            top += 100;
+            panDeleteBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
         }
         // draw boxes
         internalPaint.setColor(Color.BLACK);
         internalPaint.setStyle(Paint.Style.FILL);
-        c.drawRect(panMoveToFrontBox,internalPaint);
+        c.drawRect(panMoveToFrontBox, internalPaint);
         c.drawRect(panMoveToBackBox, internalPaint);
         c.drawRect(panDuplicateBox, internalPaint);
+        c.drawRect(panDeleteBox, internalPaint);
         internalPaint.setTextSize(panMoveToFrontBox.height() / 2);
         internalPaint.setTextAlign(Paint.Align.CENTER);
         internalPaint.setColor(Color.WHITE);
@@ -443,6 +447,10 @@ public class Paper extends FrameLayout {
 
         c.drawText("⧉", panDuplicateBox.centerX(),
                 panDuplicateBox.centerY() + internalPaint.getTextSize() / 2 - internalPaint.descent() / 2,
+                internalPaint);
+
+        c.drawText("⊗", panDeleteBox.centerX(),
+                panDeleteBox.centerY() + internalPaint.getTextSize() / 2 - internalPaint.descent() / 2,
                 internalPaint);
     }
 
@@ -526,6 +534,16 @@ public class Paper extends FrameLayout {
                         panningIndexes.add(history.size() - 1);
                     }
                     skipPan = true;
+                } else if (panDeleteBox.contains(e.getX(), e.getY())) {
+                    // delete all
+                    ArrayList<Integer> tempList = new ArrayList<>(panningIndexes);
+                    panningIndexes.clear();
+                    tempList.sort((a, b) -> b - a);
+                    for (int i : tempList) {
+                        redoStack.push(history.get(i));
+                        history.get(i).focusLost();
+                        removeView(history.remove(i));
+                    }
                 } else if (Math.abs(panX - e.getX()) + Math.abs(panY - e.getY()) < 80 &&
                         System.currentTimeMillis() - lastTapTime < 200) {
                     // cancel

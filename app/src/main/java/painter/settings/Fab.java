@@ -42,7 +42,7 @@ public class Fab extends AbstractSetting {
     }
 
     int iconAlpha = 0;
-    int targetIconAlpha = 100;
+    int targetIconAlpha = 111;
     @Override
     public void drawIcon(Canvas canvas) {
         super.drawIcon(canvas);
@@ -117,7 +117,7 @@ public class Fab extends AbstractSetting {
                         ex.printStackTrace();
                     }
                     if (!dragging) {
-                        targetIconAlpha = 100;
+                        targetIconAlpha = 111;
                         invalidate();
                     }
                 }).start();
