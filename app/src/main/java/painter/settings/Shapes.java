@@ -12,6 +12,7 @@ import java.util.HashMap;
 import cse340.undo.R;
 import painter.actions.AbstractPaintActionExtendsView;
 import painter.actions.ActionArrow;
+import painter.actions.ActionDash;
 import painter.actions.ActionLetters;
 import painter.actions.ActionNumbers;
 import painter.actions.ActionOval;
@@ -33,15 +34,18 @@ public class Shapes extends AbstractSetting {
         shapesMap.put(ActionNumbers.class, R.string.number);
         shapesMap.put(ActionRectangle.class, R.string.rect);
         shapesMap.put(ActionOval.class, R.string.oval);
+        shapesMap.put(ActionDash.class, R.string.dash);
         shapeBoxes = new RectF[shapesMap.keySet().size()];
         for (int i = 0; i < shapeBoxes.length; i++) {
             shapeBoxes[i] = new RectF();
         }
         indexToShape = new HashMap<>();
+        // a fixed order for shapes
         ArrayList<Class<? extends AbstractPaintActionExtendsView>> sortedShapeList = new ArrayList<>();
         sortedShapeList.add(ActionLetters.class);
         sortedShapeList.add(ActionNumbers.class);
         sortedShapeList.add(ActionStroke.class);
+        sortedShapeList.add(ActionDash.class);
         sortedShapeList.add(ActionArrow.class);
         sortedShapeList.add(ActionStraightLine.class);
         sortedShapeList.add(ActionRectangle.class);

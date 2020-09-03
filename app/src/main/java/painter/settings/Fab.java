@@ -10,6 +10,7 @@ import java.util.HashMap;
 import cse340.undo.R;
 import painter.actions.AbstractPaintActionExtendsView;
 import painter.actions.ActionArrow;
+import painter.actions.ActionDash;
 import painter.actions.ActionLetters;
 import painter.actions.ActionNumbers;
 import painter.actions.ActionOval;
@@ -39,6 +40,7 @@ public class Fab extends AbstractSetting {
         shapesMap.put(ActionNumbers.class, R.string.number);
         shapesMap.put(ActionRectangle.class, R.string.rect);
         shapesMap.put(ActionOval.class, R.string.oval);
+        shapesMap.put(ActionDash.class, R.string.dash);
     }
 
     int iconAlpha = 0;
