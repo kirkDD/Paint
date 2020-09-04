@@ -29,9 +29,11 @@ import java.util.Stack;
 
 import painter.actions.AbstractPaintActionExtendsView;
 import painter.actions.ActionArrow;
+import painter.actions.ActionDash;
 import painter.actions.ActionLetters;
 import painter.actions.ActionNumbers;
 import painter.actions.ActionOval;
+import painter.actions.ActionPen;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
 import painter.actions.ActionStroke;
@@ -61,7 +63,7 @@ public class Paper extends FrameLayout {
     // current action
     public AbstractPaintActionExtendsView action;
     // current action's class
-    Class<? extends AbstractPaintActionExtendsView> actionClass = ActionStroke.class;
+    Class<? extends AbstractPaintActionExtendsView> actionClass = ActionPen.class;
     static Paint theOneAndOnlyPaint;
 
     int background_color = -1;
@@ -230,7 +232,7 @@ public class Paper extends FrameLayout {
             if (canUndo()) {
                 action = history.get(history.size() - 1);
             } else {
-                Log.d(TAG, "undo: initing");
+//                Log.d(TAG, "undo: initing");
                 initCurrentAction();
             }
             invalidate();
@@ -256,7 +258,7 @@ public class Paper extends FrameLayout {
             invalidate();
             return true;
         } else {
-            Log.i(TAG, "redo: nothing to redo");
+//            Log.i(TAG, "redo: nothing to redo");
             return false;
         }
     }

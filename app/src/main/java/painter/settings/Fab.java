@@ -3,6 +3,7 @@ package painter.settings;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.v7.view.ActionBarPolicy;
 import android.view.MotionEvent;
 
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import painter.actions.ActionDash;
 import painter.actions.ActionLetters;
 import painter.actions.ActionNumbers;
 import painter.actions.ActionOval;
+import painter.actions.ActionPen;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
 import painter.actions.ActionStroke;
@@ -33,7 +35,8 @@ public class Fab extends AbstractSetting {
         paint.setTextAlign(Paint.Align.CENTER);
 
         shapesMap = new HashMap<>();
-        shapesMap.put(ActionStroke.class, R.string.stroke);
+//        shapesMap.put(ActionStroke.class, R.string.stroke);
+        shapesMap.put(ActionPen.class, R.string.stroke);
         shapesMap.put(ActionStraightLine.class, R.string.line);
         shapesMap.put(ActionArrow.class, R.string.arrow);
         shapesMap.put(ActionLetters.class, R.string.letter);
@@ -73,6 +76,11 @@ public class Fab extends AbstractSetting {
         }
         if (iconAlpha != targetIconAlpha) {
             iconAlpha += (targetIconAlpha - iconAlpha) * 0.2;
+            if (targetIconAlpha > iconAlpha) {
+                iconAlpha += 1;
+            } else {
+                iconAlpha -= 1;
+            }
             invalidate();
         }
     }

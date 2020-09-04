@@ -196,14 +196,16 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     }
 
     void onDraw2(Canvas canvas) {
-//        Log.d(TAG, "onDraw2: cap " + thisCap);
+        applyStrokeStyles();
+        canvas.drawPath(myPath, paint);
+    }
+
+    void applyStrokeStyles() {
         paint.setColor(thisColor);
         paint.setStrokeCap(thisCap);
         paint.setStrokeWidth(thisWidth);
         paint.setStrokeJoin(thisJoin);
         paint.setStyle(Paint.Style.STROKE);
-
-        canvas.drawPath(myPath, paint);
     }
 
     void conditionalDrawHighlight(Canvas canvas) {

@@ -195,8 +195,8 @@ public class PaperController extends View {
         if (hideUI) {
             if (vBarXOff > -BAR_W) {
                 vBarXOff += (-BAR_W - vBarXOff) * 0.2 - 1;
+                invalidate();
             }
-            invalidate();
         } else if (vBarXOff < 0) {
             vBarXOff += - vBarXOff * 0.2 + 1;
             if (vBarXOff > 0) {

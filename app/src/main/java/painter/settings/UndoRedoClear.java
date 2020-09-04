@@ -34,7 +34,7 @@ public class UndoRedoClear extends AbstractSetting {
         if (clear) {
             paint.setTextSize(300);
             paint.setAlpha(100);
-            canvas.drawText("CLEAR", mW / 2f, mH / 2f, paint);
+            canvas.drawText("CLEAR", iW + mW / 2f, mH / 2f, paint);
         }
     }
 
@@ -54,11 +54,18 @@ public class UndoRedoClear extends AbstractSetting {
                 int targetState = (int) Math.pow(Math.abs(e.getY() - startY) / 200, 1.4);
                 if (e.getY() - startY < 0) targetState = - targetState;
                 if (targetState == 0) {
-                    // see if quick redo (nope!) or clear
-                    clear = e.getX() - iW * 2 > mW * 0.5;
-//                    if (!clear && e.getX() - iW - iW > mW / 4f) {
-//                        targetState = 1;
-//                    }
+                    // see if quick clear
+                    if (e.getX() - iW * 2 > mW * 0.5) {
+                        if (!clear) {
+                            invalidate();
+                        }
+                        clear = true;
+                    } else {
+                        if (clear) {
+                            invalidate();
+                        }
+                        clear = false;
+                    }
                 } else {
                     clear = false;
                 }
@@ -76,12 +83,12 @@ public class UndoRedoClear extends AbstractSetting {
                             targetState++;
                         }
                     }
+                    invalidate();
                 }
                 // check for a click
                 if (dist(startX, startY, e.getX(), e.getY()) > 20) {
                     clicking = false;
                 }
-                invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 if (clear) {

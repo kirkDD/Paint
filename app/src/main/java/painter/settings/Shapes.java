@@ -16,6 +16,7 @@ import painter.actions.ActionDash;
 import painter.actions.ActionLetters;
 import painter.actions.ActionNumbers;
 import painter.actions.ActionOval;
+import painter.actions.ActionPen;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
 import painter.actions.ActionStroke;
@@ -27,7 +28,8 @@ public class Shapes extends AbstractSetting {
     RectF[] shapeBoxes;
     public Shapes() {
         shapesMap = new HashMap<>();
-        shapesMap.put(ActionStroke.class, R.string.stroke);
+//        shapesMap.put(ActionStroke.class, R.string.stroke);
+        shapesMap.put(ActionPen.class, R.string.stroke);
         shapesMap.put(ActionStraightLine.class, R.string.line);
         shapesMap.put(ActionArrow.class, R.string.arrow);
         shapesMap.put(ActionLetters.class, R.string.letter);
@@ -44,7 +46,8 @@ public class Shapes extends AbstractSetting {
         ArrayList<Class<? extends AbstractPaintActionExtendsView>> sortedShapeList = new ArrayList<>();
         sortedShapeList.add(ActionLetters.class);
         sortedShapeList.add(ActionNumbers.class);
-        sortedShapeList.add(ActionStroke.class);
+        sortedShapeList.add(ActionPen.class);
+//        sortedShapeList.add(ActionStroke.class);
         sortedShapeList.add(ActionDash.class);
         sortedShapeList.add(ActionArrow.class);
         sortedShapeList.add(ActionStraightLine.class);
