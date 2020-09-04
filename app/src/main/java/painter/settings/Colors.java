@@ -70,11 +70,25 @@ public class Colors extends AbstractSetting {
         super.drawIcon(canvas);
 
         paint.setStyle(Paint.Style.FILL);
+        if (colors[currColorIndex] != paper.getPaintToEdit().getColor()) {
+            for (int i = 0; i < colors.length; i++) {
+                if (colors[i] == paper.getPaintToEdit().getColor()) {
+                    prevColorIndex = currColorIndex;
+                    currColorIndex = i;
+                    nextColorBoxIndex = currColorIndex;
+                    break;
+                }
+            }
+        }
         for (int i = 0; i < colorBoxes.length; i++) {
             paint.setColor(colors[i]);
             canvas.save();
             if (i == currColorIndex) {
-                canvas.translate(selectedColorXOff, 0);
+                if (colors[currColorIndex] != paper.getPaintToEdit().getColor()) {
+                    // do nothing
+                } else {
+                    canvas.translate(selectedColorXOff, 0);
+                }
             } else if (i == prevColorIndex && selectedColorXOff < X_OFFSET_AMOUNT) {
                 canvas.translate(X_OFFSET_AMOUNT - selectedColorXOff, 0);
             } else if (i == nextColorBoxIndex) {

@@ -37,6 +37,7 @@ import painter.actions.ActionPen;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
 import painter.actions.ActionStroke;
+import painter.settings.Colors;
 
 /**
  * the paper to hold all drawings (views)
@@ -64,6 +65,7 @@ public class Paper extends FrameLayout {
     public AbstractPaintActionExtendsView action;
     // current action's class
     Class<? extends AbstractPaintActionExtendsView> actionClass = ActionPen.class;
+    Class<? extends AbstractPaintActionExtendsView> previousActionClass = ActionPen.class;
     static Paint theOneAndOnlyPaint;
 
     int background_color = -1;
@@ -72,7 +74,7 @@ public class Paper extends FrameLayout {
         super(context, attrs);
         Log.d(TAG, "Paper: initializing");
         theOneAndOnlyPaint = new Paint();
-        theOneAndOnlyPaint.setColor(Color.RED);
+        theOneAndOnlyPaint.setColor(CURRENT_COLOR);
         theOneAndOnlyPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         theOneAndOnlyPaint.setStrokeWidth(10);
         theOneAndOnlyPaint.setTextSize(120);
@@ -131,6 +133,10 @@ public class Paper extends FrameLayout {
      * set next action - line, rect...
      */
     public void setDrawAction(Class<? extends AbstractPaintActionExtendsView> action) {
+        // update previous action
+        if (action != actionClass) {
+            previousActionClass = actionClass;
+        }
         if (erasing) toggleEraseMode();
         finishAction();
         actionClass = action;
@@ -141,6 +147,9 @@ public class Paper extends FrameLayout {
         return actionClass;
     }
 
+    public Class<? extends AbstractPaintActionExtendsView> getPreviousAction() {
+        return previousActionClass;
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -191,8 +200,14 @@ public class Paper extends FrameLayout {
         return theOneAndOnlyPaint;
     }
 
+    int PREVIOUS_COLOR;
+    int CURRENT_COLOR = Color.RED;
     // apply settings
     public void applyPaintEdit() {
+        if (theOneAndOnlyPaint.getColor() != CURRENT_COLOR) {
+            PREVIOUS_COLOR = CURRENT_COLOR; // save the color
+            CURRENT_COLOR = theOneAndOnlyPaint.getColor();
+        }
         if (isPanning()) {
             // apply edits to current panning thing
             for (int i : panningIndexes) {
@@ -204,6 +219,10 @@ public class Paper extends FrameLayout {
                 action.setStyle(theOneAndOnlyPaint);
             }
         }
+    }
+
+    public int getPreviousColor() {
+        return PREVIOUS_COLOR;
     }
 
     // other settings
