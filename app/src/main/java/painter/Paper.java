@@ -422,11 +422,11 @@ public class Paper extends FrameLayout {
     void drawPanningQuickActionBox(Canvas c) {
         if (panMoveToFrontBox == null) {
             float top = getHeight() / 1.5f;
+            panDuplicateBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
+            top += 100;
             panMoveToFrontBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
             top += 100;
             panMoveToBackBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
-            top += 100;
-            panDuplicateBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
             top += 100;
             panDeleteBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
         }

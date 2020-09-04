@@ -110,6 +110,14 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                 } else if (currentState == ActionState.REVISING) {
                     // revising
                     if ((action == 1 && e.getPointerCount() == 2) || (action == 2 && e.getPointerCount() == 1)) {
+                        pathTransform.reset();
+                        boundW = bound.width();
+                        boundH = bound.height();
+                        boundCX = bound.centerX();
+                        boundCY = bound.centerY();
+                        savedPath.rewind();
+                        savedPath.addPath(myPath);
+                        // reset saved path
                         action = 0; // back to move
                         boundCX = bound.centerX();
                         boundCY = bound.centerY();  // stop
@@ -135,6 +143,10 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                 action = 1;
                 // scale
                 secondPointerId = id;
+                if (e.getY(index) > e.getY(e.findPointerIndex(pointerId))) {
+                    secondPointerId = pointerId;
+                    pointerId = id;
+                }
             } else {
                 action = 2;
                 // rotate
@@ -157,8 +169,8 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                 return; // finger disappeared
             }
             pathTransform.setScale(
-                    -(e.getX(e.findPointerIndex(pointerId)) - e.getX(e.findPointerIndex(secondPointerId))) / boundW,
-                    -(e.getY(e.findPointerIndex(pointerId)) - e.getY(e.findPointerIndex(secondPointerId))) / boundH,
+                    (e.getX(e.findPointerIndex(pointerId)) - e.getX(e.findPointerIndex(secondPointerId))) / boundW,
+                    (e.getY(e.findPointerIndex(pointerId)) - e.getY(e.findPointerIndex(secondPointerId))) / boundH,
                     boundCX, boundCY);
             pathTransform.postTranslate(
                     (e.getX(e.findPointerIndex(pointerId)) + e.getX(e.findPointerIndex(secondPointerId))) / 2f - boundCX,
@@ -233,6 +245,11 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
     @Override
     AbstractPaintActionExtendsView duplicateImp() {
         ActionStroke re = new ActionStroke(getContext());
+        duplicateWork(re);
+        return re;
+    }
+
+    void duplicateWork(ActionStroke re) {
         re.thisColor = thisColor;
         re.thisWidth = thisWidth;
         re.thisCap = thisCap;
@@ -244,6 +261,5 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
         re.pathTransform.setTranslate(DUPLICATE_OFFSET, DUPLICATE_OFFSET);
         re.myPath.transform(re.pathTransform);
         re.pathTransform.set(pathTransform);
-        return re;
     }
 }

@@ -6,20 +6,9 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
-import cse340.undo.R;
 import painter.actions.AbstractPaintActionExtendsView;
-import painter.actions.ActionArrow;
-import painter.actions.ActionDash;
-import painter.actions.ActionLetters;
-import painter.actions.ActionNumbers;
-import painter.actions.ActionOval;
-import painter.actions.ActionPen;
-import painter.actions.ActionRectangle;
-import painter.actions.ActionStraightLine;
-import painter.actions.ActionStroke;
 
 public class Shapes extends AbstractSetting {
 
@@ -28,35 +17,15 @@ public class Shapes extends AbstractSetting {
     RectF[] shapeBoxes;
     public Shapes() {
         shapesMap = new HashMap<>();
-//        shapesMap.put(ActionStroke.class, R.string.stroke);
-        shapesMap.put(ActionPen.class, R.string.stroke);
-        shapesMap.put(ActionStraightLine.class, R.string.line);
-        shapesMap.put(ActionArrow.class, R.string.arrow);
-        shapesMap.put(ActionLetters.class, R.string.letter);
-        shapesMap.put(ActionNumbers.class, R.string.number);
-        shapesMap.put(ActionRectangle.class, R.string.rect);
-        shapesMap.put(ActionOval.class, R.string.oval);
-        shapesMap.put(ActionDash.class, R.string.dash);
+        indexToShape = new HashMap<>();
+        for (int i = 0; i < AbstractPaintActionExtendsView.ALL_ACTIONS.length; i++) {
+            shapesMap.put(AbstractPaintActionExtendsView.ALL_ACTIONS[i], AbstractPaintActionExtendsView.ACTION_STRING_IDS[i]);
+            // a predefined order for shapes
+            indexToShape.put(i, AbstractPaintActionExtendsView.ALL_ACTIONS[i]);
+        }
         shapeBoxes = new RectF[shapesMap.keySet().size()];
         for (int i = 0; i < shapeBoxes.length; i++) {
             shapeBoxes[i] = new RectF();
-        }
-        indexToShape = new HashMap<>();
-        // a fixed order for shapes
-        ArrayList<Class<? extends AbstractPaintActionExtendsView>> sortedShapeList = new ArrayList<>();
-        sortedShapeList.add(ActionLetters.class);
-        sortedShapeList.add(ActionNumbers.class);
-        sortedShapeList.add(ActionPen.class);
-//        sortedShapeList.add(ActionStroke.class);
-        sortedShapeList.add(ActionDash.class);
-        sortedShapeList.add(ActionArrow.class);
-        sortedShapeList.add(ActionStraightLine.class);
-        sortedShapeList.add(ActionRectangle.class);
-        sortedShapeList.add(ActionOval.class);
-        int i = 0;
-        for (Class<? extends AbstractPaintActionExtendsView> cls : sortedShapeList) {
-            indexToShape.put(i, cls);
-            i += 1;
         }
     }
 

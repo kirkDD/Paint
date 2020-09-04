@@ -31,4 +31,12 @@ public class ActionDash extends ActionStroke {
         canvas.drawPath(myPath, paint);
         paint.setPathEffect(null);
     }
+
+    @Override
+    AbstractPaintActionExtendsView duplicateImp() {
+        ActionDash re = new ActionDash(getContext());
+        duplicateWork(re);
+        re.pathEffect = new DashPathEffect(new float[]{thisWidth, thisWidth * 2}, 0);
+        return re;
+    }
 }

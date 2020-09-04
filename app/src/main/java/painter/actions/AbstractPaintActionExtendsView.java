@@ -1,7 +1,5 @@
 package painter.actions;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Currency;
 import java.util.function.UnaryOperator;
 
 import android.content.Context;
@@ -11,10 +9,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Xfermode;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -26,6 +22,32 @@ import cse340.undo.R;
  */
 public abstract class AbstractPaintActionExtendsView extends View {
     static final String TAG = "-=-= Abstract Action";
+
+    public static final Class<? extends AbstractPaintActionExtendsView>[] ALL_ACTIONS = new Class[]{
+            ActionLetters.class,
+            ActionNumbers.class,
+            ActionOval.class,
+            ActionRectangle.class,
+            ActionStroke.class,
+            ActionPen.class,
+            ActionDash.class,
+            ActionStraightLine.class,
+            ActionArrow.class,
+            ActionTest.class
+    };
+
+    public static final int[] ACTION_STRING_IDS = new int[]{
+            R.string.letter,
+            R.string.number,
+            R.string.oval,
+            R.string.rect,
+            R.string.stroke,
+            R.string.pen,
+            R.string.dash,
+            R.string.line,
+            R.string.arrow,
+            R.string.test_action
+    };
 
     static final Xfermode HIGHLIGHT_PAINT_MODE = new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY);
     static final float HIGHLIGHT_STROKE_WIDTH = 4f;

@@ -35,15 +35,9 @@ public class Fab extends AbstractSetting {
         paint.setTextAlign(Paint.Align.CENTER);
 
         shapesMap = new HashMap<>();
-//        shapesMap.put(ActionStroke.class, R.string.stroke);
-        shapesMap.put(ActionPen.class, R.string.stroke);
-        shapesMap.put(ActionStraightLine.class, R.string.line);
-        shapesMap.put(ActionArrow.class, R.string.arrow);
-        shapesMap.put(ActionLetters.class, R.string.letter);
-        shapesMap.put(ActionNumbers.class, R.string.number);
-        shapesMap.put(ActionRectangle.class, R.string.rect);
-        shapesMap.put(ActionOval.class, R.string.oval);
-        shapesMap.put(ActionDash.class, R.string.dash);
+        for (int i = 0; i < AbstractPaintActionExtendsView.ALL_ACTIONS.length; i++) {
+            shapesMap.put(AbstractPaintActionExtendsView.ALL_ACTIONS[i], AbstractPaintActionExtendsView.ACTION_STRING_IDS[i]);
+        }
     }
 
     int iconAlpha = 0;

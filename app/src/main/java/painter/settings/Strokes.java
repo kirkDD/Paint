@@ -154,6 +154,7 @@ public class Strokes extends AbstractSetting {
                             if (nextStyleIndex == 0) STROKE_STYLE = Paint.Style.FILL;
                             if (nextStyleIndex == 1) STROKE_STYLE = Paint.Style.STROKE;
                             if (nextStyleIndex == 2) STROKE_STYLE = Paint.Style.FILL_AND_STROKE;
+                            nextStyleIndex = -1;
                             changeStroke();
                             invalidate();
                             break;

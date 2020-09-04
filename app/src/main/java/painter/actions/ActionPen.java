@@ -26,6 +26,7 @@ public class ActionPen extends ActionStroke {
         //        temp.addOval(-2, thisWidth / -2, 3, thisWidth / 2, Path.Direction.CW);
 //        temp.addRect(-2, thisWidth / -2, 3, thisWidth / 2, Path.Direction.CW);
         pathEffect = new PathDashPathEffect(temp, Math.max(thisWidth / 16, 2), 0, PathDashPathEffect.Style.TRANSLATE);
+        invalidate();
     }
 
     @Override
@@ -42,5 +43,13 @@ public class ActionPen extends ActionStroke {
 //        }
         canvas.drawPath(myPath, paint);
         paint.setPathEffect(null);
+    }
+
+    @Override
+    AbstractPaintActionExtendsView duplicateImp() {
+        ActionPen re = new ActionPen(getContext());
+        duplicateWork(re);
+        re.setPathEffect();
+        return re;
     }
 }
