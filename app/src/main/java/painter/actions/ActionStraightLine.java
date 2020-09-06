@@ -8,6 +8,8 @@ import android.graphics.Path;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import painter.help.InterestingPoints;
+
 /**
  * draw a straight line
  */
@@ -52,11 +54,18 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     // change current state
                     currentIndex = 2;
                     currentState = ActionState.STARTED;
+                    // also snap
+                    InterestingPoints.Point p = interestingPoints.query(e.getX(), e.getY());
+                    if (p != null) {
+                        coors[0] = p.x;
+                        coors[1] = p.y;
+                    }
                 } else if (currentState == ActionState.FINISHED) {
                     // done
                     callWhenDone.apply(this);
                     return false;
                 } else if (currentState == ActionState.STARTED || currentState == ActionState.REVISING) {
+                    removeAllInterestingPoints();
                     // decide: resize, move
                     // which end point to move?
                     if (dist(coors[0], coors[1], e.getX(), e.getY()) < ACTION_RADIUS) {
@@ -81,12 +90,42 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                         coors[1] -= lastY - e.getY();
                         coors[2] -= lastX - e.getX();
                         coors[3] -= lastY - e.getY();
+                    } else {
+                        lastX = e.getX();
+                        lastY = e.getY();
                     }
-                    lastX = e.getX();
-                    lastY = e.getY();
+                    boolean snapped = false;
+                    for (int i = 0; i < 2; i++) {
+                        InterestingPoints.Point p = interestingPoints.query(coors[i * 2], coors[i * 2 + 1]);
+                        if (p != null) {
+                            // delta snap
+                            float dx = p.x - coors[i * 2];
+                            float dy = p.y - coors[i * 2 + 1];
+                            coors[0] += dx;
+                            coors[1] += dy;
+                            coors[2] += dx;
+                            coors[3] += dy;
+                            snapped = true;
+                            break;
+                        }
+                    }
+                    if (!snapped) {
+                        lastX = e.getX();
+                        lastY = e.getY();
+                    }
                 } else { // move one end point
-                    coors[currentIndex] = e.getX();
-                    coors[currentIndex + 1] = e.getY();
+//                    coors[currentIndex] = e.getX();
+//                    coors[currentIndex + 1] = e.getY();
+                    // snap to ip
+                    InterestingPoints.Point p = interestingPoints.query(e.getX(), e.getY());
+                    if (p != null) {
+                        // single snap
+                        coors[currentIndex] = p.x;
+                        coors[currentIndex + 1] = p.y;
+                    } else {
+                        coors[currentIndex] = e.getX();
+                        coors[currentIndex + 1] = e.getY();
+                    }
                     // snap to same x
                     if (Math.abs(coors[0] - coors[2]) < 10) {
                         coors[currentIndex] = coors[2 - currentIndex];
@@ -101,14 +140,26 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                 invalidate();
 
                 if (e.getPointerCount() == 1 &&
-                        e.getActionMasked() == MotionEvent.ACTION_UP &&
-                        currentState == ActionState.STARTED) { // change this to click done or clicked edit
-                    currentState = ActionState.FINISHED;
+                        e.getActionMasked() == MotionEvent.ACTION_UP) { // change this to click done or clicked edit
+                    // set interesting points
+                    removeAllInterestingPoints();
+                    addAllInterestingPoints();
+                    if (currentState == ActionState.STARTED) {
+                        currentState = ActionState.FINISHED;
+                    }
                 }
+
                 return true;
             default:
                 return false;
         }
+    }
+
+    @Override
+    public void addAllInterestingPoints() {
+        super.addAllInterestingPoints();
+        interestingPoints.addPoint(this, coors[0], coors[1]);
+        interestingPoints.addPoint(this, coors[2], coors[3]);
     }
 
     void updateMyPath() {

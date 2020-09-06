@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import cse340.undo.R;
+import painter.help.InterestingPoints;
 
 /**
  * parent of all actions
@@ -22,6 +23,18 @@ import cse340.undo.R;
  */
 public abstract class AbstractPaintActionExtendsView extends View {
     static final String TAG = "-=-= Abstract Action";
+
+    // snap to interesting points
+    static InterestingPoints interestingPoints;
+    public void setInterestingPoints(InterestingPoints ip) {
+        interestingPoints = ip;
+    }
+    public void addAllInterestingPoints() {
+
+    }
+    public void removeAllInterestingPoints() {
+        interestingPoints.removeAllPoints(this);
+    }
 
     public static final Class<? extends AbstractPaintActionExtendsView>[] ALL_ACTIONS = new Class[]{
             ActionLetters.class,
@@ -136,6 +149,12 @@ public abstract class AbstractPaintActionExtendsView extends View {
 //        canvas.drawRect(toggleFillBox, abstractActionPaint);
 //        canvas.drawText("\u176e", toggleFillBox.centerX(), toggleFillBox.centerY(), abstractActionPaint);
 
+        // debug
+        abstractActionPaint.setStyle(Paint.Style.FILL);
+        abstractActionPaint.setColor(Color.BLACK);
+        for (InterestingPoints.Point p : interestingPoints.allPoints()) {
+            canvas.drawCircle(p.x, p.y, 5, abstractActionPaint);
+        }
     }
 
 

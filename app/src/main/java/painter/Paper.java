@@ -37,6 +37,7 @@ import painter.actions.ActionPen;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
 import painter.actions.ActionStroke;
+import painter.help.InterestingPoints;
 import painter.settings.Colors;
 
 /**
@@ -70,6 +71,9 @@ public class Paper extends FrameLayout {
 
     int background_color = -1;
 
+    // snap to interesting points
+    InterestingPoints interestingPoints;
+
     public Paper(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         Log.d(TAG, "Paper: initializing");
@@ -79,6 +83,7 @@ public class Paper extends FrameLayout {
         theOneAndOnlyPaint.setStrokeWidth(10);
         theOneAndOnlyPaint.setTextSize(120);
         theOneAndOnlyPaint.setStrokeCap(Paint.Cap.ROUND);
+        interestingPoints = new InterestingPoints();
 
         // internal use
         internalPaint = new Paint();
@@ -90,6 +95,7 @@ public class Paper extends FrameLayout {
         groupSelectPath = new Path();
         groupSelectPathEffect = new DashPathEffect(new float[]{20, 10}, 0);
         initCurrentAction();
+
     }
 
 
@@ -102,6 +108,7 @@ public class Paper extends FrameLayout {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             Log.e(TAG, "initAction: cannot init class", e);
         }
+        action.setInterestingPoints(interestingPoints);
         action.setStyle(theOneAndOnlyPaint); // apply current style
         // add to view
         addView(action);
@@ -248,6 +255,7 @@ public class Paper extends FrameLayout {
             clearPaperStates();
             redoStack.push(history.remove(history.size() - 1));
             removeView(redoStack.peek());
+            redoStack.peek().removeAllInterestingPoints();
             if (canUndo()) {
                 action = history.get(history.size() - 1);
             } else {
@@ -274,6 +282,7 @@ public class Paper extends FrameLayout {
             action = history.get(history.size() - 1);
             addView(action);
             histTranslateX = getWidth() * 11;
+            action.addAllInterestingPoints();
             invalidate();
             return true;
         } else {

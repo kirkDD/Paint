@@ -1,7 +1,10 @@
 package painter.help;
 
 
+import android.util.Log;
+
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -14,32 +17,74 @@ public class InterestingPoints {
     int SNAP_RADIUS = 20;
 
     HashMap<Point, Integer> pointCounts;
-    public InterestingPoints(int xMin, int xMax, int yMin, int yMax) {
+    HashMap<Object, Set<Point>> pointStorage;
+    public InterestingPoints() {
         pointCounts = new HashMap<>();
+        pointStorage = new HashMap<>();
         // big hash map
         // with x // SNAP_R as key, and set of points as value
         // 2. modify the Hashcode of Point to achieve this!!!
-        // todo
+        // using a set first
     }
 
     public Point query(float x, float y) {
+        for (Point p : pointCounts.keySet()) {
+            if (dist((int) x, (int) y, p.x, p.y) < SNAP_RADIUS) {
+                return p;
+            }
+        }
         return null;
     }
 
-    public void addPoint(float x, float y) {
+    public void addPoint(Object o, float x, float y) {
         Point n = new Point(x, y);
-        pointCounts.put(n, pointCounts.getOrDefault(n, 1));
+        if (!pointStorage.containsKey(o)) {
+            pointStorage.put(o, new HashSet<>());
+        }
+        pointStorage.get(o).add(n);
+        pointCounts.put(n, pointCounts.getOrDefault(n, 0) + 1);
     }
 
-    public void removePoint(float x, float y) {
+    public void removePoint(Object o, float x, float y) {
         Point n = new Point(x, y);
-        if (pointCounts.containsKey(n)) {
-            if (pointCounts.get(n) == 1) {
-                pointCounts.remove(n);
-            } else {
-                pointCounts.put(n, pointCounts.get(n) - 1);
+        if (pointStorage.containsKey(o)) {
+            pointStorage.get(o).remove(n);
+            if (pointCounts.containsKey(n)) {
+                if (pointCounts.get(n) == 1) {
+                    pointCounts.remove(n);
+                } else {
+                    pointCounts.put(n, pointCounts.get(n) - 1);
+                }
             }
         }
+    }
+
+    public void removeAllPoints(Object o) {
+        if (pointStorage.containsKey(o)) {
+            for (Point p : pointStorage.get(o)) {
+                if (pointCounts.containsKey(p)) {
+                    if (pointCounts.get(p) == 1) {
+                        pointCounts.remove(p);
+                    } else {
+                        pointCounts.put(p, pointCounts.get(p) - 1);
+                    }
+                } else {
+                    Log.d("[][]", "removeAllPoints: nothing!!!");
+                }
+            }
+            pointStorage.remove(o);
+        }
+    }
+
+
+    double dist(int x1, int y1, int x2, int y2) {
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    }
+
+
+    // debug
+    public Set<Point> allPoints() {
+        return pointCounts.keySet();
     }
 
 

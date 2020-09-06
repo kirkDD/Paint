@@ -16,12 +16,21 @@ import android.view.MotionEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.ClosedDirectoryStreamException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
+import painter.help.InterestingPoints;
+import painter.help.InterestingPoints.Point;
 
 public class ActionRectangle extends AbstractPaintActionExtendsView {
 
 
     // positions
     float[] coors; // x1,y1, x2,y2
+
+    // snap 2.0
+    Set<InterestingPoints.Point> myIPs;
+    // order, top, right, bottom, left, center
 
     static Paint paint;
 
@@ -38,6 +47,39 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         }
         idMap = new HashMap<>();
         coors = new float[4];
+        myIPs = new HashSet<>();
+    }
+
+    void updateMyIPs() {
+        myIPs.clear();
+        // respect the orders
+        float cX = (coors[0] + coors[2]) / 2f;
+        float cY = (coors[1] + coors[3]) / 2f;
+        myIPs.add(new Point(cX, cY));
+        // rotate
+        double r = dist(cX, cY, coors[0], coors[1]);
+        double deg = angleBetween(coors[0], coors[1], coors[2], coors[3]);
+        Log.d(TAG, "updateMyIPs: ang between " + deg);
+        deg -= rotateAngle;
+        deg = deg * Math.PI / 180;
+//        myIPs.add(new Point((float) (cX + r * Math.cos(deg)), (float) (cY + r * Math.sin(deg))));
+    }
+
+    boolean deltaSnap() {
+        for (Point p1 : myIPs) {
+            InterestingPoints.Point p2 = interestingPoints.query(p1.x, p1.y);
+            if (p2 != null) {
+                // delta
+                int dx = p2.x - p1.x;
+                int dy = p2.y - p1.y;
+                coors[0] += dx;
+                coors[2] += dx;
+                coors[1] += dy;
+                coors[3] += dy;
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -77,13 +119,13 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                     callWhenDone.apply(this);
                     return false;
                 } else {
+                    removeAllInterestingPoints();
                     // more than one finger or resize or move
                     if (e.getPointerCount() == 1) {
                         action = 1;
                         lastX = e.getX(index);
                         lastY = e.getY(index);
                     } else if (e.getPointerCount() == 2) {
-
                         if (contains(e.getX(index),e.getY(index),5) &&
                                 dist((coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2,e.getX(index), e.getY(index)) <
                                 Math.max(Math.abs(coors[2] - coors[0]), Math.abs(coors[3] - coors[1]))) {
@@ -103,8 +145,6 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                     coors[1] -= lastY - e.getY(index);
                     coors[2] -= lastX - e.getX(index);
                     coors[3] -= lastY - e.getY(index);
-                    lastX = e.getX(index);
-                    lastY = e.getY(index);
                 } else if (action == 2) {
                     // rotating
                     rotateAngle = (float) angleBetween(
@@ -122,6 +162,13 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                         }
                     }
                 }
+                // snap
+                updateMyIPs();
+                if (!deltaSnap()) {
+                    lastX = e.getX(index);
+                    lastY = e.getY(index);
+                }
+                updateMyIPs();
                 updateMyPath();
                 invalidate();
                 return true;
@@ -132,12 +179,24 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                     if (currentState == ActionState.STARTED) {
                         currentState = ActionState.FINISHED;
                     }
+                    deltaSnap();
+                    updateMyIPs();
+                    removeAllInterestingPoints();
+                    addAllInterestingPoints();
                 }
                 updateMyPath();
                 invalidate();
                 return true;
             default:
                 return false;
+        }
+    }
+
+    @Override
+    public void addAllInterestingPoints() {
+        super.addAllInterestingPoints();
+        for (Point p : myIPs) {
+            interestingPoints.addPoint(this, p.x, p.y);
         }
     }
 
