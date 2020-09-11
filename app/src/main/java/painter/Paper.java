@@ -255,7 +255,7 @@ public class Paper extends FrameLayout {
             clearPaperStates();
             redoStack.push(history.remove(history.size() - 1));
             removeView(redoStack.peek());
-            redoStack.peek().removeAllInterestingPoints();
+            redoStack.peek().removingFromView();
             if (canUndo()) {
                 action = history.get(history.size() - 1);
             } else {
@@ -282,7 +282,7 @@ public class Paper extends FrameLayout {
             action = history.get(history.size() - 1);
             addView(action);
             histTranslateX = getWidth() * 11;
-            action.addAllInterestingPoints();
+            action.addingToView();
             invalidate();
             return true;
         } else {
@@ -297,6 +297,7 @@ public class Paper extends FrameLayout {
         finishAction();
         for (int i = history.size() - 1; i > -1; i--) {
             redoStack.push(history.get(history.size() - 1 - i));
+            redoStack.peek().removingFromView();
         }
         history.clear();
         removeAllViews();

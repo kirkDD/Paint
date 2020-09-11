@@ -2,6 +2,7 @@ package painter.actions;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.Log;
@@ -17,22 +18,6 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
     static int NUM_ACTIVE = 0;
     static boolean MOVING_CORNER = false;
     boolean ME_WROTE_MOVING_CORNER;
-
-    @Override
-    public void editButtonClicked() {
-        super.editButtonClicked();
-//        if (currentState == ActionState.REVISING)
-//            NUM_ACTIVE++;
-//        if (currentState == ActionState.FINISHED)
-//            NUM_ACTIVE--;
-    }
-
-    @Override
-    public boolean focusLost() {
-//        if (currentState == ActionState.REVISING)
-//            NUM_ACTIVE--;
-        return super.focusLost();
-    }
 
     static Paint paint;
     float strokeWidth;

@@ -151,12 +151,6 @@ public abstract class AbstractPaintActionExtendsView extends View {
 //        canvas.drawRect(toggleFillBox, abstractActionPaint);
 //        canvas.drawText("\u176e", toggleFillBox.centerX(), toggleFillBox.centerY(), abstractActionPaint);
 
-        // debug
-        abstractActionPaint.setStyle(Paint.Style.FILL);
-        abstractActionPaint.setColor(Color.BLACK);
-        for (InterestingPoints.Point p : interestingPoints.allPoints()) {
-            canvas.drawCircle(p.x, p.y, 5, abstractActionPaint);
-        }
     }
 
 
@@ -260,6 +254,14 @@ public abstract class AbstractPaintActionExtendsView extends View {
             invalidate();
             return true;
         }
+    }
+
+    public void removingFromView() {
+        removeAllInterestingPoints();
+    }
+
+    public void addingToView() {
+        addAllInterestingPoints();
     }
 
     /**

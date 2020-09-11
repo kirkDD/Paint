@@ -13,26 +13,24 @@ import java.util.Set;
  *  use this class to query those points that are close to a given point
  */
 public class InterestingPoints {
-
+    static final String TAG = "-=-= InterestingPoints";
     int SNAP_RADIUS = 20;
 
     HashMap<Point, Integer> pointCounts;
     HashMap<Object, Set<Point>> pointStorage;
+    // implementation to speed up query
+    PointCloud pointCloud;
     public InterestingPoints() {
         pointCounts = new HashMap<>();
         pointStorage = new HashMap<>();
-        // big hash map
-        // with x // SNAP_R as key, and set of points as value
-        // 2. modify the Hashcode of Point to achieve this!!!
-        // using a set first
+        pointCloud = new NaiveCloud();
     }
 
     public Point query(float x, float y) {
         // linear implementation
-        for (Point p : pointCounts.keySet()) {
-            if (dist(x, y, p.x, p.y) < SNAP_RADIUS) {
-                return p;
-            }
+        Point p = pointCloud.closest(x, y);
+        if (p != null && dist(x, y, p.x, p.y) < SNAP_RADIUS) {
+            return p;
         }
         return null;
     }
@@ -44,6 +42,10 @@ public class InterestingPoints {
         }
         pointStorage.get(o).add(n);
         pointCounts.put(n, pointCounts.getOrDefault(n, 0) + 1);
+        if (pointCounts.get(n) == 1) {
+            // only add a point once
+            pointCloud.add(n);
+        }
     }
 
     public void removePoint(Object o, float x, float y) {
@@ -53,6 +55,8 @@ public class InterestingPoints {
             if (pointCounts.containsKey(n)) {
                 if (pointCounts.get(n) == 1) {
                     pointCounts.remove(n);
+                    pointCloud.remove(n);
+                    pointCloud.remove(n);
                 } else {
                     pointCounts.put(n, pointCounts.get(n) - 1);
                 }
@@ -66,11 +70,12 @@ public class InterestingPoints {
                 if (pointCounts.containsKey(p)) {
                     if (pointCounts.get(p) == 1) {
                         pointCounts.remove(p);
+                        pointCloud.remove(p);
                     } else {
                         pointCounts.put(p, pointCounts.get(p) - 1);
                     }
                 } else {
-                    Log.d("[][]", "removeAllPoints: nothing!!!");
+                    Log.d(TAG, "removeAllPoints: nothing!!!");
                 }
             }
             pointStorage.remove(o);
@@ -78,7 +83,7 @@ public class InterestingPoints {
     }
 
 
-    double dist(float x1, float y1, float x2, float y2) {
+    static double dist(float x1, float y1, float x2, float y2) {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
@@ -95,6 +100,7 @@ public class InterestingPoints {
     public static class Point {
         public float x;
         public float y;
+
         public Point(float x, float y) {
             this.x = x;
             this.y = y;
@@ -112,6 +118,180 @@ public class InterestingPoints {
         @Override
         public int hashCode() {
             return Objects.hash((int) x, (int) y);
+        }
+    }
+
+
+    /**
+     * interface of PointCloud implementations
+     */
+    private interface PointCloud {
+        void add(Point point);
+        void remove(Point point);
+        InterestingPoints.Point closest(float x, float y);
+    }
+
+    /**
+     * linear solution
+     */
+    private static class NaiveCloud implements PointCloud {
+
+        HashSet<Point> pool;
+        NaiveCloud() {
+            pool = new HashSet<>();
+        }
+
+        @Override
+        public void add(Point point) {
+            pool.add(point);
+        }
+
+        @Override
+        public void remove(Point point) {
+            if (!pool.remove(point)) {
+                Log.e(TAG, "remove: point to remove is not found " + point.x + ", " + point.y);
+            }
+        }
+
+        @Override
+        public Point closest(float x, float y) {
+            double min = Double.POSITIVE_INFINITY;
+            Point re = null;
+            for (Point p : pool) {
+                double dist = InterestingPoints.dist(x, y, p.x, p.y);
+                if (dist < min) {
+                    min = dist;
+                    re = p;
+                }
+            }
+            return re;
+        }
+    }
+
+    /**
+     * kd-tree implementation
+     */
+    private static class KDTree implements PointCloud {
+
+        private static class TreeNode {
+            Point p;
+            TreeNode left;
+            TreeNode right;
+            TreeNode(Point point) {
+                p = point;
+                left = null;
+                right = null;
+            }
+        }
+
+        TreeNode overallRoot;
+        public KDTree() {
+
+        }
+
+
+        @Override
+        public void add(Point point) {
+            // call add
+            overallRoot = addNode(new TreeNode(point), overallRoot, false);
+        }
+
+        private TreeNode addNode(TreeNode newNode, TreeNode current, boolean isX) {
+            if (current == null) {
+                return newNode;
+            }
+
+            float val = 0;
+            float split = 0;
+
+            if (isX) {
+                val = newNode.p.x;
+                split = current.p.x;
+            } else {
+                val = newNode.p.y;
+                split = current.p.y;
+            }
+
+
+            if (val > split) {
+                current.right = addNode(newNode, current.right, !isX);
+            } else {
+                current.left = addNode(newNode, current.left, !isX);
+            }
+
+            return current;
+        }
+
+
+        @Override
+        public void remove(Point point) {
+
+            TreeNode p = overallRoot;
+            boolean isX = false;
+            while (p != null && !p.p.equals(point)) {
+                if (isX) {
+                    if (point.x > p.p.x) {
+                        p = p.right;
+                    } else {
+                        p = p.left;
+                    }
+                } else {
+                    if (point.y > p.p.y) {
+                        p = p.right;
+                    } else {
+                        p = p.left;
+                    }
+                }
+            }
+            if (p == null) {
+                Log.e(TAG, "remove: no point found " + point.x + ", " + point.y);
+                return;
+            }
+            // need to remove p
+            overallRoot = removeNode(p, overallRoot, false);
+        }
+
+        private TreeNode removeNode(TreeNode tar, TreeNode curr, boolean isX) {
+            if (curr == null) {
+                return curr;
+            }
+            if (curr.left == null && curr.right == null) {
+                return null;
+            }
+            return null;
+        }
+
+        @Override
+        public Point closest(float x, float y) {
+            return null;
+        }
+
+
+    }
+
+    /**
+     * spacial hash implementation
+     */
+    private static class SpacialHash implements PointCloud {
+
+
+        SpacialHash() {
+
+        }
+
+        @Override
+        public void add(Point point) {
+
+        }
+
+        @Override
+        public void remove(Point point) {
+
+        }
+
+        @Override
+        public Point closest(float x, float y) {
+            return null;
         }
     }
 
