@@ -413,6 +413,9 @@ public class Paper extends FrameLayout {
             if (isErasing()) {
                 toggleEraseMode();
             }
+            if (action != null) {
+                action.focusLost();
+            }
         } else {
             // end
             if (panningIndexes.size() != 0) {

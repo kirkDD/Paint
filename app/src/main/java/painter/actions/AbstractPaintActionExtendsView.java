@@ -37,29 +37,31 @@ public abstract class AbstractPaintActionExtendsView extends View {
     }
 
     public static final Class<? extends AbstractPaintActionExtendsView>[] ALL_ACTIONS = new Class[]{
-            ActionLetters.class,
+//            ActionLetters.class,
             ActionNumbers.class,
             ActionOval.class,
             ActionRectangle.class,
+            ActionTriangle.class,
             ActionStroke.class,
             ActionPen.class,
             ActionDash.class,
             ActionStraightLine.class,
-            ActionArrow.class,
-            ActionTest.class
+            ActionArrow.class
+//            ActionTest.class
     };
 
     public static final int[] ACTION_STRING_IDS = new int[]{
-            R.string.letter,
+//            R.string.letter,
             R.string.number,
             R.string.oval,
             R.string.rect,
+            R.string.triangle,
             R.string.stroke,
             R.string.pen,
             R.string.dash,
             R.string.line,
-            R.string.arrow,
-            R.string.test_action
+            R.string.arrow
+//            R.string.test_action
     };
 
     static final Xfermode HIGHLIGHT_PAINT_MODE = new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY);
