@@ -21,16 +21,16 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
     @Override
     public void editButtonClicked() {
         super.editButtonClicked();
-        if (currentState == ActionState.REVISING)
-            NUM_ACTIVE++;
-        if (currentState == ActionState.FINISHED)
-            NUM_ACTIVE--;
+//        if (currentState == ActionState.REVISING)
+//            NUM_ACTIVE++;
+//        if (currentState == ActionState.FINISHED)
+//            NUM_ACTIVE--;
     }
 
     @Override
     public boolean focusLost() {
-        if (currentState == ActionState.REVISING)
-            NUM_ACTIVE--;
+//        if (currentState == ActionState.REVISING)
+//            NUM_ACTIVE--;
         return super.focusLost();
     }
 
@@ -75,6 +75,7 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
         if (currentState == ActionState.REVISING) {
             paint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
             paint.setStyle(Paint.Style.STROKE);
+            paint.setAlpha(255);
             for (int i = 0; i < 3; i++) {
                 if (dragging && dragIndex == i) {
                     canvas.drawCircle(pos[i * 2], pos[i * 2 + 1], EDIT_RADIUS * 2f, paint);
@@ -149,8 +150,8 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
                             float length = (float) (dist(pos[0], pos[1], pos[4], pos[5]) *
                                     Math.sqrt(3) / 2);
 //                            Log.d(TAG, "handleTouch: length " + length);
-                            pos[2] = (pos[0] + pos[4]) / 2 + 20;
-                            pos[3] = (pos[1] + pos[5]) / 2 + 20;
+                            pos[2] = (pos[0] + pos[4]) / 2;
+                            pos[3] = (pos[1] + pos[5]) / 2;
                             float dx = (float) (length / (Math.sqrt(1 + slope * slope)));
                             if (pos[5] < pos[1]) {
                                 dx = -dx;
@@ -171,12 +172,15 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
                                 pos[i * 2] += e.getX() - lastX;
                                 pos[i * 2 + 1] += e.getY() - lastY;
                             }
-                            if (NUM_ACTIVE == 1 && !shiftSnap()) {
+                            if (NUM_ACTIVE == 1) {
+                                if (!shiftSnap()) {
+                                    lastX = e.getX();
+                                    lastY = e.getY();
+                                }
+                            } else {
                                 lastX = e.getX();
                                 lastY = e.getY();
                             }
-                            lastX = e.getX();
-                            lastY = e.getY();
                             Log.d(TAG, "handleTouch: num active " + NUM_ACTIVE);
                         }
                         updateMyPath();

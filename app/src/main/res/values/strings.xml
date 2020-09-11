@@ -30,7 +30,7 @@
 
     <string name="erase">erase</string>
     <string name="clear">clear</string>
-    <string name="triangle">Triangle</string>
+    <string name="triangle">▲</string>
     <string name="rect">\u2395</string>
     <string name="rect_desc">draw a rectangle</string>
     <string name="oval">\u2d54</string>

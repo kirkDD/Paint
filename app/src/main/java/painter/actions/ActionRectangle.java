@@ -57,11 +57,11 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
         float cY = (coors[1] + coors[3]) / 2f;
         myIPs.add(new Point(cX, cY));
         // rotate
-        double r = dist(cX, cY, coors[0], coors[1]);
-        double deg = angleBetween(coors[0], coors[1], coors[2], coors[3]);
-        Log.d(TAG, "updateMyIPs: ang between " + deg);
-        deg -= rotateAngle;
-        deg = deg * Math.PI / 180;
+//        double r = dist(cX, cY, coors[0], coors[1]);
+//        double deg = angleBetween(coors[0], coors[1], coors[2], coors[3]);
+//        Log.d(TAG, "updateMyIPs: ang between " + deg);
+//        deg -= rotateAngle;
+//        deg = deg * Math.PI / 180;
 //        myIPs.add(new Point((float) (cX + r * Math.cos(deg)), (float) (cY + r * Math.sin(deg))));
     }
 
@@ -70,8 +70,8 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
             InterestingPoints.Point p2 = interestingPoints.query(p1.x, p1.y);
             if (p2 != null) {
                 // delta
-                int dx = p2.x - p1.x;
-                int dy = p2.y - p1.y;
+                float dx = p2.x - p1.x;
+                float dy = p2.y - p1.y;
                 coors[0] += dx;
                 coors[2] += dx;
                 coors[1] += dy;

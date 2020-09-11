@@ -28,8 +28,9 @@ public class InterestingPoints {
     }
 
     public Point query(float x, float y) {
+        // linear implementation
         for (Point p : pointCounts.keySet()) {
-            if (dist((int) x, (int) y, p.x, p.y) < SNAP_RADIUS) {
+            if (dist(x, y, p.x, p.y) < SNAP_RADIUS) {
                 return p;
             }
         }
@@ -77,7 +78,7 @@ public class InterestingPoints {
     }
 
 
-    double dist(int x1, int y1, int x2, int y2) {
+    double dist(float x1, float y1, float x2, float y2) {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
@@ -92,11 +93,11 @@ public class InterestingPoints {
      * keep track of a point
      */
     public static class Point {
-        public int x;
-        public int y;
+        public float x;
+        public float y;
         public Point(float x, float y) {
-            this.x = (int) x;
-            this.y = (int) y;
+            this.x = x;
+            this.y = y;
         }
 
         @Override
@@ -104,13 +105,13 @@ public class InterestingPoints {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             Point point = (Point) o;
-            return x == point.x &&
-                    y == point.y;
+            return (int) x == (int) point.x &&
+                    (int) y == (int) point.y;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(x, y);
+            return Objects.hash((int) x, (int) y);
         }
     }
 
