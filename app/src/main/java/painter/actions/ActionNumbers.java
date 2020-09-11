@@ -69,7 +69,7 @@ public class ActionNumbers extends ActionStroke {
     @Override
     public void setStyle(Paint p) {
         super.setStyle(p);
-        thisTextSize = p.getTextSize();
+        thisTextSize = p.getStrokeWidth() * 8;
         paint.setTextSize(thisTextSize);
         CHAR_WIDTH = paint.measureText("0  ") / 3f + 3; // tune width :(
     }

@@ -336,6 +336,11 @@ public class Paper extends FrameLayout {
                 canvas.drawPath(groupSelectPath, internalPaint);
                 internalPaint.setPathEffect(null);
             }
+            // debug ?? show interesting points
+            theOneAndOnlyPaint.setColor();
+            for (InterestingPoints.Point p : interestingPoints.allPoints()) {
+                canvas.drawCircle(p.x, p.y, 10, theOneAndOnlyPaint);
+            }
 
         }
     }

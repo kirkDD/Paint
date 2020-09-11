@@ -65,6 +65,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
 //        myIPs.add(new Point((float) (cX + r * Math.cos(deg)), (float) (cY + r * Math.sin(deg))));
     }
 
+
     boolean deltaSnap() {
         for (Point p1 : myIPs) {
             InterestingPoints.Point p2 = interestingPoints.query(p1.x, p1.y);

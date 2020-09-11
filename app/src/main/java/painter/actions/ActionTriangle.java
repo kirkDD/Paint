@@ -14,7 +14,6 @@ import painter.help.InterestingPoints;
 
 public class ActionTriangle extends AbstractPaintActionExtendsView {
 
-    static final int EDIT_RADIUS = 40;
     static int NUM_ACTIVE = 0;
     static boolean MOVING_CORNER = false;
     boolean ME_WROTE_MOVING_CORNER;
@@ -63,9 +62,9 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
             paint.setAlpha(255);
             for (int i = 0; i < 3; i++) {
                 if (dragging && dragIndex == i) {
-                    canvas.drawCircle(pos[i * 2], pos[i * 2 + 1], EDIT_RADIUS * 2f, paint);
+                    canvas.drawCircle(pos[i * 2], pos[i * 2 + 1], EDIT_TOUCH_RADIUS * 3, paint);
                 } else {
-                    canvas.drawCircle(pos[i * 2], pos[i * 2 + 1], EDIT_RADIUS, paint);
+                    canvas.drawCircle(pos[i * 2], pos[i * 2 + 1], EDIT_TOUCH_RADIUS, paint);
                 }
             }
         }
@@ -101,7 +100,7 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
                         lastX = e.getX();
                         lastY = e.getY();
                         for (int i = 0; i < 3; i++) {
-                            if (dist(pos[i * 2], pos[i * 2 + 1], lastX, lastY) < EDIT_RADIUS) {
+                            if (dist(pos[i * 2], pos[i * 2 + 1], lastX, lastY) < EDIT_TOUCH_RADIUS) {
                                 dragging = true;
                                 dragIndex = i;
                                 if (!MOVING_CORNER) {
@@ -153,6 +152,11 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
                             pos[dragIndex * 2 + 1] = e.getY();
                             snapToInterestingPoint(dragIndex);
                         } else if (!MOVING_CORNER) {
+                            if (dist(lastX , lastY, e.getX(), e.getY()) > 250) {
+                                // skip if too large, 2 fingers
+                                lastX = e.getX();
+                                lastY = e.getY();
+                            }
                             for (int i = 0; i < 3; i++) {
                                 pos[i * 2] += e.getX() - lastX;
                                 pos[i * 2 + 1] += e.getY() - lastY;

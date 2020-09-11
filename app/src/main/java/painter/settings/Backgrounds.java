@@ -7,6 +7,8 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.view.MotionEvent;
 
+import painter.help.Calculator;
+
 public class Backgrounds extends AbstractSetting {
 
     int COLOR;
@@ -26,7 +28,7 @@ public class Backgrounds extends AbstractSetting {
     public void drawIcon(Canvas canvas) {
         super.drawIcon(canvas);
 //        canvas.drawCircle(iLeft + iW / 2f, iTop + iH / 2f, Math.min(iW, iH) / 2f, paint);
-        paint.setColor(getContrastColor(paper.getBackgroundColor()));
+        paint.setColor(Calculator.CONTRAST_COLOR(paper.getBackgroundColor()));
         canvas.drawText("\u274f", iLeft + iW / 2f,
                 iTop + iH / 2f + paint.descent() + 5, paint);
     }
@@ -69,8 +71,8 @@ public class Backgrounds extends AbstractSetting {
             for (int j = 0; j < mH / 2; j+=10) {
                 paint.setColor(Color.argb(
                         Color.alpha(COLOR),
-                        (int) map(i, 0, mW, 0, 255),
-                        (int) map(j, 0, mH / 2f, 0, 255),
+                        (int) Calculator.MAP(i, 0, mW, 0, 255),
+                        (int) Calculator.MAP(j, 0, mH / 2f, 0, 255),
                         Color.blue(COLOR)));
                 canvas.drawRect(i, j, i + 10, j + 10, paint);
             }
@@ -78,10 +80,10 @@ public class Backgrounds extends AbstractSetting {
         for (int i = 0; i < mW; i+=10) {
             for (int j = 0; j < mH / 2; j+=10) {
                 paint.setColor(Color.argb(
-                        (int) map(i, 0, mW, 0, 255),
+                        (int) Calculator.MAP(i, 0, mW, 0, 255),
                         Color.red(COLOR),
                         Color.green(COLOR),
-                        (int) map(j, 0, mH / 2f, 0, 255)
+                        (int) Calculator.MAP(j, 0, mH / 2f, 0, 255)
                         ));
                 canvas.drawRect(i, mH / 2f + j, i + 10, mH /2f + j + 10, paint);
             }
@@ -90,8 +92,8 @@ public class Backgrounds extends AbstractSetting {
         paint.setColor(COLOR);
         // top:
         float s = 200;
-        float tX = map(Color.red(COLOR), 0, 255, 0, mW);
-        float tY = map(Color.green(COLOR), 0, 255, 0, mH / 2f);
+        float tX = Calculator.MAP(Color.red(COLOR), 0, 255, 0, mW);
+        float tY = Calculator.MAP(Color.green(COLOR), 0, 255, 0, mH / 2f);
         canvas.save();
         canvas.clipRect(0,0,mW,mH / 2);
         canvas.clipRect(tX - s, tY - s, tX + s, tY + s);
@@ -101,8 +103,8 @@ public class Backgrounds extends AbstractSetting {
         canvas.drawRect(tX - s, tY - s, tX + s, tY + s, paint);
         canvas.restore();
         // bottom
-        tX = map(Color.alpha(COLOR), 0, 255, 0, mW);
-        tY = mH / 2f + map(Color.blue(COLOR), 0, 255, 0, mH / 2f);
+        tX = Calculator.MAP(Color.alpha(COLOR), 0, 255, 0, mW);
+        tY = mH / 2f + Calculator.MAP(Color.blue(COLOR), 0, 255, 0, mH / 2f);
         canvas.save();
         canvas.clipRect(0, mH / 2, mW, mH);
         canvas.clipRect(tX - s, tY - s, tX + s, tY + s);

@@ -24,6 +24,8 @@ import painter.help.InterestingPoints;
 public abstract class AbstractPaintActionExtendsView extends View {
     static final String TAG = "-=-= Abstract Action";
 
+    static final int EDIT_TOUCH_RADIUS = 40;
+
     // snap to interesting points
     static InterestingPoints interestingPoints;
     public void setInterestingPoints(InterestingPoints ip) {

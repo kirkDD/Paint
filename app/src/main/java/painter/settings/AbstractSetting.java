@@ -7,6 +7,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import painter.Paper;
+import painter.help.Calculator;
 
 /**
  * knobs and dials for paper and paint objects
@@ -49,8 +50,8 @@ public abstract class AbstractSetting { // ????????????????
 //        canvas.drawRoundRect(iLeft, iTop, iLeft + iW, iTop + iH, 5, 5, paint);
         if (SU_clickSize < 100) {
             // animate touch
-            paint.setColor(getContrastColor(paper.getBackgroundColor()));
-            paint.setAlpha((int) map(SU_clickSize,0,100,180, 20));
+            paint.setColor(Calculator.CONTRAST_COLOR(paper.getBackgroundColor()));
+            paint.setAlpha((int) Calculator.MAP(SU_clickSize,0,100,180, 20));
             paint.setStyle(Paint.Style.FILL);
             canvas.drawCircle(SU_posX, SU_posY, SU_clickSize, paint);
             SU_clickSize += 0.1 * (100 - SU_clickSize) + 1;
@@ -106,26 +107,6 @@ public abstract class AbstractSetting { // ????????????????
     public boolean inIcon(float xPos, float yPos) {
         return xPos >= iLeft && xPos <= iLeft + iW &&
                 yPos >= iTop && yPos <= iTop + iH;
-    }
-
-    float dist(float x, float y, float a, float b) {
-        return (float) Math.sqrt(Math.pow(x - a, 2) + Math.pow(y - b, 2));
-    }
-
-    float map(float val, float vLow, float vHigh, float tLow, float tHigh) {
-        // shift to 0, scale and shift
-        val -= vLow;
-        val = val * (tHigh - tLow) / (vHigh - vLow);
-        val += tLow;
-        return val;
-    }
-
-     int getContrastColor(int color) {
-        int y = (299 * Color.red(color) + 587 * Color.green(color) + 114 * Color.blue(color)) / 1000;
-        if (Color.alpha(color) < 140) {
-            return Color.WHITE;
-        }
-        return y >= 128 ? Color.BLACK : Color.WHITE;
     }
 
 }

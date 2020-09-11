@@ -15,8 +15,7 @@ import painter.help.InterestingPoints;
  */
 public class ActionStraightLine extends AbstractPaintActionExtendsView {
     static final String TAG = "-=-= Straight Line";
-    static final int ACTION_RADIUS = 100;
-
+    static boolean SOMEONE_DRAGGING = false; // some fellow is editing one point
     // x1, y1, x2, y2
     float[] coors;
 
@@ -68,15 +67,17 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     removeAllInterestingPoints();
                     // decide: resize, move
                     // which end point to move?
-                    if (dist(coors[0], coors[1], e.getX(), e.getY()) < ACTION_RADIUS) {
+                    if (dist(coors[0], coors[1], e.getX(), e.getY()) < EDIT_TOUCH_RADIUS) {
                         currentIndex = 0;
-                    } else if (dist(coors[2], coors[3], e.getX(), e.getY()) < ACTION_RADIUS) {
+                        SOMEONE_DRAGGING = true;
+                    } else if (dist(coors[2], coors[3], e.getX(), e.getY()) < EDIT_TOUCH_RADIUS) {
                         currentIndex = 2;
+                        SOMEONE_DRAGGING = true;
                     } else {
-                        lastX = e.getX();
-                        lastY = e.getY();
                         currentIndex = -1;
                     }
+                    lastX = e.getX();
+                    lastY = e.getY();
                 }
                 updateMyPath();
 
@@ -84,7 +85,10 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                 return true;
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_UP:
-                if (currentIndex == -1) { // move both
+                if (SOMEONE_DRAGGING && currentIndex == -1) {
+                    lastX = e.getX();
+                    lastY = e.getY();
+                } else if (currentIndex == -1) {
                     if (Math.abs(lastX - e.getX()) < 250 && Math.abs(lastY - e.getY()) < 250) {
                         coors[0] -= lastX - e.getX();
                         coors[1] -= lastY - e.getY();
@@ -113,10 +117,10 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                         lastX = e.getX();
                         lastY = e.getY();
                     }
-                } else { // move one end point
-//                    coors[currentIndex] = e.getX();
-//                    coors[currentIndex + 1] = e.getY();
+                } else {
+                    // dragging one point
                     // snap to ip
+
                     InterestingPoints.Point p = interestingPoints.query(e.getX(), e.getY());
                     if (p != null) {
                         // single snap
@@ -125,25 +129,29 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     } else {
                         coors[currentIndex] = e.getX();
                         coors[currentIndex + 1] = e.getY();
-                    }
-                    // snap to same x
-                    if (Math.abs(coors[0] - coors[2]) < 10) {
-                        coors[currentIndex] = coors[2 - currentIndex];
-                    } else if (Math.abs(coors[1] - coors[3]) < 10) {
-                        // same y
-                        coors[currentIndex + 1] = coors[2 - currentIndex + 1];
+                        // snap to same x, iff not snapped to point
+                        if (Math.abs(coors[0] - coors[2]) < 10) {
+                            coors[currentIndex] = coors[2 - currentIndex];
+                        } else if (Math.abs(coors[1] - coors[3]) < 10) {
+                            // same y
+                            coors[currentIndex + 1] = coors[2 - currentIndex + 1];
+                        }
                     }
                 }
 
                 updateMyPath();
-
                 invalidate();
 
+                // END ACTION
                 if (e.getPointerCount() == 1 &&
                         e.getActionMasked() == MotionEvent.ACTION_UP) { // change this to click done or clicked edit
                     // set interesting points
                     removeAllInterestingPoints();
                     addAllInterestingPoints();
+                    if (currentIndex != -1) {
+                        SOMEONE_DRAGGING = false;
+                    }
+                    currentIndex = -1;
                     if (currentState == ActionState.STARTED) {
                         currentState = ActionState.FINISHED;
                     }
@@ -176,7 +184,6 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         thisColor = p.getColor();
     }
 
-    float animate = 0;
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -189,7 +196,6 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
         // draw high light
         conditionalDrawHighlight(canvas);
 
-
     }
 
 
@@ -199,11 +205,17 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
             paint.setAlpha(HIGHLIGHT_ALPHA);
             paint.setStrokeWidth(HIGHLIGHT_STROKE_WIDTH);
             paint.setXfermode(HIGHLIGHT_PAINT_MODE);
-            canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f,
-                    thisWidth * 3 * (float) (1 + Math.sin(animate) * 0.1), paint);
+            if (currentIndex == 0) {
+                canvas.drawCircle(coors[0], coors[1], EDIT_TOUCH_RADIUS * 3, paint);
+            } else {
+                canvas.drawCircle(coors[0], coors[1], EDIT_TOUCH_RADIUS, paint);
+            }
+            if (currentIndex == 2) {
+                canvas.drawCircle(coors[2], coors[3], EDIT_TOUCH_RADIUS * 3, paint);
+            } else {
+                canvas.drawCircle(coors[2], coors[3], EDIT_TOUCH_RADIUS, paint);
+            }
             paint.setXfermode(null);
-            animate += 0.08;
-            invalidate();
         }
     }
 
