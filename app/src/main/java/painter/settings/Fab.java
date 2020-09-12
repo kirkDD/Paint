@@ -44,6 +44,9 @@ public class Fab extends AbstractSetting {
             shapesMap.put(AbstractPaintActionExtendsView.ALL_ACTIONS[i], AbstractPaintActionExtendsView.ACTION_STRING_IDS[i]);
         }
         DASH_PATH_EFFECT = new DashPathEffect(new float[]{10, 20},0);
+
+        paper.postDelayed(this::snapToEdge, 2300);
+//        snapToEdge();
     }
 
     int iconAlpha = 0;

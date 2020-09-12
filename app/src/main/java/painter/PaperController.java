@@ -114,7 +114,7 @@ public class PaperController extends View {
         paperStates.init(paper, BAR_W, 120, W - BAR_W, H, yTop, 0);
 
         // free icon, position not fixed
-        toggleUI.init(paper, W / 8, W / 8, W - BAR_W, H, H - 280, W - 280);
+        toggleUI.init(paper, W / 8, W / 8, W - BAR_W, H, H - 280, W - 180);
 
     }
 
