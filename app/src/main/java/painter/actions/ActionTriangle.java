@@ -2,21 +2,18 @@ package painter.actions;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.util.Log;
 import android.view.MotionEvent;
 
 import java.util.Arrays;
 
+import painter.help.Calculator;
 import painter.help.InterestingPoints;
 
 public class ActionTriangle extends AbstractPaintActionExtendsView {
 
     static int NUM_ACTIVE = 0;
-    static boolean MOVING_CORNER = false;
-    boolean ME_WROTE_MOVING_CORNER;
 
     static Paint paint;
     float strokeWidth;
@@ -95,17 +92,16 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
                     case STARTED:
                         break;
                     case REVISING:
-                        removeAllInterestingPoints();
                         NUM_ACTIVE++;
                         lastX = e.getX();
                         lastY = e.getY();
                         for (int i = 0; i < 3; i++) {
-                            if (dist(pos[i * 2], pos[i * 2 + 1], lastX, lastY) < EDIT_TOUCH_RADIUS) {
+                            if (Calculator.DIST(pos[i * 2], pos[i * 2 + 1], lastX, lastY) < EDIT_TOUCH_RADIUS) {
                                 dragging = true;
                                 dragIndex = i;
-                                if (!MOVING_CORNER) {
-                                    MOVING_CORNER = true;
-                                    ME_WROTE_MOVING_CORNER = true;
+                                if (!SHIFTING_LOCK) {
+                                    SHIFTING_LOCK = true;
+                                    SHIFTING_LOCKER = this;
                                 }
                                 invalidate();
                                 break;
@@ -131,7 +127,7 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
                         } else {
                             float slope = (pos[5] - pos[1]) / (pos[4] - pos[0]);
                             slope = -1 / slope;
-                            float length = (float) (dist(pos[0], pos[1], pos[4], pos[5]) *
+                            float length = (float) (Calculator.DIST(pos[0], pos[1], pos[4], pos[5]) *
                                     Math.sqrt(3) / 2);
 //                            Log.d(TAG, "handleTouch: length " + length);
                             pos[2] = (pos[0] + pos[4]) / 2;
@@ -151,8 +147,8 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
                             pos[dragIndex * 2] = e.getX();
                             pos[dragIndex * 2 + 1] = e.getY();
                             snapToInterestingPoint(dragIndex);
-                        } else if (!MOVING_CORNER) {
-                            if (dist(lastX , lastY, e.getX(), e.getY()) > 250) {
+                        } else if (!SHIFTING_LOCK) {
+                            if (Calculator.DIST(lastX , lastY, e.getX(), e.getY()) > 250) {
                                 // skip if too large, 2 fingers
                                 lastX = e.getX();
                                 lastY = e.getY();
@@ -161,7 +157,7 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
                                 pos[i * 2] += e.getX() - lastX;
                                 pos[i * 2 + 1] += e.getY() - lastY;
                             }
-                            if (NUM_ACTIVE == 1) {
+                            if (!GROUP_SELECTED) {
                                 if (!shiftSnap()) {
                                     lastX = e.getX();
                                     lastY = e.getY();
@@ -190,10 +186,7 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
                         NUM_ACTIVE--;
                         dragging = false;
                         moving = false;
-                        if (ME_WROTE_MOVING_CORNER) {
-                            MOVING_CORNER = false;
-                            ME_WROTE_MOVING_CORNER = false;
-                        }
+                        SHIFTING_LOCK = false;
                         removeAllInterestingPoints();
                         addAllInterestingPoints();
                         invalidate();
@@ -228,7 +221,7 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
 
     void snapToInterestingPoint(int index) {
         // snap to IP
-        InterestingPoints.Point ip = interestingPoints.query(pos[index * 2], pos[index * 2 + 1]);
+        InterestingPoints.Point ip = interestingPoints.query(this, pos[index * 2], pos[index * 2 + 1]);
         if (ip != null) {
             pos[index * 2] = ip.x;
             pos[index * 2 + 1] = ip.y;
@@ -237,7 +230,7 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
 
     boolean shiftSnap() {
         for (int i = 0; i < 3; i++) {
-            InterestingPoints.Point point = interestingPoints.query(pos[i * 2], pos[i * 2 + 1]);
+            InterestingPoints.Point point = interestingPoints.query(this, pos[i * 2], pos[i * 2 + 1]);
             if (point != null) {
                 // this one
                 float dx = point.x - pos[i * 2];

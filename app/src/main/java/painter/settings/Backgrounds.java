@@ -46,7 +46,7 @@ public class Backgrounds extends AbstractSetting {
                     break;
                 }
                 if (e.getX() - sX > mW / 3f) {
-                    COLOR = getContrastColor(paper.getBackgroundColor());
+                    COLOR = Calculator.CONTRAST_COLOR(paper.getBackgroundColor());
                     paper.setBackgroundColor(COLOR);
                     skip = true;
                 }
@@ -138,16 +138,16 @@ public class Backgrounds extends AbstractSetting {
             // top
             COLOR = Color.argb(
                     Color.alpha(COLOR),
-                    (int) map(x, 0, mW, 0, 255),
-                    (int) map(y, 0, mH / 2f, 0, 255),
+                    (int) Calculator.MAP(x, 0, mW, 0, 255),
+                    (int) Calculator.MAP(y, 0, mH / 2f, 0, 255),
                     Color.blue(COLOR)
                     );
         } else {
             COLOR = Color.argb(
-                    (int) map(x, 0, mW, 0, 255),
+                    (int) Calculator.MAP(x, 0, mW, 0, 255),
                     Color.red(COLOR),
                     Color.green(COLOR),
-                    (int) map(y - mH / 2f, 0, mH / 2f, 0, 255)
+                    (int) Calculator.MAP(y - mH / 2f, 0, mH / 2f, 0, 255)
             );
 
 

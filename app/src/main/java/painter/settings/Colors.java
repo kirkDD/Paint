@@ -7,6 +7,8 @@ import android.graphics.RectF;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import painter.help.Calculator;
+
 public class Colors extends AbstractSetting {
     static final String TAG = "[][] Color Settings";
 
@@ -153,8 +155,8 @@ public class Colors extends AbstractSetting {
             for (int j = MAIN_MARGIN; j < mH / 2 - MAIN_MARGIN; j+=16) {
                 paint.setColor(Color.argb(
                         Color.alpha(colors[currColorIndex]),
-                        (int) map(i, MAIN_MARGIN, mW - MAIN_MARGIN, 0, 255),
-                        (int) map(j, MAIN_MARGIN, mH / 2f - MAIN_MARGIN, 0, 255),
+                        (int) Calculator.MAP(i, MAIN_MARGIN, mW - MAIN_MARGIN, 0, 255),
+                        (int) Calculator.MAP(j, MAIN_MARGIN, mH / 2f - MAIN_MARGIN, 0, 255),
                         Color.blue(colors[currColorIndex])));
                 canvas.drawRect(i, j, i + 16, j + 16, paint);
             }
@@ -162,8 +164,9 @@ public class Colors extends AbstractSetting {
         // draw where the current point in
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.STROKE);
-        canvas.drawCircle(map(Color.red(colors[currColorIndex]), 0, 255, MAIN_MARGIN, mW - MAIN_MARGIN),
-                map(Color.green(colors[currColorIndex]), 0, 255, MAIN_MARGIN, mH / 2f - MAIN_MARGIN), 20, paint);
+        canvas.drawCircle(
+                Calculator.MAP(Color.red(colors[currColorIndex]), 0, 255, MAIN_MARGIN, mW - MAIN_MARGIN),
+                Calculator.MAP(Color.green(colors[currColorIndex]), 0, 255, MAIN_MARGIN, mH / 2f - MAIN_MARGIN), 20, paint);
         // draw interactor
         for (int i = 0; i < 4; i++) {
             float buttonXPos;
@@ -248,8 +251,8 @@ public class Colors extends AbstractSetting {
                         default: // from gradient
                             int boundX = (int) Math.max(MAIN_MARGIN, Math.min(mW - MAIN_MARGIN, eX));
                             int boundY = (int) Math.max(MAIN_MARGIN, Math.min(mH / 2f - MAIN_MARGIN, eY));
-                            boundX = (int) map(boundX, MAIN_MARGIN, mW - MAIN_MARGIN, 0, 255);
-                            boundY = (int) map(boundY, MAIN_MARGIN, mH / 2f - MAIN_MARGIN, 0, 255);
+                            boundX = (int) Calculator.MAP(boundX, MAIN_MARGIN, mW - MAIN_MARGIN, 0, 255);
+                            boundY = (int) Calculator.MAP(boundY, MAIN_MARGIN, mH / 2f - MAIN_MARGIN, 0, 255);
                             colors[currColorIndex] = Color.argb(Color.alpha(co), boundX, boundY, Color.blue(co));
                     }
                     invalidate();

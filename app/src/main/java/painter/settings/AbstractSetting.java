@@ -102,7 +102,6 @@ public abstract class AbstractSetting { // ????????????????
         END_MAIN_ACTION = r;
     }
 
-    // helpers
 
     public boolean inIcon(float xPos, float yPos) {
         return xPos >= iLeft && xPos <= iLeft + iW &&

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import painter.help.Calculator;
 import painter.help.InterestingPoints;
 import painter.help.InterestingPoints.Point;
 
@@ -68,7 +69,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
 
     boolean deltaSnap() {
         for (Point p1 : myIPs) {
-            InterestingPoints.Point p2 = interestingPoints.query(p1.x, p1.y);
+            InterestingPoints.Point p2 = interestingPoints.query(this, p1.x, p1.y);
             if (p2 != null) {
                 // delta
                 float dx = p2.x - p1.x;
@@ -128,7 +129,7 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                         lastY = e.getY(index);
                     } else if (e.getPointerCount() == 2) {
                         if (contains(e.getX(index),e.getY(index),5) &&
-                                dist((coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2,e.getX(index), e.getY(index)) <
+                                Calculator.DIST((coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2,e.getX(index), e.getY(index)) <
                                 Math.max(Math.abs(coors[2] - coors[0]), Math.abs(coors[3] - coors[1]))) {
                             action = 0; // resize
                         } else {
@@ -148,11 +149,11 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
                     coors[3] -= lastY - e.getY(index);
                 } else if (action == 2) {
                     // rotating
-                    rotateAngle = (float) angleBetween(
+                    rotateAngle = (float) Calculator.ANGLE_BETWEEN(
                             (coors[0] + coors[2]) / 2, (coors[1] + coors[3]) / 2,
                             e.getX(index), e.getY(index));
                     // snap to angle
-                    rotateAngle = snapAngle(rotateAngle);
+                    rotateAngle = Calculator.SNAP_ANGLE(rotateAngle);
                 } else {
                     // resizing
                     for (int i : idMap.keySet()) {
@@ -265,26 +266,12 @@ public class ActionRectangle extends AbstractPaintActionExtendsView {
             paint.setStyle(Paint.Style.STROKE);
             paint.setXfermode(HIGHLIGHT_PAINT_MODE);
             canvas.drawCircle((coors[0] + coors[2]) / 2f, (coors[1] + coors[3]) / 2f,
-                    (float) (dist(coors[0], coors[1], coors[2], coors[3]) / 30f * (0.1 * Math.sin(time) + 1)) + 10,
+                    (float) (Calculator.DIST(coors[0], coors[1], coors[2], coors[3]) / 30f * (0.1 * Math.sin(time) + 1)) + 10,
                     paint);
             paint.setXfermode(null);
             time += 0.08;
             invalidate();
         }
-    }
-
-    // subclassing
-
-    @Override
-    void toggleFill() {
-        if (myStyle == Paint.Style.FILL) {
-            myStyle = Paint.Style.STROKE;
-        } else if (myStyle == Paint.Style.STROKE) {
-            myStyle = Paint.Style.FILL;
-        } else {
-            myStyle = Paint.Style.FILL;
-        }
-        invalidate();
     }
 
 

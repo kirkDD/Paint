@@ -8,6 +8,7 @@ import android.graphics.Path;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import painter.help.Calculator;
 import painter.help.InterestingPoints;
 
 /**
@@ -15,7 +16,6 @@ import painter.help.InterestingPoints;
  */
 public class ActionStraightLine extends AbstractPaintActionExtendsView {
     static final String TAG = "-=-= Straight Line";
-    static boolean SOMEONE_DRAGGING = false; // some fellow is editing one point
     // x1, y1, x2, y2
     float[] coors;
 
@@ -54,7 +54,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     currentIndex = 2;
                     currentState = ActionState.STARTED;
                     // also snap
-                    InterestingPoints.Point p = interestingPoints.query(e.getX(), e.getY());
+                    InterestingPoints.Point p = interestingPoints.query(this, e.getX(), e.getY());
                     if (p != null) {
                         coors[0] = p.x;
                         coors[1] = p.y;
@@ -64,15 +64,21 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     callWhenDone.apply(this);
                     return false;
                 } else if (currentState == ActionState.STARTED || currentState == ActionState.REVISING) {
-                    removeAllInterestingPoints();
+//                    removeAllInterestingPoints();
                     // decide: resize, move
                     // which end point to move?
-                    if (dist(coors[0], coors[1], e.getX(), e.getY()) < EDIT_TOUCH_RADIUS) {
+                    if (Calculator.DIST(coors[0], coors[1], e.getX(), e.getY()) < EDIT_TOUCH_RADIUS) {
                         currentIndex = 0;
-                        SOMEONE_DRAGGING = true;
-                    } else if (dist(coors[2], coors[3], e.getX(), e.getY()) < EDIT_TOUCH_RADIUS) {
+                        if (!SHIFTING_LOCK) {
+                            SHIFTING_LOCK = true;
+                            SHIFTING_LOCKER = this;
+                        }
+                    } else if (Calculator.DIST(coors[2], coors[3], e.getX(), e.getY()) < EDIT_TOUCH_RADIUS) {
                         currentIndex = 2;
-                        SOMEONE_DRAGGING = true;
+                        if (!SHIFTING_LOCK) {
+                            SHIFTING_LOCK = true;
+                            SHIFTING_LOCKER = this;
+                        }
                     } else {
                         currentIndex = -1;
                     }
@@ -85,7 +91,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                 return true;
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_UP:
-                if (SOMEONE_DRAGGING && currentIndex == -1) {
+                if (SHIFTING_LOCK && currentIndex == -1) {
                     lastX = e.getX();
                     lastY = e.getY();
                 } else if (currentIndex == -1) {
@@ -98,22 +104,28 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                         lastX = e.getX();
                         lastY = e.getY();
                     }
-                    boolean snapped = false;
-                    for (int i = 0; i < 2; i++) {
-                        InterestingPoints.Point p = interestingPoints.query(coors[i * 2], coors[i * 2 + 1]);
-                        if (p != null) {
-                            // delta snap
-                            float dx = p.x - coors[i * 2];
-                            float dy = p.y - coors[i * 2 + 1];
-                            coors[0] += dx;
-                            coors[1] += dy;
-                            coors[2] += dx;
-                            coors[3] += dy;
-                            snapped = true;
-                            break;
+                    if (!SHIFTING_LOCK && !GROUP_SELECTED) {
+                        // snap to points
+                        boolean snapped = false;
+                        for (int i = 0; i < 2; i++) {
+                            InterestingPoints.Point p = interestingPoints.query(this, coors[i * 2], coors[i * 2 + 1]);
+                            if (p != null) {
+                                // delta snap
+                                float dx = p.x - coors[i * 2];
+                                float dy = p.y - coors[i * 2 + 1];
+                                coors[0] += dx;
+                                coors[1] += dy;
+                                coors[2] += dx;
+                                coors[3] += dy;
+                                snapped = true;
+                                break;
+                            }
                         }
-                    }
-                    if (!snapped) {
+                        if (!snapped) {
+                            lastX = e.getX();
+                            lastY = e.getY();
+                        }
+                    } else {
                         lastX = e.getX();
                         lastY = e.getY();
                     }
@@ -121,7 +133,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     // dragging one point
                     // snap to ip
 
-                    InterestingPoints.Point p = interestingPoints.query(e.getX(), e.getY());
+                    InterestingPoints.Point p = interestingPoints.query(this, e.getX(), e.getY());
                     if (p != null) {
                         // single snap
                         coors[currentIndex] = p.x;
@@ -149,7 +161,7 @@ public class ActionStraightLine extends AbstractPaintActionExtendsView {
                     removeAllInterestingPoints();
                     addAllInterestingPoints();
                     if (currentIndex != -1) {
-                        SOMEONE_DRAGGING = false;
+                        SHIFTING_LOCK = false;
                     }
                     currentIndex = -1;
                     if (currentState == ActionState.STARTED) {

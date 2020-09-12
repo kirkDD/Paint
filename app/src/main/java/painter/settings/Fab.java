@@ -22,6 +22,7 @@ import painter.actions.ActionPen;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
 import painter.actions.ActionStroke;
+import painter.help.Calculator;
 
 
 /**
@@ -56,7 +57,7 @@ public class Fab extends AbstractSetting {
             // draw a big circle
             // and small sections
             paint.setStyle(Paint.Style.FILL);
-            paint.setColor(getContrastColor(paper.getBackgroundColor()));
+            paint.setColor(Calculator.CONTRAST_COLOR(paper.getBackgroundColor()));
             paint.setAlpha(70);
             canvas.drawCircle(iLeft + iW / 2f, iTop + iH / 2f, iconRadius * 4, paint);
             paint.setAlpha(140);
@@ -94,7 +95,7 @@ public class Fab extends AbstractSetting {
         }
 
         paint.setTextSize(iconRadius / 1.7f);
-        paint.setColor(getContrastColor(paper.getBackgroundColor()));
+        paint.setColor(Calculator.CONTRAST_COLOR(paper.getBackgroundColor()));
         paint.setAlpha(iconAlpha);
         paint.setStyle(Paint.Style.FILL);
         paint.setStrokeWidth(iconRadius / 3f);
@@ -108,7 +109,7 @@ public class Fab extends AbstractSetting {
 
         // show state
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(getContrastColor(paper.getBackgroundColor()) == Color.WHITE ? Color.BLACK : Color.WHITE);
+        paint.setColor(Calculator.CONTRAST_COLOR(paper.getBackgroundColor()) == Color.WHITE ? Color.BLACK : Color.WHITE);
         if (paper.isPanning()) {
             paint.setStrokeWidth(8);
             paint.setStyle(Paint.Style.STROKE);
@@ -127,7 +128,7 @@ public class Fab extends AbstractSetting {
         // draw dragging indicator
         if (dragging) {
             paint.setStyle(Paint.Style.FILL);
-            paint.setColor(getContrastColor(paper.getBackgroundColor()));
+            paint.setColor(Calculator.CONTRAST_COLOR(paper.getBackgroundColor()));
             paint.setAlpha(120);
             canvas.drawCircle(iLeft + iW / 2f, iTop + iH / 2f, iconRadius * 2, paint);
         }
@@ -149,7 +150,7 @@ public class Fab extends AbstractSetting {
 
     @Override
     public boolean inIcon(float xPos, float yPos) {
-        return dist(xPos, yPos, iLeft + iW / 2f, iTop + iH / 2f) < Math.min(iW, iH) / 2f + 40; // 40 spare
+        return Calculator.DIST(xPos, yPos, iLeft + iW / 2f, iTop + iH / 2f) < Math.min(iW, iH) / 2f + 40; // 40 spare
     }
 
     // pieAction
@@ -177,7 +178,7 @@ public class Fab extends AbstractSetting {
 //                },1000);
                 invalidate();
             case MotionEvent.ACTION_MOVE:
-                if (dist(sX, sY, e.getX(), e.getY()) > 50 && !(dragging || pieing)) {
+                if (Calculator.DIST(sX, sY, e.getX(), e.getY()) > 50 && !(dragging || pieing)) {
                     if (System.currentTimeMillis() - touchDownTime > 500) {
                         dragging = true;
                     } else {
@@ -190,7 +191,7 @@ public class Fab extends AbstractSetting {
                     invalidate();
                 } else if (pieing) {
                     // update pieAction
-                    if (dist(iLeft + iW /2f,iTop + iH / 2f,e.getX(), e.getY()) < iconRadius) {
+                    if (Calculator.DIST(iLeft + iW /2f,iTop + iH / 2f,e.getX(), e.getY()) < iconRadius) {
                         pieAction = -1;
                     } else {
                         double angle = Math.atan2(e.getY() - (iTop + iH / 2f), e.getX() - (iLeft + iW / 2f));

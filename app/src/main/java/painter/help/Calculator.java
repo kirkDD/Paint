@@ -22,4 +22,20 @@ public class Calculator {
         }
         return y >= 128 ? Color.BLACK : Color.WHITE;
     }
+
+
+    // in degrees
+    public static double ANGLE_BETWEEN(float a, float b, float x, float y) {
+        return Math.atan2(a - x, b - y) * 180 / Math.PI;
+    }
+
+    // in degrees
+    public static float SNAP_ANGLE(float angle) {
+        for (int i = -180; i <= 180; i += 45) {
+            if (Math.abs(angle - i) < 3) {
+                return i;
+            }
+        }
+        return angle;
+    }
 }

@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.CollapsibleActionView;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.webkit.WebHistoryItem;
@@ -37,6 +38,7 @@ import painter.actions.ActionPen;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
 import painter.actions.ActionStroke;
+import painter.help.Calculator;
 import painter.help.InterestingPoints;
 import painter.settings.Colors;
 
@@ -144,7 +146,8 @@ public class Paper extends FrameLayout {
         if (action != actionClass) {
             previousActionClass = actionClass;
         }
-        if (erasing) toggleEraseMode();
+        if (isErasing()) toggleEraseMode();
+        if (isPanning()) togglePanningMode();
         finishAction();
         actionClass = action;
         initCurrentAction();
@@ -337,9 +340,10 @@ public class Paper extends FrameLayout {
                 internalPaint.setPathEffect(null);
             }
             // debug ?? show interesting points
-            theOneAndOnlyPaint.setColor();
+            internalPaint.setColor(Calculator.CONTRAST_COLOR(background_color));
+            internalPaint.setStyle(Paint.Style.FILL);
             for (InterestingPoints.Point p : interestingPoints.allPoints()) {
-                canvas.drawCircle(p.x, p.y, 10, theOneAndOnlyPaint);
+                canvas.drawCircle(p.x, p.y, 8, internalPaint);
             }
 
         }
@@ -605,8 +609,11 @@ public class Paper extends FrameLayout {
                 for (Integer i : panningIndexes) {
                     history.get(i).handleTouch(e);
                 }
+                // DEBUG: show interesting points
+                invalidate();
             }
         }
+        AbstractPaintActionExtendsView.GROUP_SELECTED = panningIndexes.size() > 1;
         return true;
     }
 

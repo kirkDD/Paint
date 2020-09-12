@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import java.util.HashMap;
 
 import painter.actions.AbstractPaintActionExtendsView;
+import painter.help.Calculator;
 
 public class Shapes extends AbstractSetting {
 
@@ -53,7 +54,7 @@ public class Shapes extends AbstractSetting {
         if (action == null) {
             return;
         }
-        paint.setColor(getContrastColor(paper.getBackgroundColor()));
+        paint.setColor(Calculator.CONTRAST_COLOR(paper.getBackgroundColor()));
         paint.setTextSize(iH * 0.75f);
         int actionStringId = shapesMap.get(action);
         canvas.drawText(paper.getContext().getResources().getString(actionStringId),

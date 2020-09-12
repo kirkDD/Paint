@@ -6,6 +6,8 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 
+import painter.help.Calculator;
+
 public class Strokes extends AbstractSetting {
 
     static final float MIN_STROKE_W = 5;
@@ -66,7 +68,7 @@ public class Strokes extends AbstractSetting {
 //        paint.setAlpha(200);
 //        canvas.drawCircle(iconBox.centerX(), iconBox.centerY(), iW / 3f, paint);
 
-        paint.setColor(getContrastColor(paper.getBackgroundColor()));
+        paint.setColor(Calculator.CONTRAST_COLOR(paper.getBackgroundColor()));
         paint.setStyle(STROKE_STYLE);
         canvas.drawCircle(iconBox.centerX(), iconBox.centerY(), iW / 3f, paint);
 
@@ -163,7 +165,9 @@ public class Strokes extends AbstractSetting {
                 }
                 if (nextStyleIndex == -1) {
                     // might be changing size
-                    if (dist(e.getX() - iW, e.getY(), strokeStyleBox[0].centerX(), (strokeStyleBox[2].bottom + mH) / 2) < STROKE_WIDTH / 2 + 40) {
+                    if (Calculator.DIST(e.getX() - iW, e.getY(),
+                            strokeStyleBox[0].centerX(), (strokeStyleBox[2].bottom + mH) / 2)
+                            < STROKE_WIDTH / 2 + 40) {
                         nextStyleIndex = 4;
                     }
                 }

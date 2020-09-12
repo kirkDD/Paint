@@ -26,10 +26,18 @@ public class InterestingPoints {
         pointCloud = new NaiveCloud();
     }
 
-    public Point query(float x, float y) {
+    public Point query(Object o, float x, float y) {
         // linear implementation
         Point p = pointCloud.closest(x, y);
-        if (p != null && dist(x, y, p.x, p.y) < SNAP_RADIUS) {
+        // ownership test: don't snap to yourself
+        if (pointStorage.containsKey(o)) {
+            for (Point myPoints : pointStorage.get(o)) {
+                if (myPoints.equals(p)) {
+                    return null;
+                }
+            }
+        }
+        if (p != null && Calculator.DIST(x, y, p.x, p.y) < SNAP_RADIUS) {
             return p;
         }
         return null;
@@ -83,9 +91,7 @@ public class InterestingPoints {
     }
 
 
-    static double dist(float x1, float y1, float x2, float y2) {
-        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-    }
+
 
 
     // debug
@@ -158,7 +164,7 @@ public class InterestingPoints {
             double min = Double.POSITIVE_INFINITY;
             Point re = null;
             for (Point p : pool) {
-                double dist = InterestingPoints.dist(x, y, p.x, p.y);
+                double dist = Calculator.DIST(x, y, p.x, p.y);
                 if (dist < min) {
                     min = dist;
                     re = p;

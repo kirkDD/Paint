@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
+import painter.help.Calculator;
+
 public class UndoRedoClear extends AbstractSetting {
     @Override
     void privateInit() {
@@ -20,7 +22,7 @@ public class UndoRedoClear extends AbstractSetting {
         canvas.save();
         canvas.translate(iLeft + iW / 2f, iTop + iH / 2f);
         canvas.rotate(90);
-        paint.setColor(getContrastColor(paper.getBackgroundColor()));
+        paint.setColor(Calculator.CONTRAST_COLOR(paper.getBackgroundColor()));
         paint.setTextSize(iW);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         canvas.drawText("\u27f2", -iH / 7f, iW / 3.5f, paint);
@@ -86,7 +88,7 @@ public class UndoRedoClear extends AbstractSetting {
                     invalidate();
                 }
                 // check for a click
-                if (dist(startX, startY, e.getX(), e.getY()) > 20) {
+                if (Calculator.DIST(startX, startY, e.getX(), e.getY()) > 20) {
                     clicking = false;
                 }
                 break;

@@ -7,6 +7,8 @@ import android.graphics.Paint;
 
 import java.util.Arrays;
 
+import painter.help.Calculator;
+
 public class ActionArrow extends ActionStraightLine {
     static final String TAG = "-=-= ActionArrow";
 
@@ -41,7 +43,7 @@ public class ActionArrow extends ActionStraightLine {
         // translate and rotate?
         paint.setColor(thisColor);
         canvas.translate(coors[2], coors[3]);
-        canvas.rotate(180f + (float) angleBetween(coors[1], coors[0], coors[3], coors[2]));
+        canvas.rotate(180f + (float) Calculator.ANGLE_BETWEEN(coors[1], coors[0], coors[3], coors[2]));
         canvas.drawVertices(Canvas.VertexMode.TRIANGLE_FAN, 6, triangle, 0, null, 0,
                 colors, 0, null, 0, 0, paint);
     }

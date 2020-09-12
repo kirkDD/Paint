@@ -24,8 +24,6 @@ import painter.help.InterestingPoints;
 public abstract class AbstractPaintActionExtendsView extends View {
     static final String TAG = "-=-= Abstract Action";
 
-    static final int EDIT_TOUCH_RADIUS = 40;
-
     // snap to interesting points
     static InterestingPoints interestingPoints;
     public void setInterestingPoints(InterestingPoints ip) {
@@ -66,9 +64,18 @@ public abstract class AbstractPaintActionExtendsView extends View {
 //            R.string.test_action
     };
 
+    static final int EDIT_TOUCH_RADIUS = 40;
+
     static final Xfermode HIGHLIGHT_PAINT_MODE = new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY);
     static final float HIGHLIGHT_STROKE_WIDTH = 4f;
     static final int HIGHLIGHT_ALPHA = 125;
+
+    // for multi-select
+    // if one action is DRAGGING a point, instead of
+    // everybody shifting, we skip and don't shift
+    public static boolean GROUP_SELECTED = false;
+    static boolean SHIFTING_LOCK = false;
+    static Object SHIFTING_LOCKER = null;
 
     static Paint abstractActionPaint;
 
@@ -111,11 +118,6 @@ public abstract class AbstractPaintActionExtendsView extends View {
                     getHeight() / 2f - quickBoxWidth,
                     getWidth(),
                     getHeight() / 2f + quickBoxWidth);
-            toggleFillBox = new RectF(getWidth() - quickBoxWidth ,
-                    getHeight() / 2f - quickBoxWidth * 3,
-                    getWidth(),
-                    getHeight() / 2f - quickBoxWidth);
-
         }
 
 
@@ -186,13 +188,13 @@ public abstract class AbstractPaintActionExtendsView extends View {
                     return true;
                     // skip this event
                 }
-//            } else if (toggleFillBoxTouched(e.getX(), e.getY())) {
-//                toggleFill();
-//                abstractSkippingEvent = true;
-//                startButtonClickedAnimation(toggleFillBox, e.getX(), e.getY());
-//                return true;
             }
         }
+
+//        if (SHIFTING_LOCK && SHIFTING_LOCKER != this) {
+//            return true;
+//        }
+        // leave to Actions to handle this
         return false;
     }
 
@@ -309,29 +311,6 @@ public abstract class AbstractPaintActionExtendsView extends View {
         invalidate();
     }
 
-    /**
-     * useful helpers
-     */
-
-    double dist(float a, float b, float x, float y) {
-        return Math.sqrt(Math.pow(a - x, 2) + Math.pow(b - y, 2));
-    }
-
-    // in degrees
-    double angleBetween(float a, float b, float x, float y) {
-        return Math.atan2(a - x, b - y) * 180 / Math.PI;
-    }
-
-    // in degrees
-    float snapAngle(float angle) {
-        for (int i = -180; i <= 180; i += 45) {
-            if (Math.abs(angle - i) < 3) {
-                return i;
-            }
-        }
-        return angle;
-    }
-
 
     public enum ActionState {
         NEW, STARTED, FINISHED, REVISING;
@@ -360,17 +339,6 @@ public abstract class AbstractPaintActionExtendsView extends View {
                 quickEditBox.contains(x, y);
     }
 
-    static RectF toggleFillBox;
-
-    boolean toggleFillBoxTouched(float x, float y) {
-        return toggleFillBox != null && toggleFillBox.contains(x, y);
-    }
-
-
-    // internal sub classing
-    void toggleFill() {
-
-    }
 
     /**
      * for copy paste, if failed return null

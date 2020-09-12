@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import cse340.undo.R;
+import painter.help.Calculator;
 
 public class PaperStates extends AbstractSetting {
 
@@ -54,7 +55,7 @@ public class PaperStates extends AbstractSetting {
     @Override
     public void drawIcon(Canvas canvas) {
         super.drawIcon(canvas);
-        paint.setColor(getContrastColor(paper.getBackgroundColor()));
+        paint.setColor(Calculator.CONTRAST_COLOR(paper.getBackgroundColor()));
         paint.setStyle(Paint.Style.FILL);
         if (paper.isErasing()) {
             canvas.drawText(icons[2], iLeft + iW / 2f,
@@ -102,11 +103,11 @@ public class PaperStates extends AbstractSetting {
         paint.setStyle(Paint.Style.FILL);
         for (int i = 0; i < states.length; i++) {
             RectF box = states[i];
-            paint.setColor(getContrastColor(paper.getBackgroundColor()));
+            paint.setColor(Calculator.CONTRAST_COLOR(paper.getBackgroundColor()));
             paint.setAlpha(220);
             paint.setStyle(Paint.Style.FILL);
             canvas.drawRoundRect(box, 10, 10, paint);
-            paint.setColor(getContrastColor(paint.getColor()));
+            paint.setColor(Calculator.CONTRAST_COLOR(paint.getColor()));
             if (i == 1) {
                 drawPanningIcon(canvas, box.centerX(), box.centerY(), box.height() / 2.8f);
             } else {

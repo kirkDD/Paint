@@ -10,6 +10,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import painter.help.Calculator;
+
 
 public class ActionStroke extends AbstractPaintActionExtendsView {
     
@@ -88,7 +90,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
                 index = e.findPointerIndex(pointerId);
                 if (index == -1) return true;
                 if (currentState == ActionState.STARTED) {
-                    if (dist(lastX, lastY, e.getX(index), e.getY(index)) >= MIN_MOVE_DIST) {
+                    if (Calculator.DIST(lastX, lastY, e.getX(index), e.getY(index)) >= MIN_MOVE_DIST) {
                         myPath.quadTo(lastX,lastY,
                                 (lastX + e.getX(index)) / 2f,
                                 (lastY + e.getY(index)) / 2f);
@@ -179,7 +181,7 @@ public class ActionStroke extends AbstractPaintActionExtendsView {
         } else if (action == 2) {
             // rotate
             pathTransform.setRotate(
-                    snapAngle((float) -angleBetween(boundCX, boundCY, e.getX(), e.getY())),
+                    Calculator.SNAP_ANGLE((float) -Calculator.ANGLE_BETWEEN(boundCX, boundCY, e.getX(), e.getY())),
                     boundCX, boundCY);
         }
         savedPath.transform(pathTransform, myPath);

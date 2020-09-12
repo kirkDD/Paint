@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
+import painter.help.Calculator;
+
 public class ActionNumbers extends ActionStroke {
 
     StringBuilder stringBuilder;
@@ -33,7 +35,7 @@ public class ActionNumbers extends ActionStroke {
         // only add numbers when drawing, not revising
         if (e.getActionMasked() != MotionEvent.ACTION_DOWN) {
             // threshold to bypass multitouch
-            distMoved += dist(lX, lY, e.getX(), e.getY());
+            distMoved += Calculator.DIST(lX, lY, e.getX(), e.getY());
         }
         lX = e.getX();
         lY = e.getY();
