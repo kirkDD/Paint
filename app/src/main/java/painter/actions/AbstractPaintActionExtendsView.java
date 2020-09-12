@@ -67,7 +67,7 @@ public abstract class AbstractPaintActionExtendsView extends View {
     static final int EDIT_TOUCH_RADIUS = 40;
 
     static final Xfermode HIGHLIGHT_PAINT_MODE = new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY);
-    static final float HIGHLIGHT_STROKE_WIDTH = 4f;
+    static final float HIGHLIGHT_STROKE_WIDTH = 2;
     static final int HIGHLIGHT_ALPHA = 125;
 
     // for multi-select

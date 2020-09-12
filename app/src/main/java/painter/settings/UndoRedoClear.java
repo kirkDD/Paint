@@ -31,7 +31,11 @@ public class UndoRedoClear extends AbstractSetting {
         if (state != 0) {
             paint.setTextSize(450);
             paint.setAlpha(100);
-            canvas.drawText("" + state, mW / 2f, mH / 2f, paint);
+            if (state > 0) {
+                canvas.drawText("+" + state, mW / 2f, mH / 2f + paint.getTextSize() / 2 - paint.descent() / 2, paint);
+            } else {
+                canvas.drawText("" + state, mW / 2f, mH / 2f + paint.getTextSize() / 2 - paint.descent() / 2, paint);
+            }
         }
         if (clear) {
             paint.setTextSize(300);

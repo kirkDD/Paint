@@ -124,17 +124,22 @@ public class Colors extends AbstractSetting {
                         return true;
                     }
                 }
+                nextColorBoxIndex = -1;
                 return true;
             case MotionEvent.ACTION_UP:
-                if (nextColorBoxIndex != currColorIndex) {
+                if (nextColorBoxIndex != -1 && nextColorBoxIndex != currColorIndex) {
                     prevColorIndex = currColorIndex;
                     currColorIndex = nextColorBoxIndex;
                     selectedColorXOff = 0;
                     changeColor();
                     END_MAIN_ACTION.run();
                 } else {
-                    // edit color
-                    START_MAIN_ACTION.run();
+                    if (nextColorBoxIndex != -1) {
+                        // edit color
+                        START_MAIN_ACTION.run();
+                    } else {
+                        END_MAIN_ACTION.run();
+                    }
                 }
                 invalidate();
                 return true;

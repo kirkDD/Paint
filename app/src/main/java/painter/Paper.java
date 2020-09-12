@@ -343,7 +343,7 @@ public class Paper extends FrameLayout {
             internalPaint.setColor(Calculator.CONTRAST_COLOR(background_color));
             internalPaint.setStyle(Paint.Style.FILL);
             for (InterestingPoints.Point p : interestingPoints.allPoints()) {
-                canvas.drawCircle(p.x, p.y, 8, internalPaint);
+                canvas.drawCircle(p.x, p.y, 4, internalPaint);
             }
 
         }
@@ -456,13 +456,16 @@ public class Paper extends FrameLayout {
     float panX, panY;
     float panLastX, panLastY;
     boolean skipPan;
+    RectF panFinishBox;
+    RectF panDuplicateBox;
     RectF panMoveToFrontBox;
     RectF panMoveToBackBox;
-    RectF panDuplicateBox;
     RectF panDeleteBox;
     void drawPanningQuickActionBox(Canvas c) {
         if (panMoveToFrontBox == null) {
-            float top = getHeight() / 1.5f;
+            float top = getHeight() / 1.7f;
+            panFinishBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
+            top += 100;
             panDuplicateBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
             top += 100;
             panMoveToFrontBox = new RectF(getWidth() - 100, top, getWidth(), top + 100);
@@ -474,22 +477,27 @@ public class Paper extends FrameLayout {
         // draw boxes
         internalPaint.setColor(Color.BLACK);
         internalPaint.setStyle(Paint.Style.FILL);
+        c.drawRect(panFinishBox, internalPaint);
+        c.drawRect(panDuplicateBox, internalPaint);
         c.drawRect(panMoveToFrontBox, internalPaint);
         c.drawRect(panMoveToBackBox, internalPaint);
-        c.drawRect(panDuplicateBox, internalPaint);
         c.drawRect(panDeleteBox, internalPaint);
         internalPaint.setTextSize(panMoveToFrontBox.height() / 2);
         internalPaint.setTextAlign(Paint.Align.CENTER);
         internalPaint.setColor(Color.WHITE);
+
+        c.drawText("\u2713", panFinishBox.centerX(),
+                panFinishBox.centerY() + internalPaint.getTextSize() / 2 - internalPaint.descent() / 2,
+                internalPaint);
+
+        c.drawText("⧉", panDuplicateBox.centerX(),
+                panDuplicateBox.centerY() + internalPaint.getTextSize() / 2 - internalPaint.descent() / 2,
+                internalPaint);
         c.drawText("▲", panMoveToFrontBox.centerX(),
                 panMoveToFrontBox.centerY() + internalPaint.getTextSize() / 2 - internalPaint.descent() / 2,
                 internalPaint);
         c.drawText("▼", panMoveToBackBox.centerX(),
                 panMoveToBackBox.centerY() + internalPaint.getTextSize() / 2 - internalPaint.descent() / 2,
-                internalPaint);
-
-        c.drawText("⧉", panDuplicateBox.centerX(),
-                panDuplicateBox.centerY() + internalPaint.getTextSize() / 2 - internalPaint.descent() / 2,
                 internalPaint);
 
         c.drawText("⊗", panDeleteBox.centerX(),
@@ -554,7 +562,16 @@ public class Paper extends FrameLayout {
         } else {
             if (e.getActionMasked() == MotionEvent.ACTION_DOWN) {
                 // record time
-                if (panMoveToFrontBox.contains(e.getX(), e.getY())) {
+                if (panFinishBox.contains(e.getX(), e.getY())) {
+                    // deselect all
+                    // copied from cancel
+                    for (int i : panningIndexes) {
+                        history.get(i).focusLost();
+                    }
+                    panningIndexes.clear();
+                    invalidate();
+                    skipPan = true;
+                } else if (panMoveToFrontBox.contains(e.getX(), e.getY())) {
                     // moving to front
                     panningIndexes = shiftZIndex(panningIndexes, true);
                     skipPan = true;
@@ -572,6 +589,7 @@ public class Paper extends FrameLayout {
                         AbstractPaintActionExtendsView dup = history.get(i).duplicate();
                         if (dup == null) continue;
                         history.add(dup);
+                        dup.addingToView();
                         addView(dup);
                         dup.editButtonClicked();
                         panningIndexes.add(history.size() - 1);
@@ -585,6 +603,7 @@ public class Paper extends FrameLayout {
                     for (int i : tempList) {
                         redoStack.push(history.get(i));
                         history.get(i).focusLost();
+                        history.get(i).removingFromView();
                         removeView(history.remove(i));
                     }
                 } else if (Math.abs(panX - e.getX()) + Math.abs(panY - e.getY()) < 80 &&

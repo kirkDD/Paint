@@ -123,7 +123,7 @@ public class ActionTriangle extends AbstractPaintActionExtendsView {
                         if (pos[0] - pos[4] == 0) {
                             // vertical
                             pos[3] = (pos[1] + pos[5]) / 2;
-                            pos[2] = (float) (pos[0] + Math.sqrt(3) / 2 * (pos[1] - pos[5]));
+                            pos[2] = (float) (pos[0] + Math.sqrt(3) / 2 * (pos[5] - pos[1]));
                         } else {
                             float slope = (pos[5] - pos[1]) / (pos[4] - pos[0]);
                             slope = -1 / slope;
