@@ -26,6 +26,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <Button
+        android:layout_marginTop="@dimen/fab_label_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="connect"
+        android:onClick="connect"/>
+
 </FrameLayout>
     <cse340.undo.app.ColorPickerView
         android:id="@+id/colorpicker"

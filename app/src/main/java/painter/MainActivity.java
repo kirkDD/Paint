@@ -1,26 +1,24 @@
 package painter;
 
-import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.util.Arrays;
 
 import cse340.undo.R;
-import cse340.undo.app.ReversibleDrawingActivity;
 import painter.actions.ActionArrow;
 import painter.actions.ActionLetters;
 import painter.actions.ActionNumbers;
@@ -28,8 +26,7 @@ import painter.actions.ActionOval;
 import painter.actions.ActionRectangle;
 import painter.actions.ActionStraightLine;
 import painter.actions.ActionStroke;
-import painter.superactions.AbstractSuperAction;
-import painter.superactions.ActionSave;
+import painter.help.ContentPusher;
 
 public class MainActivity extends AppCompatActivity {
     static final String TAG = "-=-= MainActivity";
@@ -42,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private SparseIntArray mMenusLastId;
 
     private int mFabMargin;
+
+    private ContentPusher contentPusher;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,15 +67,24 @@ public class MainActivity extends AppCompatActivity {
 //        findViewById(R.id.fab_undo).setOnClickListener((v) -> paper.undo());
 //        findViewById(R.id.fab_redo).setOnClickListener((v) -> paper.redo());
 
-        SuperActionManager superActionManager = new SuperActionManager(this);
-        superActionManager.setPaper(paper);
+//        SuperActionManager superActionManager = new SuperActionManager(this);
+//        superActionManager.setPaper(paper);
 
         ((PaperController) findViewById(R.id.paperController)).setPaper(paper);
 
-        addContentView(superActionManager, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+//        addContentView(superActionManager, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
 //        getPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
+        contentPusher = new ContentPusher(paper);
+//        new Handler().postDelayed(() -> contentPusher.connect(
+//                () -> runOnUiThread(() -> Toast.makeText(this, "connected", Toast.LENGTH_LONG).show()),
+//                () -> runOnUiThread(() -> Toast.makeText(this, "failed to connect", Toast.LENGTH_LONG).show())), 1000);
+    }
 
+    public void connect(View v) {
+        contentPusher.connect(
+                () -> runOnUiThread(() -> Toast.makeText(this, "connected", Toast.LENGTH_LONG).show()),
+                () -> runOnUiThread(() -> Toast.makeText(this, "failed to connect", Toast.LENGTH_LONG).show()));
     }
 
     void getPermission(String[] permissions) {
