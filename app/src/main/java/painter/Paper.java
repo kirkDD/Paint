@@ -174,6 +174,9 @@ public class Paper extends FrameLayout {
 //            histYTarget = 0;
 //        }
         // erasing
+//        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+            state += 1;
+//        }
         if (erasing) {
             eraseAction(event);
             invalidate();
@@ -805,6 +808,11 @@ public class Paper extends FrameLayout {
         }
     }
 
+    // for sync
 
+    int state;
+    public int getState() {
+        return state;
+    }
 
 }

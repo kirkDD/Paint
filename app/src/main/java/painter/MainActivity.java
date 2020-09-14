@@ -81,10 +81,16 @@ public class MainActivity extends AppCompatActivity {
 //                () -> runOnUiThread(() -> Toast.makeText(this, "failed to connect", Toast.LENGTH_LONG).show())), 1000);
     }
 
+    boolean connectedOrNot;
     public void connect(View v) {
-        contentPusher.connect(
-                () -> runOnUiThread(() -> Toast.makeText(this, "connected", Toast.LENGTH_LONG).show()),
-                () -> runOnUiThread(() -> Toast.makeText(this, "failed to connect", Toast.LENGTH_LONG).show()));
+        connectedOrNot = !connectedOrNot;
+        if (connectedOrNot) {
+            contentPusher.connect(
+                    () -> runOnUiThread(() -> Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show()),
+                    () -> runOnUiThread(() -> Toast.makeText(this, "dis connected", Toast.LENGTH_SHORT).show()));
+        } else {
+            contentPusher.disconnect();
+        }
     }
 
     void getPermission(String[] permissions) {

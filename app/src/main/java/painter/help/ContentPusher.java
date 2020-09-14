@@ -9,9 +9,12 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 import painter.Paper;
 
@@ -35,30 +38,47 @@ public class ContentPusher {
     class NetworkThread extends Thread {
         @Override
         public void run() {
+            int paperState = -1;
             while (true) {
-                synchronized (LOCK) {
-                    try {
-                        LOCK.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                if (SIGNAL == SIGDISC) {
+                    // just don't connect
+                    CONNECTED = false;
+                    if (FAIL != null) {
+                        FAIL.run();
                     }
-                }
-                if (SIGNAL == SIGCONN) {
-                    startConnection();
-                } else if (SIGNAL == SIGDISC) {
-                    // todo disconnect
-                } else {
-                    return;
+                    synchronized (LOCK) {
+                        try {
+                            LOCK.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else if (SIGNAL == SIGCONN) {
+                    if (paperState != paper.getState()) {
+                        paperState = paper.getState();
+                        startConnection();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                 }
             }
         }
 
+        /**
+         * more like send
+         */
         void startConnection() {
             Log.d(TAG, "startConnection");
-            if (CONNECTED) {
-//                SUCCEED.run();
-//                return;
-            }
             if (canvas == null) {
                 FAIL.run();
                 Log.d(TAG, "startConnection: canvas is null");
@@ -73,26 +93,32 @@ public class ContentPusher {
                 OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
 
                 paper.draw(canvas);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
-
-//                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-//                byte[] b = new byte[16];
-//                while ((in.read(b) + 1 & -2) != 0) {
-//                    Log.d(TAG, "startConnection: " + new String(b));
-//                }
-                out.flush();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+//                Buffer ok = ByteBuffer.allocate(bitmap.getByteCount());
+//                bitmap.copyPixelsToBuffer(ok);
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                byte[] b = new byte[16];
+                while ((in.read(b) + 1 & -2) != 0) {
+                    Log.d(TAG, "startConnection: received " + new String(b));
+                }
+                in.close();
+//                out.flush();
             } catch (IOException e) {
                 Log.e(TAG, "startConnection: url error", e);
-                e.printStackTrace();
-                FAIL.run();
+//                e.printStackTrace();
+                ContentPusher.this.disconnect();
                 return;
             } finally {
                 urlConnection.disconnect();
             }
             Log.d(TAG, "startConnection: communication finished");
+            if (!CONNECTED) {
+                SUCCEED.run();
+            }
             CONNECTED = true;
-            SUCCEED.run();
+
         }
+
     }
 
     static boolean CONNECTED;
